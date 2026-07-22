@@ -109,54 +109,24 @@
     const toastTitle = document.getElementById('toast-title');
     const toastDesc = document.getElementById('toast-desc');
 
-    // 1. Gestione Autenticazione (se Firebase attivo)
+    // 1. Gestione Autenticazione (Bypassa login form, usa auth anonima se disponibile)
+    loginView.style.display = "none";
+    appContent.style.display = "block";
+    nav.style.display = "flex";
+    btnLogout.style.display = "none";
+    loadDefaultValues();
+    loadClientsHistory();
+
     if (firebaseActive) {
-      auth.onAuthStateChanged(user => {
-        if (user) {
-          // Daniela è loggata
-          loginView.style.display = "none";
-          appContent.style.display = "block";
-          nav.style.display = "flex";
-          btnLogout.style.display = "block";
-          loadDefaultValues();
-          loadClientsHistory();
-        } else {
-          // Daniela deve loggarsi
-          loginView.style.display = "flex";
-          appContent.style.display = "none";
-          nav.style.display = "none";
-          btnLogout.style.display = "none";
-        }
-      });
-
-      loginForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
-
-        showToast("Accesso in corso", "Verifica delle credenziali...", "loading");
-
-        auth.signInWithEmailAndPassword(email, password)
-          .then(() => {
-            hideToast();
-          })
-          .catch(error => {
-            console.error(error);
-            showToast("Errore di Accesso", "Email o password errate. Riprova.", "error", 3000);
-          });
-      });
-
-      btnLogout.addEventListener('click', function() {
-        auth.signOut().then(() => {
-          window.location.reload();
+      auth.signInAnonymously()
+        .then(() => {
+          console.log("Autenticazione anonima completata con successo.");
+        })
+        .catch(error => {
+          console.error("Autenticazione anonima fallita. Verifica che sia abilitata nella console di Firebase:", error);
         });
-      });
     } else {
       // Modalità Offline (senza auth)
-      loginView.style.display = "none";
-      appContent.style.display = "block";
-      nav.style.display = "flex";
-      btnLogout.style.display = "none";
       
       // Aggiungi un indicatore visuale dell'offline
       const logoSpan = document.querySelector('.logo span');
