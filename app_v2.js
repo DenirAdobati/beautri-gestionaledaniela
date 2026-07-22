@@ -202,12 +202,10 @@ window.addEventListener('unhandledrejection', function(e) {
           <label>Tipo di Seduta</label>
           <select class="treat-type-select" required>
             <option value="" disabled ${!data.name ? 'selected' : ''}>Seleziona...</option>
-            <option value="BEAUTRÌ CHECK">BEAUTRÌ CHECK</option>
-            <option value="CONSULENZA BEAUTRICO">CONSULENZA BEAUTRICO</option>
-            <option value="IGIENIZZAZIONE CUTE">IGIENIZZAZIONE CUTE</option>
-            <option value="DETOSSINAZIONE CUTE">DETOSSINAZIONE CUTE</option>
-            <option value="FOTOBIOSTIMOLAZIONE LASER">FOTOBIOSTIMOLAZIONE LASER</option>
-            <option value="TRATTAMENTO RIGENERANTE">TRATTAMENTO RIGENERANTE</option>
+            <option value="IGENIZZARE/PURIFICARE">IGENIZZARE/PURIFICARE</option>
+            <option value="LENIRE">LENIRE</option>
+            <option value="DETOSSINARE">DETOSSINARE</option>
+            <option value="NUTRIRE">NUTRIRE</option>
             <option value="Altro / Personalizzato">Altro / Personalizzato...</option>
           </select>
           <input type="text" class="custom-treat-input" placeholder="Specifica..." style="display: none; margin-top: 5px;">
