@@ -106,42 +106,26 @@
           <div class="q-card">
             <h3 class="form-title">
               <i data-lucide="sparkles" style="color: var(--gold); width: 22px; height: 22px;"></i>
-              Percorso Personalizzato
+              Percorso Personalizzato (Sedute Proposte)
             </h3>
             
-            <div class="form-grid-2">
-              <div class="form-group">
-                <label for="treatment-type">Tipo di Trattamento</label>
-                <select id="treatment-type" required>
-                  <option value="" disabled selected>Seleziona un trattamento...</option>
-                  <option value="BEAUTRÌ CHECK">BEAUTRÌ CHECK</option>
-                  <option value="CONSULENZA BEAUTRICO">CONSULENZA BEAUTRICO</option>
-                  <option value="DETOSSINARE P. + CUT">DETOSSINARE P. + CUT</option>
-                  <option value="DETOSSINARE P.">DETOSSINARE P.</option>
-                  <option value="FOTOBIOSTIMOLAZIONE LASER">FOTOBIOSTIMOLAZIONE LASER</option>
-                  <option value="PERCORSO TRICOLOGO CADUTA">PERCORSO TRICOLOGO CADUTA</option>
-                  <option value="PERCORSO RIGENERANTE CUTE">PERCORSO RIGENERANTE CUTE</option>
-                  <option value="Altro / Personalizzato">Altro / Personalizzato...</option>
-                </select>
-              </div>
-              <div class="form-group" id="custom-treatment-group" style="display: none;">
-                <label for="custom-treatment">Specifica Trattamento</label>
-                <input type="text" id="custom-treatment" placeholder="Es. Detossinazione Plus">
-              </div>
+            <div class="products-container" id="treatments-container" style="margin-bottom: 14px;">
+              <!-- I trattamenti inseriti dinamicamente compariranno qui -->
             </div>
+            
+            <button type="button" class="add-prod-btn" id="add-treatment" style="margin-bottom: 20px;">
+              <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+              Aggiungi Tipo di Seduta
+            </button>
 
-            <div class="form-grid-3" style="margin-top: 14px;">
-              <div class="form-group">
-                <label for="sessions-count">Sedute</label>
-                <input type="number" id="sessions-count" min="1" max="100" placeholder="Es. 6" required>
-              </div>
-              <div class="form-group">
-                <label for="price">Costo Totale (€)</label>
-                <input type="number" id="price" min="0" step="0.01" placeholder="Es. 450" required>
-              </div>
+            <div class="form-grid-2" style="border-top: 2px solid var(--bg); padding-top: 18px;">
               <div class="form-group">
                 <label for="expiry-date">Offerta Valida Fino Al</label>
                 <input type="date" id="expiry-date" required>
+              </div>
+              <div class="form-group" style="text-align: right; display: flex; flex-direction: column; justify-content: center; align-items: flex-end;">
+                <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--gray); margin-bottom: 4px;">Costo Totale Stimato</span>
+                <span id="estimated-total-price" style="font-size: 24px; font-weight: 800; color: var(--gold-hover);">€ 0,00</span>
               </div>
             </div>
           </div>

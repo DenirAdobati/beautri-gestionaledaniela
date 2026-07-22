@@ -427,6 +427,29 @@ select:focus {
   color: #fff;
 }
 
+.treatment-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.2fr auto;
+  gap: 10px;
+  align-items: end;
+  background: var(--gray-light);
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  animation: fadeUp .18s ease both;
+  margin-bottom: 10px;
+}
+
+.treatment-row .form-group {
+  margin-bottom: 0;
+}
+
+@media(max-width: 480px) {
+  .treatment-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
 .add-prod-btn {
   width: 100%;
   padding: 10px;

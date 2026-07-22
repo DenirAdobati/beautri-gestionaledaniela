@@ -97,11 +97,9 @@ window.addEventListener('unhandledrejection', function(e) {
     const fileNameLabel = document.getElementById('file-name-label');
     const fileRemove = document.getElementById('file-remove');
     
-    const treatmentType = document.getElementById('treatment-type');
-    const customTreatmentGroup = document.getElementById('custom-treatment-group');
-    const customTreatment = document.getElementById('custom-treatment');
-    const sessionsCount = document.getElementById('sessions-count');
-    const price = document.getElementById('price');
+    const treatmentsContainer = document.getElementById('treatments-container');
+    const addTreatmentBtn = document.getElementById('add-treatment');
+    const estimatedTotalPrice = document.getElementById('estimated-total-price');
     const expiryDate = document.getElementById('expiry-date');
     const productsContainer = document.getElementById('products-container');
     const addProductBtn = document.getElementById('add-product');
@@ -192,16 +190,104 @@ window.addEventListener('unhandledrejection', function(e) {
       });
     });
 
-    // 3. Gestione Form Trattamento Personalizzato
-    treatmentType.addEventListener('change', function() {
-      if (this.value === 'Altro / Personalizzato') {
-        customTreatmentGroup.style.display = "block";
-        customTreatment.setAttribute('required', 'required');
-      } else {
-        customTreatmentGroup.style.display = "none";
-        customTreatment.removeAttribute('required');
+    // 3. Gestione Trattamenti/Sedute Dinamici
+    function addTreatmentRow(data = {}) {
+      const treatId = 'treat_' + Date.now() + Math.random().toString(36).substring(2, 5);
+      const row = document.createElement('div');
+      row.className = 'treatment-row';
+      row.id = treatId;
+
+      row.innerHTML = `
+        <div class="form-group">
+          <label>Tipo di Seduta</label>
+          <select class="treat-type-select" required>
+            <option value="" disabled ${!data.name ? 'selected' : ''}>Seleziona...</option>
+            <option value="BEAUTRÌ CHECK">BEAUTRÌ CHECK</option>
+            <option value="CONSULENZA BEAUTRICO">CONSULENZA BEAUTRICO</option>
+            <option value="IGIENIZZAZIONE CUTE">IGIENIZZAZIONE CUTE</option>
+            <option value="DETOSSINAZIONE CUTE">DETOSSINAZIONE CUTE</option>
+            <option value="FOTOBIOSTIMOLAZIONE LASER">FOTOBIOSTIMOLAZIONE LASER</option>
+            <option value="TRATTAMENTO RIGENERANTE">TRATTAMENTO RIGENERANTE</option>
+            <option value="Altro / Personalizzato">Altro / Personalizzato...</option>
+          </select>
+          <input type="text" class="custom-treat-input" placeholder="Specifica..." style="display: none; margin-top: 5px;">
+        </div>
+        <div class="form-group">
+          <label>N. Sedute</label>
+          <input type="number" min="1" value="${data.sessionsCount || 1}" required class="treat-qty-input">
+        </div>
+        <div class="form-group">
+          <label>Costo Cad. (€)</label>
+          <input type="number" min="0" step="0.01" value="${data.pricePerSession !== undefined ? data.pricePerSession : ''}" placeholder="Costo cad." required class="treat-price-input">
+        </div>
+        <button type="button" class="remove-prod-btn remove-treat-btn" title="Rimuovi seduta">&times;</button>
+      `;
+
+      const select = row.querySelector('.treat-type-select');
+      const customInput = row.querySelector('.custom-treat-input');
+      const qtyInput = row.querySelector('.treat-qty-input');
+      const priceInput = row.querySelector('.treat-price-input');
+      const removeBtn = row.querySelector('.remove-treat-btn');
+
+      // Se ci sono dati pre-caricati
+      if (data.name) {
+        const optionExists = Array.from(select.options).some(opt => opt.value === data.name);
+        if (optionExists) {
+          select.value = data.name;
+        } else {
+          select.value = "Altro / Personalizzato";
+          customInput.value = data.name;
+          customInput.style.display = "block";
+          customInput.setAttribute('required', 'required');
+        }
       }
-    });
+
+      // Mostra/nascondi custom input
+      select.addEventListener('change', function() {
+        if (this.value === 'Altro / Personalizzato') {
+          customInput.style.display = 'block';
+          customInput.setAttribute('required', 'required');
+        } else {
+          customInput.style.display = 'none';
+          customInput.removeAttribute('required');
+        }
+        recalculateEstimatedTotal();
+      });
+
+      // Calcola totale quando cambiano i valori
+      qtyInput.addEventListener('input', recalculateEstimatedTotal);
+      priceInput.addEventListener('input', recalculateEstimatedTotal);
+
+      // Rimozione riga
+      removeBtn.addEventListener('click', function() {
+        // Impedisci di rimuovere se è l'unica riga
+        if (treatmentsContainer.querySelectorAll('.treatment-row').length <= 1) {
+          showToast("Azione non consentita", "Devi inserire almeno un tipo di seduta per la proposta.", "error", 2000);
+          return;
+        }
+        row.remove();
+        recalculateEstimatedTotal();
+      });
+
+      treatmentsContainer.appendChild(row);
+      recalculateEstimatedTotal();
+    }
+
+    function recalculateEstimatedTotal() {
+      let total = 0;
+      const rows = treatmentsContainer.querySelectorAll('.treatment-row');
+      rows.forEach(row => {
+        const qty = parseInt(row.querySelector('.treat-qty-input').value) || 0;
+        const price = parseFloat(row.querySelector('.treat-price-input').value) || 0;
+        total += qty * price;
+      });
+      estimatedTotalPrice.textContent = `€ ${total.toFixed(2)}`;
+    }
+
+    addTreatmentBtn.addEventListener('click', () => addTreatmentRow());
+    
+    // Inizializza con un trattamento vuoto
+    addTreatmentRow();
 
     // 4. Gestione Dropzone Drag-and-Drop per PDF
     ['dragenter', 'dragover'].forEach(eventName => {
@@ -292,12 +378,44 @@ window.addEventListener('unhandledrejection', function(e) {
       e.preventDefault();
 
       const clientNameVal = document.getElementById('client-name').value.trim();
-      const treatmentVal = treatmentType.value === 'Altro / Personalizzato' ? customTreatment.value.trim() : treatmentType.value;
-      const sessionsVal = parseInt(sessionsCount.value);
-      const priceVal = parseFloat(price.value);
       const expiryDateVal = expiryDate.value;
       const menuLinkVal = menuLink.value.trim();
       const salonHoursVal = salonHours.value.trim();
+
+      // Raccogli trattamenti/sedute
+      const finalTreatments = [];
+      let totalSessions = 0;
+      let totalPrice = 0;
+      
+      document.querySelectorAll('.treatment-row').forEach(row => {
+        const select = row.querySelector('.treat-type-select');
+        const customInput = row.querySelector('.custom-treat-input');
+        const qty = parseInt(row.querySelector('.treat-qty-input').value) || 0;
+        const priceCad = parseFloat(row.querySelector('.treat-price-input').value) || 0;
+        
+        let name = select.value;
+        if (name === "Altro / Personalizzato") {
+          name = customInput.value.trim() || "Trattamento Personalizzato";
+        }
+        
+        if (name) {
+          finalTreatments.push({
+            name,
+            sessionsCount: qty,
+            pricePerSession: priceCad
+          });
+          totalSessions += qty;
+          totalPrice += qty * priceCad;
+        }
+      });
+
+      if (finalTreatments.length === 0) {
+        showToast("Trattamento mancante", "Inserisci almeno un tipo di seduta per la proposta.", "error", 3000);
+        return;
+      }
+
+      // Genera un nome cumulativo per la visualizzazione nello storico
+      const mainTreatmentName = finalTreatments.map(t => `${t.sessionsCount}x ${t.name}`).join(", ");
 
       if (!selectedPdfFile) {
         showToast("File mancante", "Carica il report PDF della cute per generare la scheda.", "error", 3000);
@@ -339,9 +457,10 @@ window.addEventListener('unhandledrejection', function(e) {
             id: clientId,
             name: clientNameVal,
             pdfUrl: pdfUrl,
-            treatment: treatmentVal,
-            sessions: sessionsVal,
-            price: priceVal,
+            treatment: mainTreatmentName,
+            sessions: totalSessions,
+            price: totalPrice,
+            treatments: finalTreatments,
             expiryDate: expiryDateVal,
             products: finalProducts,
             menuLink: menuLinkVal,
@@ -362,9 +481,10 @@ window.addEventListener('unhandledrejection', function(e) {
             id: clientId,
             name: clientNameVal,
             pdfUrl: pdfUrl,
-            treatment: treatmentVal,
-            sessions: sessionsVal,
-            price: priceVal,
+            treatment: mainTreatmentName,
+            sessions: totalSessions,
+            price: totalPrice,
+            treatments: finalTreatments,
             expiryDate: expiryDateVal,
             products: finalProducts,
             menuLink: menuLinkVal,
@@ -429,8 +549,8 @@ window.addEventListener('unhandledrejection', function(e) {
       productsContainer.innerHTML = "";
       recommendedProducts = [];
       
-      customTreatmentGroup.style.display = "none";
-      customTreatment.removeAttribute('required');
+      treatmentsContainer.innerHTML = "";
+      addTreatmentRow();
 
       loadDefaultValues();
 
@@ -669,7 +789,7 @@ window.addEventListener('unhandledrejection', function(e) {
     const displayClientName = document.getElementById('display-client-name');
     const displayDate = document.getElementById('display-date');
     const btnViewPdf = document.getElementById('btn-view-pdf');
-    const displayTreatment = document.getElementById('display-treatment');
+    const displayTreatmentsList = document.getElementById('display-treatments-list');
     const displaySessions = document.getElementById('display-sessions');
     const displayPrice = document.getElementById('display-price');
     const cardProductsSection = document.getElementById('card-products-section');
@@ -750,9 +870,52 @@ window.addEventListener('unhandledrejection', function(e) {
       };
 
       // Percorso
-      displayTreatment.textContent = data.treatment;
-      displaySessions.textContent = data.sessions;
-      displayPrice.textContent = `€ ${data.price.toFixed(2)}`;
+      displayTreatmentsList.innerHTML = "";
+      
+      let treatmentsList = [];
+      if (data.treatments && data.treatments.length > 0) {
+        treatmentsList = data.treatments;
+      } else if (data.treatment) {
+        // Fallback per vecchie consulenze nel database
+        treatmentsList = [{
+          name: data.treatment,
+          sessionsCount: data.sessions || 1,
+          pricePerSession: data.sessions ? (data.price / data.sessions) : data.price
+        }];
+      }
+
+      let totalSessions = 0;
+      let totalPrice = 0;
+
+      treatmentsList.forEach(t => {
+        totalSessions += t.sessionsCount;
+        totalPrice += t.sessionsCount * t.pricePerSession;
+
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'prod-item';
+        itemDiv.style.background = '#fff';
+        itemDiv.style.border = '1.5px solid var(--border)';
+        itemDiv.style.boxShadow = 'none';
+        itemDiv.style.display = 'flex';
+        itemDiv.style.justifyContent = 'space-between';
+        itemDiv.style.alignItems = 'center';
+        itemDiv.style.padding = '12px 14px';
+
+        itemDiv.innerHTML = `
+          <div style="text-align: left; display: flex; flex-direction: column;">
+            <span class="prod-name" style="font-size: 15px;">${t.name}</span>
+            <span style="font-size: 11px; color: var(--gray); margin-top: 2px; font-weight: 500;">Pagamento seduta per seduta</span>
+          </div>
+          <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end;">
+            <span style="font-weight: 800; color: var(--gold-hover); font-size: 16px;">€ ${t.pricePerSession.toFixed(2)} <span style="font-size: 10px; font-weight: 600; color: var(--gray);">/ cad.</span></span>
+            <span style="font-size: 11px; font-weight: 700; color: var(--dark); margin-top: 2px;">N. Sedute: ${t.sessionsCount}</span>
+          </div>
+        `;
+        displayTreatmentsList.appendChild(itemDiv);
+      });
+
+      displaySessions.textContent = totalSessions;
+      displayPrice.textContent = `€ ${totalPrice.toFixed(2)}`;
 
       // Prodotti
       if (data.products && data.products.length > 0) {

@@ -71,23 +71,22 @@
       <div class="q-card">
         <h3 class="form-title">
           <i data-lucide="sparkles" style="color: var(--gold); width: 22px; height: 22px;"></i>
-          Il tuo Percorso Consigliato
+          Il tuo Percorso Consigliato (Sedute Proposte)
         </h3>
         
-        <div class="offer-grid">
-          <div class="offer-item">
-            <div class="offer-label">Trattamento</div>
-            <div class="offer-val-sm" id="display-treatment">Trattamento Base</div>
-          </div>
-          <div class="offer-item">
-            <div class="offer-label">Sedute Totali</div>
-            <div class="offer-val" id="display-sessions">6</div>
-          </div>
+        <div id="display-treatments-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+          <!-- Popolato via JS con le righe delle sedute -->
         </div>
 
-        <div class="offer-item" style="margin-bottom: 0;">
-          <div class="offer-label">Costo Complessivo Percorso</div>
-          <div class="offer-val price" id="display-price">€ 450,00</div>
+        <div class="offer-grid" style="border-top: 1.5px solid var(--border); padding-top: 16px;">
+          <div class="offer-item">
+            <div class="offer-label">Sedute Totali</div>
+            <div class="offer-val" id="display-sessions">0</div>
+          </div>
+          <div class="offer-item">
+            <div class="offer-label">Valore Totale Percorso</div>
+            <div class="offer-val price" id="display-price">€ 0,00</div>
+          </div>
         </div>
       </div>
 
