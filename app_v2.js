@@ -16,8 +16,8 @@ window.addEventListener('unhandledrejection', function(e) {
   let firebaseActive = false;
 
   // Dati di default
-  const DEFAULT_MENU = "https://menu.beautri.it/";
-  const DEFAULT_HOURS = "Lunedì - Venerdì: 09:00 - 19:30\nSabato: 09:00 - 18:00\nDomenica: Chiuso";
+  const DEFAULT_MENU = "https://menu.beautri.it";
+  const DEFAULT_HOURS = "Lunedì: Chiuso\nMartedì: 13:30 - 21:00\nMercoledì: 13:30 - 21:00\nGiovedì: 09:00 - 12:00 / 14:00 - 18:45\nVenerdì: 09:00 - 12:00 / 14:00 - 19:30\nSabato: 08:00 - 17:30\nDomenica: Chiuso";
 
   // Prodotti caricati in memoria (Daniela)
   let recommendedProducts = [];
