@@ -28,6 +28,13 @@ window.addEventListener('unhandledrejection', function(e) {
   // Inizializzazione Firebase
   function initFirebase() {
     try {
+      // Controlla se Firebase è abilitato
+      const isFirebaseEnabled = localStorage.getItem('beautri_firebase_enabled') !== 'false';
+      if (!isFirebaseEnabled) {
+        console.log("Firebase disabilitato dall'utente. Avvio in modalità Offline.");
+        return;
+      }
+
       // Controlla se ci sono impostazioni in localStorage, altrimenti usa quelle globali
       const savedConfig = localStorage.getItem('beautri_firebase_config');
       const config = savedConfig ? JSON.parse(savedConfig) : window.FIREBASE_CONFIG_LOCAL;
@@ -572,6 +579,9 @@ window.addEventListener('unhandledrejection', function(e) {
       const savedConfig = localStorage.getItem('beautri_firebase_config');
       const currentConfig = savedConfig ? JSON.parse(savedConfig) : window.FIREBASE_CONFIG_LOCAL;
 
+      const isFirebaseEnabled = localStorage.getItem('beautri_firebase_enabled') !== 'false';
+      document.getElementById('set-firebase-enable').checked = isFirebaseEnabled;
+
       if (currentConfig) {
         document.getElementById('set-api-key').value = currentConfig.apiKey || "";
         document.getElementById('set-project-id').value = currentConfig.projectId || "";
@@ -594,6 +604,9 @@ window.addEventListener('unhandledrejection', function(e) {
 
     settingsForm.onsubmit = function(e) {
       e.preventDefault();
+      
+      const isChecked = document.getElementById('set-firebase-enable').checked;
+      localStorage.setItem('beautri_firebase_enabled', isChecked ? 'true' : 'false');
       
       const newConfig = {
         apiKey: document.getElementById('set-api-key').value.trim(),
