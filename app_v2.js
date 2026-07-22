@@ -346,8 +346,28 @@ window.addEventListener('unhandledrejection', function(e) {
 
       productRow.innerHTML = `
         <div class="form-group">
-          <label>Nome Prodotto</label>
-          <input type="text" placeholder="Es. Shampoo Detossinante" required class="prod-name-input">
+          <label>Prodotto consigliato</label>
+          <select class="prod-select" required>
+            <option value="" disabled selected>Seleziona prodotto...</option>
+            <option value="Lozione SOFT">Lozione SOFT</option>
+            <option value="Lozione ACTIVE">Lozione ACTIVE</option>
+            <option value="Lozione PRO">Lozione PRO</option>
+            <option value="Shampoo Nutriente">Shampoo Nutriente</option>
+            <option value="Shampoo Caduta GOLD">Shampoo Caduta GOLD</option>
+            <option value="Shampoo Caduta SILVER">Shampoo Caduta SILVER</option>
+            <option value="Shampoo Caduta PLATINUM">Shampoo Caduta PLATINUM</option>
+            <option value="Shampoo Purificante">Shampoo Purificante</option>
+            <option value="Shampoo Equilibrante">Shampoo Equilibrante</option>
+            <option value="Shampoo Forfora">Shampoo Forfora</option>
+            <option value="Shampoo Delicato">Shampoo Delicato</option>
+            <option value="Emulsione Lenitiva">Emulsione Lenitiva</option>
+            <option value="Emulsione Avvolgente">Emulsione Avvolgente</option>
+            <option value="Maschera Rigenerante">Maschera Rigenerante</option>
+            <option value="Maschera Nutriente">Maschera Nutriente</option>
+            <option value="Conditioner Idratante">Conditioner Idratante</option>
+            <option value="Altro / Personalizzato">Altro / Personalizzato...</option>
+          </select>
+          <input type="text" class="custom-prod-input" placeholder="Specifica prodotto..." style="display: none; margin-top: 5px;">
         </div>
         <div class="form-group">
           <label>Quantità</label>
@@ -356,10 +376,24 @@ window.addEventListener('unhandledrejection', function(e) {
         <button type="button" class="remove-prod-btn" title="Rimuovi prodotto">&times;</button>
       `;
 
+      const select = productRow.querySelector('.prod-select');
+      const customInput = productRow.querySelector('.custom-prod-input');
+
       // Gestione rimozione prodotto
       productRow.querySelector('.remove-prod-btn').addEventListener('click', function() {
         productRow.remove();
         recommendedProducts = recommendedProducts.filter(p => p.id !== prodId);
+      });
+
+      // Gestione mostra/nascondi custom input
+      select.addEventListener('change', function() {
+        if (this.value === 'Altro / Personalizzato') {
+          customInput.style.display = 'block';
+          customInput.setAttribute('required', 'required');
+        } else {
+          customInput.style.display = 'none';
+          customInput.removeAttribute('required');
+        }
       });
 
       productsContainer.appendChild(productRow);
@@ -431,8 +465,15 @@ window.addEventListener('unhandledrejection', function(e) {
         // Raccogli i prodotti inseriti
         const finalProducts = [];
         document.querySelectorAll('.product-row').forEach(row => {
-          const name = row.querySelector('.prod-name-input').value.trim();
-          const qty = parseInt(row.querySelector('.prod-qty-input').value);
+          const select = row.querySelector('.prod-select');
+          const customInput = row.querySelector('.custom-prod-input');
+          const qty = parseInt(row.querySelector('.prod-qty-input').value) || 1;
+          
+          let name = select.value;
+          if (name === "Altro / Personalizzato") {
+            name = customInput.value.trim() || "Prodotto Personalizzato";
+          }
+          
           if (name) {
             finalProducts.push({ name, qty });
           }
