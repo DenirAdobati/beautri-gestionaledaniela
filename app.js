@@ -1,5 +1,13 @@
 // app.js - Logica applicativa del gestionale Beautri Tricologia
 
+// Cattura errori di runtime globali per renderli visibili a schermo durante i test
+window.addEventListener('error', function(e) {
+  alert("Errore di Sistema:\n" + (e.error ? e.error.stack || e.error.message : e.message));
+});
+window.addEventListener('unhandledrejection', function(e) {
+  alert("Errore di Promise non gestito (Rejection):\n" + (e.reason ? e.reason.stack || e.reason.message || e.reason : e));
+});
+
 (function() {
   // ── STATO GLOBALE DELL'APPLICAZIONE ──
   let db = null;
@@ -32,6 +40,13 @@
         db = firebase.firestore();
         storage = firebase.storage();
         auth = firebase.auth();
+        
+        // Imposta i limiti di retry per Storage (5 secondi) per evitare hang infiniti
+        if (storage) {
+          storage.setMaxUploadRetryTime(5000);
+          storage.setMaxOperationRetryTime(5000);
+        }
+        
         firebaseActive = true;
         console.log("Firebase inizializzato correttamente.");
       } else {
@@ -299,12 +314,20 @@
         });
 
         if (firebaseActive) {
-          // 1. Carica PDF su Firebase Storage
+          // 1. Assicurati che l'utente sia autenticato prima di caricare
+          if (!auth.currentUser) {
+            console.log("Nessun utente autenticato. Tentativo di accesso anonimo...");
+            await auth.signInAnonymously();
+          }
+
+          // 2. Carica PDF su Firebase Storage
+          console.log("Avvio upload PDF...");
           const storageRef = storage.ref().child(`consulenze_tricologia/${clientId}_${selectedPdfFile.name}`);
           const uploadTask = await storageRef.put(selectedPdfFile);
           pdfUrl = await uploadTask.ref.getDownloadURL();
+          console.log("Upload completato con successo. URL:", pdfUrl);
 
-          // 2. Salva scheda cliente su Firestore
+          // 3. Salva scheda cliente su Firestore
           const docData = {
             id: clientId,
             name: clientNameVal,
