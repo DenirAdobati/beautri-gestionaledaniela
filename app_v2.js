@@ -281,7 +281,9 @@ window.addEventListener('unhandledrejection', function(e) {
         const price = parseFloat(row.querySelector('.treat-price-input').value) || 0;
         total += qty * price;
       });
-      estimatedTotalPrice.textContent = `€ ${total.toFixed(2)}`;
+      if (estimatedTotalPrice) {
+        estimatedTotalPrice.textContent = `€ ${total.toFixed(2)}`;
+      }
     }
 
     addTreatmentBtn.addEventListener('click', () => addTreatmentRow());
@@ -790,8 +792,7 @@ window.addEventListener('unhandledrejection', function(e) {
     const displayDate = document.getElementById('display-date');
     const btnViewPdf = document.getElementById('btn-view-pdf');
     const displayTreatmentsList = document.getElementById('display-treatments-list');
-    const displaySessions = document.getElementById('display-sessions');
-    const displayPrice = document.getElementById('display-price');
+    const displayPaymentPlan = document.getElementById('display-payment-plan');
     const cardProductsSection = document.getElementById('card-products-section');
     const displayProductsList = document.getElementById('display-products-list');
     
@@ -914,8 +915,50 @@ window.addEventListener('unhandledrejection', function(e) {
         displayTreatmentsList.appendChild(itemDiv);
       });
 
-      displaySessions.textContent = totalSessions;
-      displayPrice.textContent = `€ ${totalPrice.toFixed(2)}`;
+      // Generazione del Piano di Pagamento (Seduta per Seduta)
+      if (displayPaymentPlan) {
+        displayPaymentPlan.innerHTML = "";
+        
+        if (treatmentsList.length === 1) {
+          const t = treatmentsList[0];
+          displayPaymentPlan.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; background: var(--gray-light); padding: 12px 14px; border-radius: var(--radius-sm);">
+              <span style="font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase;">Costo a Seduta</span>
+              <span style="font-size: 18px; font-weight: 800; color: var(--gold-hover);">€ ${t.pricePerSession.toFixed(2)}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding: 0 14px;">
+              <span style="font-size: 12px; font-weight: 600; color: var(--gray);">Sedute Totali</span>
+              <span style="font-size: 14px; font-weight: 700; color: var(--black);">${t.sessionsCount} sedute</span>
+            </div>
+          `;
+        } else if (treatmentsList.length > 1) {
+          let html = `
+            <div style="font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.05em;">
+              Piano di Pagamento (Seduta per Seduta)
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+          `;
+          
+          treatmentsList.forEach((t, index) => {
+            let label = "";
+            if (index === 0) {
+              label = `Le prime ${t.sessionsCount} sedute`;
+            } else {
+              label = `Le successive ${t.sessionsCount} sedute`;
+            }
+            
+            html += `
+              <div style="display: flex; justify-content: space-between; align-items: center; background: var(--gray-light); padding: 10px 14px; border-radius: var(--radius-sm);">
+                <span style="font-size: 13px; font-weight: 600; color: var(--dark);">${label}</span>
+                <span style="font-size: 15px; font-weight: 800; color: var(--gold-hover);">€ ${t.pricePerSession.toFixed(2)} <span style="font-size: 10px; font-weight: 600; color: var(--gray);">/ cad.</span></span>
+              </div>
+            `;
+          });
+          
+          html += `</div>`;
+          displayPaymentPlan.innerHTML = html;
+        }
+      }
 
       // Prodotti
       if (data.products && data.products.length > 0) {
