@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>La tua Consulenza Personalizzata — Beautri</title>
+  <link rel="icon" type="image/png" href="https://beautri.it/wp-content/uploads/2020/02/cropped-favicon_beautri-270x270.png">
+  <link rel="apple-touch-icon" href="https://beautri.it/wp-content/uploads/2020/02/cropped-favicon_beautri-270x270.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="client-body">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-top">
+      <span class="logo">BEAUTRÌ <span>TRICOLOGIA</span></span>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main" style="padding-top: 10px;">
+    
+    <!-- LOADER STATE -->
+    <div id="client-loader" class="done-card" style="margin-top: 40px; padding: 60px 20px;">
+      <div class="toast-icon loading">
+        <i data-lucide="loader-2" style="width: 32px; height: 32px; animation: spin 2s linear infinite;"></i>
+      </div>
+      <h2>Caricamento in corso</h2>
+      <p>Stiamo preparando la tua consulenza personalizzata...</p>
+    </div>
+
+    <!-- ERROR STATE -->
+    <div id="client-error" class="done-card" style="display: none; margin-top: 40px;">
+      <div class="toast-icon error">✕</div>
+      <h2>Consulenza Non Trovata</h2>
+      <p>Il link che hai inserito potrebbe essere scaduto o non valido. Contatta il centro per maggiori informazioni.</p>
+      <button type="button" class="btn-gold" onclick="window.open('https://beautri.it/', '_blank')">
+        <i data-lucide="home" style="width: 18px; height: 18px;"></i>
+        Visita il nostro sito
+      </button>
+    </div>
+
+    <!-- CONTENT STATE (hidden until loaded) -->
+    <div id="client-content" style="display: none;">
+      
+      <!-- Titolo di Benvenuto -->
+      <div class="client-header">
+        <div class="client-welcome">Consulenza Personalizzata</div>
+        <h1 class="client-title" id="display-client-name">Nome Cliente</h1>
+        <p class="client-intro" id="display-date">Consulenza effettuata il 22/07/2026</p>
+      </div>
+
+      <!-- REPORT FOTOGRAFICO (PDF CARD) -->
+      <div class="pdf-card">
+        <i data-lucide="file-text" class="pdf-icon"></i>
+        <div>
+          <h3 class="pdf-title">Analisi Cute e Capelli</h3>
+          <p class="pdf-desc">Visualizza il report fotografico microscopico completo eseguito durante la consulenza.</p>
+        </div>
+        <button type="button" class="btn-gold" id="btn-view-pdf" style="margin-top: 8px;">
+          <i data-lucide="eye" style="width: 18px; height: 18px;"></i>
+          Visualizza Report PDF
+        </button>
+      </div>
+
+      <!-- PROPOSTA DI PERCORSO -->
+      <div class="q-card">
+        <h3 class="form-title">
+          <i data-lucide="sparkles" style="color: var(--gold); width: 22px; height: 22px;"></i>
+          Il tuo Percorso Consigliato
+        </h3>
+        
+        <div class="offer-grid">
+          <div class="offer-item">
+            <div class="offer-label">Trattamento</div>
+            <div class="offer-val-sm" id="display-treatment">Trattamento Base</div>
+          </div>
+          <div class="offer-item">
+            <div class="offer-label">Sedute Totali</div>
+            <div class="offer-val" id="display-sessions">6</div>
+          </div>
+        </div>
+
+        <div class="offer-item" style="margin-bottom: 0;">
+          <div class="offer-label">Costo Complessivo Percorso</div>
+          <div class="offer-val price" id="display-price">€ 450,00</div>
+        </div>
+      </div>
+
+      <!-- PRODOTTI CONSIGLIATI (se presenti) -->
+      <div class="q-card" id="card-products-section" style="display: none;">
+        <h3 class="form-title">
+          <i data-lucide="package" style="color: var(--gold); width: 22px; height: 22px;"></i>
+          Autocura Domiciliare Consigliata
+        </h3>
+        <ul class="prod-list" id="display-products-list">
+          <!-- Popolato via JS -->
+        </ul>
+      </div>
+
+      <!-- COUNTDOWN VALIDITA' OFFERTA -->
+      <div class="countdown-box" id="countdown-container" style="display: none;">
+        <div class="countdown-title" id="countdown-title-text">L'offerta scade tra:</div>
+        <div class="countdown-timer" id="countdown-timer">
+          <div class="timer-part">
+            <span class="timer-num" id="timer-days">00</span>
+            <span class="timer-lbl">Giorni</span>
+          </div>
+          <span class="timer-sep">:</span>
+          <div class="timer-part">
+            <span class="timer-num" id="timer-hours">00</span>
+            <span class="timer-lbl">Ore</span>
+          </div>
+          <span class="timer-sep">:</span>
+          <div class="timer-part">
+            <span class="timer-num" id="timer-mins">00</span>
+            <span class="timer-lbl">Minuti</span>
+          </div>
+          <span class="timer-sep">:</span>
+          <div class="timer-part">
+            <span class="timer-num" id="timer-secs">00</span>
+            <span class="timer-lbl">Secondi</span>
+          </div>
+        </div>
+        <div id="offer-expired-text" style="display: none; font-size: 14px; font-weight: 700; color: var(--red);">
+          Proposta scaduta il 22/07/2026
+        </div>
+      </div>
+
+      <!-- MENU TRATTAMENTI -->
+      <div class="q-card" style="text-align: center;">
+        <h3 class="form-title" style="justify-content: center;">
+          <i data-lucide="book-open" style="color: var(--gold); width: 22px; height: 22px;"></i>
+          Menù Trattamenti
+        </h3>
+        <p style="font-size: 14px; color: var(--gray); margin-bottom: 16px;">
+          Sfoglia il nostro listino per scoprire nel dettaglio i nostri percorsi e trattamenti speciali.
+        </p>
+        <button type="button" class="btn-dark" id="btn-view-menu">
+          <i data-lucide="external-link" style="width: 18px; height: 18px;"></i>
+          Apri Menù Beautrì
+        </button>
+      </div>
+
+      <!-- ORARI DEL CENTRO -->
+      <div class="hours-card">
+        <h4 class="hours-title">
+          <i data-lucide="clock" style="color: var(--gold); width: 18px; height: 18px;"></i>
+          Orari di Apertura del Centro
+        </h4>
+        <p class="hours-text" id="display-hours">
+          Lunedì - Sabato: 09:00 - 19:00
+          Domenica: Chiuso
+        </p>
+      </div>
+
+      <!-- CONTATTACI VIA WHATSAPP -->
+      <div style="margin-top: 24px; margin-bottom: 40px;">
+        <button type="button" class="btn-gold" id="btn-whatsapp-contact">
+          <i data-lucide="message-circle" style="width: 18px; height: 18px;"></i>
+          Richiedi Info su WhatsApp
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Firebase SDK Compat (App, Firestore) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <!-- Local Config & App Logic -->
+  <script src="firebase-config.js"></script>
+  <script src="app.js"></script>
+
+  <script>
+    // Initialize lucide icons
+    lucide.createIcons();
+  </script>
+</body>
+</html>
