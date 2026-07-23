@@ -504,6 +504,34 @@ select:focus {
   transform: translateY(0);
 }
 
+.btn-whatsapp {
+  width: 100%;
+  padding: 14px 24px;
+  background: #25D366;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: white;
+  cursor: pointer;
+  transition: all .2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2);
+}
+
+.btn-whatsapp:hover {
+  background: #20ba5a;
+  transform: translateY(-1px);
+}
+
+.btn-whatsapp:active {
+  transform: translateY(0);
+}
+
 .btn-dark {
   width: 100%;
   padding: 14px 24px;
@@ -1007,6 +1035,7 @@ select:focus {
   padding-bottom: 6px;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
 }
 
@@ -1014,6 +1043,8 @@ select:focus {
   font-size: 14px;
   color: var(--dark);
   white-space: pre-line;
+  text-align: center;
+  line-height: 1.8;
 }
 
 /* Settings modal style */

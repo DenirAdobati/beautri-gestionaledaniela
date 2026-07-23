@@ -1064,8 +1064,25 @@ window.addEventListener('unhandledrejection', function(e) {
         window.open(data.menuLink || DEFAULT_MENU, '_blank');
       };
 
-      // Orari
-      displayHours.textContent = data.salonHours || DEFAULT_HOURS;
+      // Orari con evidenziazione dei giorni di apertura in grassetto
+      const rawHours = data.salonHours || DEFAULT_HOURS;
+      let formattedHoursHTML = "";
+      if (rawHours) {
+        const lines = rawHours.split('\n');
+        formattedHoursHTML = lines.map(line => {
+          const lower = line.toLowerCase();
+          const isOpenDay = lower.includes('marted') || 
+                            lower.includes('mercoled') || 
+                            lower.includes('gioved') || 
+                            lower.includes('venerd') || 
+                            lower.includes('sabat');
+          if (isOpenDay) {
+            return `<strong>${line}</strong>`;
+          }
+          return `<span style="color: var(--gray);">${line}</span>`;
+        }).join('<br>');
+      }
+      displayHours.innerHTML = formattedHoursHTML;
 
       // WhatsApp Contact
       const waText = `Ciao Daniela, ho appena visualizzato la mia consulenza personalizzata del ${formattedDate}. Vorrei avere maggiori informazioni sul mio percorso!`;

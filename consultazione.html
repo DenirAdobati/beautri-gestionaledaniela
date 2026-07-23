@@ -49,7 +49,7 @@
       
       <!-- Titolo di Benvenuto -->
       <div class="client-header">
-        <div class="client-welcome">Consulenza Personalizzata</div>
+        <div class="client-welcome">Consulenza Beautrìco</div>
         <h1 class="client-title" id="display-client-name">Nome Cliente</h1>
         <p class="client-intro" id="display-date">Consulenza effettuata il 22/07/2026</p>
       </div>
@@ -71,7 +71,7 @@
       <div class="q-card">
         <h3 class="form-title">
           <i data-lucide="sparkles" style="color: var(--gold); width: 22px; height: 22px;"></i>
-          Il tuo Percorso Consigliato (Sedute Proposte)
+          Il tuo Percorso Personalizzato
         </h3>
         
         <div id="display-treatments-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
@@ -127,14 +127,10 @@
       <div class="q-card" style="text-align: center;">
         <h3 class="form-title" style="justify-content: center;">
           <i data-lucide="book-open" style="color: var(--gold); width: 22px; height: 22px;"></i>
-          Menù Trattamenti
+          Scopri il nostro menù
         </h3>
-        <p style="font-size: 14px; color: var(--gray); margin-bottom: 16px;">
-          Sfoglia il nostro listino per scoprire nel dettaglio i nostri percorsi e trattamenti speciali.
-        </p>
-        <button type="button" class="btn-dark" id="btn-view-menu">
-          <i data-lucide="external-link" style="width: 18px; height: 18px;"></i>
-          Apri Menù Beautrì
+        <button type="button" class="btn-dark" id="btn-view-menu" style="margin-top: 16px;">
+          Clicca qui per scoprire il menù
         </button>
       </div>
 
@@ -151,10 +147,14 @@
       </div>
 
       <!-- CONTATTACI VIA WHATSAPP -->
-      <div style="margin-top: 24px; margin-bottom: 40px;">
-        <button type="button" class="btn-gold" id="btn-whatsapp-contact">
-          <i data-lucide="message-circle" style="width: 18px; height: 18px;"></i>
-          Richiedi Info su WhatsApp
+      <!-- CONTATTACI VIA WHATSAPP -->
+      <div style="text-align: center; margin-top: 32px; margin-bottom: 48px;">
+        <p style="font-size: 15px; font-weight: 600; color: var(--dark); margin-bottom: 12px;">
+          Se hai dubbi o domande, scrivici su WhatsApp
+        </p>
+        <button type="button" class="btn-whatsapp" id="btn-whatsapp-contact">
+          <i data-lucide="message-circle" style="width: 20px; height: 20px;"></i>
+          Scrivici su WhatsApp
         </button>
       </div>
 
@@ -168,8 +168,8 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 
   <!-- Local Config & App Logic -->
-  <script src="firebase-config-v2.js?v=13"></script>
-  <script src="app_v3.js?v=13"></script>
+  <script src="firebase-config-v2.js?v=14"></script>
+  <script src="app_v3.js?v=14"></script>
 
   <script>
     // Initialize lucide icons
