@@ -28,23 +28,18 @@ window.addEventListener('unhandledrejection', function(e) {
   // Inizializzazione Firebase
   function initFirebase() {
     try {
+      // Pulisci vecchie chiavi obsolete salvate in localStorage per prevenire conflitti
+      localStorage.removeItem('beautri_firebase_config');
+
       const isClientPage = document.getElementById('display-client-name') !== null;
       let config = window.FIREBASE_CONFIG_LOCAL;
 
-      if (isClientPage) {
-        // Il cliente si collega SEMPRE e SOLO alla configurazione cloud ufficiale di default
-        console.log("Inizializzazione Firebase in modalità Cliente...");
-      } else {
+      if (!isClientPage) {
         // Amministratore (Daniela): controlla se Firebase è abilitato
         const isFirebaseEnabled = localStorage.getItem('beautri_firebase_enabled') !== 'false';
         if (!isFirebaseEnabled) {
           console.log("Firebase disabilitato dall'utente. Avvio in modalità Offline.");
           return;
-        }
-        // Consente l'override tramite impostazioni di localStorage per scopi di sviluppo/test
-        const savedConfig = localStorage.getItem('beautri_firebase_config');
-        if (savedConfig) {
-          config = JSON.parse(savedConfig);
         }
       }
 
