@@ -8,7 +8,7 @@
   <link rel="apple-touch-icon" href="https://beautri.it/wp-content/uploads/2020/02/cropped-favicon_beautri-270x270.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=23">
+  <link rel="stylesheet" href="style.css?v=24">
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -91,6 +91,74 @@
 
         <div id="display-payment-plan" style="border-top: 1.5px solid var(--border); padding-top: 16px; margin-top: 16px;">
           <!-- Popolato via JS con il piano di pagamento (costo a seduta o rateizzato) -->
+        </div>
+      </div>
+
+      <!-- PERCORSO DI MANTENIMENTO -->
+      <div id="card-mantenimento-section" style="display: none; margin-bottom: 24px;">
+        <div class="q-card">
+          <h3 class="form-title">
+            <i data-lucide="activity" style="color: var(--gold); width: 22px; height: 22px;"></i>
+            <span id="mantenimento-title-text">Percorso di Mantenimento Personalizzato</span>
+          </h3>
+          <p style="font-size: 14px; color: var(--gray); margin-bottom: 20px; text-align: center; line-height: 1.5;">
+            Il percorso di mantenimento ha una durata di un anno (12 sedute). Scegli la modalità di pagamento che preferisci:
+          </p>
+
+          <!-- Card 1: Unica Soluzione -->
+          <div class="maint-card gold-card" style="position: relative; background: #EAB308; border-radius: 16px; padding: 24px; margin-bottom: 20px; color: #111827; text-align: center; box-shadow: 0 4px 15px rgba(234, 179, 8, 0.25);">
+            <div style="position: absolute; top: 12px; right: 12px; background: #EF4444; color: #fff; font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 100px; text-transform: uppercase; letter-spacing: 0.05em;">
+              Il più richiesto
+            </div>
+            <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.9; margin-bottom: 8px;">
+              Pagamento in unica soluzione
+            </div>
+            <div id="maint-price-unica" style="font-size: 26px; font-weight: 800; margin-bottom: 16px; font-family: 'Inter', sans-serif;">
+              Lui 572€ Lei 814/858€
+            </div>
+            <div style="background: rgba(255,255,255,0.25); border-radius: 12px; padding: 16px; text-align: left;">
+              <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.03em;">
+                In omaggio per te:
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; margin-bottom: 8px;">
+                <span style="color: #10B981; font-weight: 900;">✓</span> 1 seduta in omaggio
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; margin-bottom: 8px;">
+                <span style="color: #10B981; font-weight: 900;">✓</span> 1 prodotto in omaggio, selezionato in base alle tue esigenze
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700;">
+                <span style="color: #10B981; font-weight: 900;">✓</span> 2 Beautri Check in omaggio (valore totale 94 €)
+              </div>
+            </div>
+            
+            <!-- Risparmio Badge -->
+            <div style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: #111827; color: #fff; padding: 8px 16px; border-radius: 12px; margin-top: 18px; font-size: 12px; font-weight: 700; letter-spacing: 0.03em;">
+              <span>RISPARMI BEN</span>
+              <span id="maint-savings" style="color: #EAB308; font-weight: 800;">200/230€</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Seduta per Seduta -->
+          <div class="maint-card white-card" style="position: relative; background: #fff; border: 1.5px solid var(--border); border-radius: 16px; padding: 24px; color: var(--dark); text-align: center; box-shadow: var(--shadow);">
+            <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gray); margin-bottom: 8px;">
+              Pagamento seduta per seduta (una volta al mese)
+            </div>
+            <div id="maint-price-seduta" style="font-size: 26px; font-weight: 800; margin-bottom: 16px; color: var(--black); font-family: 'Inter', sans-serif;">
+              Lui 52€ Lei 74/78€
+            </div>
+            <div style="background: var(--gray-light); border-radius: 12px; padding: 16px; text-align: left;">
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--gray); margin-bottom: 8px; text-decoration: line-through; opacity: 0.5;">
+                <span style="color: #EF4444; text-decoration: none; font-weight: bold; margin-right: 2px;">✗</span> 1 seduta in omaggio
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--gray); margin-bottom: 8px; text-decoration: line-through; opacity: 0.5;">
+                <span style="color: #EF4444; text-decoration: none; font-weight: bold; margin-right: 2px;">✗</span> 1 prodotto in omaggio, selezionato in base alle tue esigenze
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--dark);">
+                <span style="color: #10B981; font-weight: 900;">✓</span> 2 Beautri Check in omaggio (valore totale 94 €)
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -179,8 +247,8 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 
   <!-- Local Config & App Logic -->
-  <script src="firebase-config-v2.js?v=23"></script>
-  <script src="app_v3.js?v=23"></script>
+  <script src="firebase-config-v2.js?v=24"></script>
+  <script src="app_v3.js?v=24"></script>
 
   <script>
     // Initialize lucide icons

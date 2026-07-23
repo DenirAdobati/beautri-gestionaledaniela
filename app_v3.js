@@ -21,6 +21,21 @@ window.addEventListener('unhandledrejection', function(e) {
   const DEFAULT_MENU = "https://menu.beautri.it";
   const DEFAULT_HOURS = "Lunedì: Chiuso\nMartedì: 13:30 - 21:00\nMercoledì: 13:30 - 21:00\nGiovedì: 09:00 - 12:00 / 14:00 - 18:45\nVenerdì: 09:00 - 12:00 / 14:00 - 19:30\nSabato: 08:00 - 17:30\nDomenica: Chiuso";
 
+  const MAINTENANCE_DEFAULTS = {
+    base: {
+      lui: { unica: "Lui 572€", seduta: "Lui 52€", risparmio: "200€" },
+      lei: { unica: "Lei 814/858€", seduta: "Lei 74/78€", risparmio: "200/230€" }
+    },
+    intermedio: {
+      lui: { unica: "Lui 737€", seduta: "Lui 67€", risparmio: "210€" },
+      lei: { unica: "Lei 979/1023€", seduta: "Lei 89/93€", risparmio: "210/240€" }
+    },
+    avanzato: {
+      lui: { unica: "Lui 836€", seduta: "Lui 76€", risparmio: "220€" },
+      lei: { unica: "Lei 1056/1144€", seduta: "Lei 96/104€", risparmio: "220/250€" }
+    }
+  };
+
   // Prodotti caricati in memoria (Daniela)
   let recommendedProducts = [];
 
@@ -102,6 +117,12 @@ window.addEventListener('unhandledrejection', function(e) {
     const typeBtnControllo = document.getElementById('type-btn-controllo');
     const typeBtnMantenimento = document.getElementById('type-btn-mantenimento');
     const conditionalSectionsWrapper = document.getElementById('conditional-sections-wrapper');
+    const maintenanceSectionsWrapper = document.getElementById('maintenance-sections-wrapper');
+    const maintLevelSelect = document.getElementById('maint-level-select');
+    const maintGenderSelect = document.getElementById('maint-gender-select');
+    const maintPriceUnicaInput = document.getElementById('maint-price-unica-input');
+    const maintPriceSedutaInput = document.getElementById('maint-price-seduta-input');
+    const maintSavingsInput = document.getElementById('maint-savings-input');
 
     const form = document.getElementById('consultation-form');
     const successView = document.getElementById('success-view');
@@ -442,6 +463,22 @@ window.addEventListener('unhandledrejection', function(e) {
       });
     });
 
+    // Autocompilazione valori di default per il Mantenimento
+    function updateMaintenanceDefaults() {
+      if (!maintLevelSelect || !maintGenderSelect || !maintPriceUnicaInput || !maintPriceSedutaInput || !maintSavingsInput) return;
+      const level = maintLevelSelect.value;
+      const gender = maintGenderSelect.value;
+      const defaults = MAINTENANCE_DEFAULTS[level][gender];
+      if (defaults) {
+        maintPriceUnicaInput.value = defaults.unica;
+        maintPriceSedutaInput.value = defaults.seduta;
+        maintSavingsInput.value = defaults.risparmio;
+      }
+    }
+
+    if (maintLevelSelect) maintLevelSelect.addEventListener('change', updateMaintenanceDefaults);
+    if (maintGenderSelect) maintGenderSelect.addEventListener('change', updateMaintenanceDefaults);
+
     // Gestione selezione Tipo Consulenza
     function selectConsultationType(type) {
       if (!consultationType) return;
@@ -452,12 +489,22 @@ window.addEventListener('unhandledrejection', function(e) {
       if (typeBtnControllo) typeBtnControllo.classList.toggle('active', type === 'controllo');
       if (typeBtnMantenimento) typeBtnMantenimento.classList.toggle('active', type === 'mantenimento');
 
-      // Mostra o nasconde le sezioni di trattamenti e prodotti
+      // Mostra o nasconde le sezioni
       if (type === 'controllo') {
         if (conditionalSectionsWrapper) conditionalSectionsWrapper.style.display = 'none';
+        if (maintenanceSectionsWrapper) maintenanceSectionsWrapper.style.display = 'none';
+        if (expiryDate) expiryDate.removeAttribute('required');
+      } else if (type === 'mantenimento') {
+        if (conditionalSectionsWrapper) conditionalSectionsWrapper.style.display = 'none';
+        if (maintenanceSectionsWrapper) {
+          maintenanceSectionsWrapper.style.display = 'block';
+          updateMaintenanceDefaults();
+        }
         if (expiryDate) expiryDate.removeAttribute('required');
       } else {
+        // Iniziale
         if (conditionalSectionsWrapper) conditionalSectionsWrapper.style.display = 'block';
+        if (maintenanceSectionsWrapper) maintenanceSectionsWrapper.style.display = 'none';
         if (expiryDate) expiryDate.setAttribute('required', 'required');
       }
     }
@@ -487,8 +534,14 @@ window.addEventListener('unhandledrejection', function(e) {
       let totalSessions = 0;
       let totalPrice = 0;
       let expiryDateVal = "";
+
+      let maintenanceLevelVal = "";
+      let maintenanceGenderVal = "";
+      let maintenancePriceUnicaVal = "";
+      let maintenancePriceSedutaVal = "";
+      let maintenanceSavingsVal = "";
       
-      if (typeVal !== 'controllo') {
+      if (typeVal === 'iniziale') {
         expiryDateVal = expiryDate.value;
         document.querySelectorAll('.treatment-row').forEach(row => {
           const select = row.querySelector('.treat-type-select');
@@ -520,10 +573,16 @@ window.addEventListener('unhandledrejection', function(e) {
 
       // Genera un nome cumulativo per la visualizzazione nello storico
       let mainTreatmentName = "Solo Relazione/Controllo";
-      if (typeVal !== 'controllo' && finalTreatments.length > 0) {
+      if (typeVal === 'iniziale' && finalTreatments.length > 0) {
         mainTreatmentName = finalTreatments.map(t => `${t.sessionsCount}x ${t.name}`).join(", ");
       } else if (typeVal === 'mantenimento') {
-        mainTreatmentName = "[Mantenimento] " + finalTreatments.map(t => `${t.sessionsCount}x ${t.name}`).join(", ");
+        maintenanceLevelVal = maintLevelSelect ? maintLevelSelect.value : "base";
+        maintenanceGenderVal = maintGenderSelect ? maintGenderSelect.value : "lei";
+        maintenancePriceUnicaVal = maintPriceUnicaInput ? maintPriceUnicaInput.value.trim() : "";
+        maintenancePriceSedutaVal = maintPriceSedutaInput ? maintPriceSedutaInput.value.trim() : "";
+        maintenanceSavingsVal = maintSavingsInput ? maintSavingsInput.value.trim() : "";
+        
+        mainTreatmentName = `Mantenimento ${maintenanceLevelVal.toUpperCase()} (${maintenanceGenderVal.toUpperCase()})`;
       }
 
       if (!selectedPdfFile) {
@@ -539,7 +598,7 @@ window.addEventListener('unhandledrejection', function(e) {
 
         // Raccogli i prodotti inseriti
         const finalProducts = [];
-        if (typeVal !== 'controllo') {
+        if (typeVal === 'iniziale') {
           document.querySelectorAll('.product-row').forEach(row => {
             const select = row.querySelector('.prod-select');
             const customInput = row.querySelector('.custom-prod-input');
@@ -578,13 +637,18 @@ window.addEventListener('unhandledrejection', function(e) {
             relation: relationVal,
             type: typeVal,
             treatment: mainTreatmentName,
-            sessions: totalSessions,
-            price: totalPrice,
+            sessions: totalSessions || 12,
+            price: totalPrice || 0,
             treatments: finalTreatments,
             expiryDate: expiryDateVal,
             products: finalProducts,
             menuLink: menuLinkVal,
             salonHours: salonHoursVal,
+            maintenanceLevel: maintenanceLevelVal,
+            maintenanceGender: maintenanceGenderVal,
+            maintenancePriceUnica: maintenancePriceUnicaVal,
+            maintenancePriceSeduta: maintenancePriceSedutaVal,
+            maintenanceSavings: maintenanceSavingsVal,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
           };
 
@@ -604,13 +668,18 @@ window.addEventListener('unhandledrejection', function(e) {
             relation: relationVal,
             type: typeVal,
             treatment: mainTreatmentName,
-            sessions: totalSessions,
-            price: totalPrice,
+            sessions: totalSessions || 12,
+            price: totalPrice || 0,
             treatments: finalTreatments,
             expiryDate: expiryDateVal,
             products: finalProducts,
             menuLink: menuLinkVal,
             salonHours: salonHoursVal,
+            maintenanceLevel: maintenanceLevelVal,
+            maintenanceGender: maintenanceGenderVal,
+            maintenancePriceUnica: maintenancePriceUnicaVal,
+            maintenancePriceSeduta: maintenancePriceSedutaVal,
+            maintenanceSavings: maintenanceSavingsVal,
             createdAt: new Date().toISOString()
           };
 
@@ -681,6 +750,11 @@ window.addEventListener('unhandledrejection', function(e) {
         if (typeBtnControllo) typeBtnControllo.classList.remove('active');
         if (typeBtnMantenimento) typeBtnMantenimento.classList.remove('active');
         if (conditionalSectionsWrapper) conditionalSectionsWrapper.style.display = 'block';
+        if (maintenanceSectionsWrapper) {
+          maintenanceSectionsWrapper.style.display = 'none';
+          if (maintLevelSelect) maintLevelSelect.value = 'base';
+          if (maintGenderSelect) maintGenderSelect.value = 'lei';
+        }
         if (expiryDate) expiryDate.setAttribute('required', 'required');
       }
 
@@ -1185,22 +1259,48 @@ window.addEventListener('unhandledrejection', function(e) {
       const cardPercorsoSection = document.getElementById('card-percorso-section');
       const cardMenuSection = document.getElementById('card-menu-section');
       const percorsoTitleText = document.getElementById('percorso-title-text');
+      const cardMantenimentoSection = document.getElementById('card-mantenimento-section');
       
       if (typeVal === 'controllo') {
         if (cardPercorsoSection) cardPercorsoSection.style.display = 'none';
         if (cardProductsSection) cardProductsSection.style.display = 'none';
         if (countdownContainer) countdownContainer.style.display = 'none';
         if (cardMenuSection) cardMenuSection.style.display = 'none';
+        if (cardMantenimentoSection) cardMantenimentoSection.style.display = 'none';
+      } else if (typeVal === 'mantenimento') {
+        if (cardPercorsoSection) cardPercorsoSection.style.display = 'none';
+        if (cardProductsSection) cardProductsSection.style.display = 'none';
+        if (countdownContainer) countdownContainer.style.display = 'none';
+        if (cardMenuSection) cardMenuSection.style.display = 'block';
+        if (cardMantenimentoSection) {
+          cardMantenimentoSection.style.display = 'block';
+          
+          // Popola i prezzi e il risparmio
+          const displayMaintPriceUnica = document.getElementById('maint-price-unica');
+          const displayMaintPriceSeduta = document.getElementById('maint-price-seduta');
+          const displayMaintSavings = document.getElementById('maint-savings');
+          const maintTitleText = document.getElementById('mantenimento-title-text');
+          
+          if (displayMaintPriceUnica) {
+            displayMaintPriceUnica.textContent = data.maintenancePriceUnica || "Lui 572€ Lei 814/858€";
+          }
+          if (displayMaintPriceSeduta) {
+            displayMaintPriceSeduta.textContent = data.maintenancePriceSeduta || "Lui 52€ Lei 74/78€";
+          }
+          if (displayMaintSavings) {
+            displayMaintSavings.textContent = data.maintenanceSavings || "200/230€";
+          }
+          if (maintTitleText && data.maintenanceLevel) {
+            maintTitleText.textContent = `Percorso di Mantenimento ${data.maintenanceLevel.toUpperCase()} Personalizzato`;
+          }
+        }
       } else {
         if (cardPercorsoSection) cardPercorsoSection.style.display = 'block';
         if (cardMenuSection) cardMenuSection.style.display = 'block';
+        if (cardMantenimentoSection) cardMantenimentoSection.style.display = 'none';
         
         if (percorsoTitleText) {
-          if (typeVal === 'mantenimento') {
-            percorsoTitleText.textContent = "Il tuo Percorso di Mantenimento";
-          } else {
-            percorsoTitleText.textContent = "Il tuo Percorso Personalizzato";
-          }
+          percorsoTitleText.textContent = "Il tuo Percorso Personalizzato";
         }
       }
 

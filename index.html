@@ -8,7 +8,7 @@
   <link rel="apple-touch-icon" href="https://beautri.it/wp-content/uploads/2020/02/cropped-favicon_beautri-270x270.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=23">
+  <link rel="stylesheet" href="style.css?v=24">
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -175,6 +175,56 @@
           </div>
         </div>
 
+        <!-- CONTENITORE CONDIZIONALE PER MANTENIMENTO -->
+        <div id="maintenance-sections-wrapper" style="display: none;">
+          <div class="q-card">
+            <h3 class="form-title">
+              <i data-lucide="activity" style="color: var(--gold); width: 22px; height: 22px;"></i>
+              Configurazione Mantenimento
+            </h3>
+            
+            <div style="display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap;">
+              <div class="form-group" style="flex: 1; min-width: 200px;">
+                <label for="maint-level-select">Livello Mantenimento</label>
+                <select id="maint-level-select">
+                  <option value="base" selected>Mantenimento Base</option>
+                  <option value="intermedio">Mantenimento Intermedio</option>
+                  <option value="avanzato">Mantenimento Avanzato</option>
+                </select>
+              </div>
+
+              <div class="form-group" style="flex: 1; min-width: 200px;">
+                <label for="maint-gender-select">Destinatario / Genere</label>
+                <select id="maint-gender-select">
+                  <option value="lei" selected>Lei (Donna)</option>
+                  <option value="lui">Lui (Uomo)</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; border-top: 1.5px solid var(--border); padding-top: 16px;">
+              <div class="form-group" style="flex: 1; min-width: 200px;">
+                <label for="maint-price-unica-input">Prezzo Unica Soluzione (€)</label>
+                <input type="text" id="maint-price-unica-input" placeholder="Es. 814/858">
+              </div>
+
+              <div class="form-group" style="flex: 1; min-width: 200px;">
+                <label for="maint-price-seduta-input">Prezzo Seduta per Seduta (€)</label>
+                <input type="text" id="maint-price-seduta-input" placeholder="Es. 74/78">
+              </div>
+
+              <div class="form-group" style="flex: 1; min-width: 200px;">
+                <label for="maint-savings-input">Valore Risparmio (€)</label>
+                <input type="text" id="maint-savings-input" placeholder="Es. 200/230">
+              </div>
+            </div>
+            
+            <p style="font-size: 12px; color: var(--gray); font-style: italic; margin-top: 8px;">
+              I prezzi e i risparmi si autocompilano in base al livello e sesso scelti, ma puoi modificarli liberamente. Il percorso avrà una validità di un anno (12 sedute).
+            </p>
+          </div>
+        </div>
+
         <!-- Informazioni di Default -->
         <div class="q-card">
           <h3 class="form-title">
@@ -336,10 +386,10 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 
   <!-- Local Config -->
-  <script src="firebase-config-v2.js?v=23">
+  <script src="firebase-config-v2.js?v=24">
   </script>
   <!-- Application Logic -->
-  <script src="app_v3.js?v=23"></script>
+  <script src="app_v3.js?v=24"></script>
 
   <script>
     // Initialize lucide icons
