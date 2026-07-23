@@ -52,14 +52,14 @@ window.addEventListener('unhandledrejection', function(e) {
           firebase.initializeApp(config);
         }
         db = firebase.firestore();
-        storage = firebase.storage();
-        auth = firebase.auth();
-        
-        // Imposta i limiti di retry per Storage (5 secondi) per evitare hang infiniti
-        if (storage) {
+        if (typeof firebase.storage === 'function') {
+          storage = firebase.storage();
           storage.setMaxUploadRetryTime(5000);
           storage.setMaxOperationRetryTime(5000);
+        } else {
+          console.warn("Firebase Storage SDK non caricato. La funzionalità di upload non sarà disponibile.");
         }
+        auth = firebase.auth();
         
         firebaseActive = true;
         console.log("Firebase inizializzato correttamente.");
