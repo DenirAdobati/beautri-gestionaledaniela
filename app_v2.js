@@ -28,16 +28,25 @@ window.addEventListener('unhandledrejection', function(e) {
   // Inizializzazione Firebase
   function initFirebase() {
     try {
-      // Controlla se Firebase è abilitato
-      const isFirebaseEnabled = localStorage.getItem('beautri_firebase_enabled') !== 'false';
-      if (!isFirebaseEnabled) {
-        console.log("Firebase disabilitato dall'utente. Avvio in modalità Offline.");
-        return;
-      }
+      const isClientPage = document.getElementById('display-client-name') !== null;
+      let config = window.FIREBASE_CONFIG_LOCAL;
 
-      // Controlla se ci sono impostazioni in localStorage, altrimenti usa quelle globali
-      const savedConfig = localStorage.getItem('beautri_firebase_config');
-      const config = savedConfig ? JSON.parse(savedConfig) : window.FIREBASE_CONFIG_LOCAL;
+      if (isClientPage) {
+        // Il cliente si collega SEMPRE e SOLO alla configurazione cloud ufficiale di default
+        console.log("Inizializzazione Firebase in modalità Cliente...");
+      } else {
+        // Amministratore (Daniela): controlla se Firebase è abilitato
+        const isFirebaseEnabled = localStorage.getItem('beautri_firebase_enabled') !== 'false';
+        if (!isFirebaseEnabled) {
+          console.log("Firebase disabilitato dall'utente. Avvio in modalità Offline.");
+          return;
+        }
+        // Consente l'override tramite impostazioni di localStorage per scopi di sviluppo/test
+        const savedConfig = localStorage.getItem('beautri_firebase_config');
+        if (savedConfig) {
+          config = JSON.parse(savedConfig);
+        }
+      }
 
       if (config && config.apiKey) {
         // Controlla se Firebase è già stato inizializzato
