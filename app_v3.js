@@ -15,6 +15,7 @@ window.addEventListener('unhandledrejection', function(e) {
   let auth = null;
   let firebaseActive = false;
   let firebaseInitError = null;
+  let firebaseActiveConfig = null;
 
   // Dati di default
   const DEFAULT_MENU = "https://menu.beautri.it";
@@ -45,6 +46,7 @@ window.addEventListener('unhandledrejection', function(e) {
       }
 
       if (config && config.apiKey) {
+        firebaseActiveConfig = config;
         // Controlla se Firebase è già stato inizializzato
         if (!firebase.apps.length) {
           firebase.initializeApp(config);
@@ -921,7 +923,8 @@ window.addEventListener('unhandledrejection', function(e) {
         if (clientData) {
           renderClientData(clientData);
         } else {
-          showErrorState("Nessuna consulenza trovata con ID '" + id + "' nel database.");
+          const configInfo = firebaseActiveConfig ? JSON.stringify(firebaseActiveConfig) : "NESSUNA";
+          showErrorState(`Nessuna consulenza trovata con ID '${id}'. DB attivo: ${configInfo}`);
         }
       } catch (err) {
         console.error("Errore caricamento dati cliente:", err);
