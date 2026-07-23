@@ -141,7 +141,7 @@ window.addEventListener('unhandledrejection', function(e) {
     loginView.style.display = "none";
     appContent.style.display = "block";
     nav.style.display = "flex";
-    btnLogout.style.display = "none";
+    if (btnLogout) btnLogout.style.display = "none";
     loadDefaultValues();
     loadClientsHistory();
 
