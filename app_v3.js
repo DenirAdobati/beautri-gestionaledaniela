@@ -1039,6 +1039,9 @@ window.addEventListener('unhandledrejection', function(e) {
     const displayClientName = document.getElementById('display-client-name');
     const displayDate = document.getElementById('display-date');
     const btnViewPdf = document.getElementById('btn-view-pdf');
+    const pdfModal = document.getElementById('pdf-modal');
+    const pdfModalIframe = document.getElementById('pdf-modal-iframe');
+    const pdfModalClose = document.getElementById('pdf-modal-close');
     const displayTreatmentsList = document.getElementById('display-treatments-list');
     const displayPaymentPlan = document.getElementById('display-payment-plan');
     const cardProductsSection = document.getElementById('card-products-section');
@@ -1120,14 +1123,40 @@ window.addEventListener('unhandledrejection', function(e) {
       }
       displayDate.textContent = `Consulenza effettuata il ${formattedDate}`;
 
-      // PDF Report Link
+      // PDF Report Link - Anteprima Modale Integrata
       btnViewPdf.onclick = function() {
         if (data.pdfUrl) {
-          window.open(data.pdfUrl, '_blank');
+          if (pdfModal && pdfModalIframe) {
+            pdfModalIframe.src = data.pdfUrl;
+            pdfModal.style.display = "flex";
+            document.body.style.overflow = "hidden"; // Blocca lo scroll di sfondo
+          }
         } else {
           alert("Report PDF non caricato correttamente.");
         }
       };
+
+      // Gestore chiusura modale PDF
+      if (pdfModalClose) {
+        pdfModalClose.onclick = function() {
+          if (pdfModal && pdfModalIframe) {
+            pdfModalIframe.src = "";
+            pdfModal.style.display = "none";
+            document.body.style.overflow = ""; // Ripristina lo scroll di sfondo
+          }
+        };
+      }
+      
+      // Chiudi cliccando anche sullo sfondo nero
+      if (pdfModal) {
+        pdfModal.onclick = function(e) {
+          if (e.target === pdfModal) {
+            pdfModalIframe.src = "";
+            pdfModal.style.display = "none";
+            document.body.style.overflow = "";
+          }
+        };
+      }
 
       // Relazione della Consulenza
       const cardRelationSection = document.getElementById('card-relation-section');
