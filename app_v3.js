@@ -97,6 +97,12 @@ window.addEventListener('unhandledrejection', function(e) {
     const loginForm = document.getElementById('login-form');
     const btnLogout = document.getElementById('btn-logout');
 
+    const consultationType = document.getElementById('consultation-type');
+    const typeBtnIniziale = document.getElementById('type-btn-iniziale');
+    const typeBtnControllo = document.getElementById('type-btn-controllo');
+    const typeBtnMantenimento = document.getElementById('type-btn-mantenimento');
+    const conditionalSectionsWrapper = document.getElementById('conditional-sections-wrapper');
+
     const form = document.getElementById('consultation-form');
     const successView = document.getElementById('success-view');
     const pdfDropzone = document.getElementById('pdf-dropzone');
@@ -436,50 +442,89 @@ window.addEventListener('unhandledrejection', function(e) {
       });
     });
 
+    // Gestione selezione Tipo Consulenza
+    function selectConsultationType(type) {
+      if (!consultationType) return;
+      consultationType.value = type;
+
+      // Aggiorna la classe attiva sui bottoni
+      if (typeBtnIniziale) typeBtnIniziale.classList.toggle('active', type === 'iniziale');
+      if (typeBtnControllo) typeBtnControllo.classList.toggle('active', type === 'controllo');
+      if (typeBtnMantenimento) typeBtnMantenimento.classList.toggle('active', type === 'mantenimento');
+
+      // Mostra o nasconde le sezioni di trattamenti e prodotti
+      if (type === 'controllo') {
+        if (conditionalSectionsWrapper) conditionalSectionsWrapper.style.display = 'none';
+        if (expiryDate) expiryDate.removeAttribute('required');
+      } else {
+        if (conditionalSectionsWrapper) conditionalSectionsWrapper.style.display = 'block';
+        if (expiryDate) expiryDate.setAttribute('required', 'required');
+      }
+    }
+
+    if (typeBtnIniziale) {
+      typeBtnIniziale.addEventListener('click', () => selectConsultationType('iniziale'));
+    }
+    if (typeBtnControllo) {
+      typeBtnControllo.addEventListener('click', () => selectConsultationType('controllo'));
+    }
+    if (typeBtnMantenimento) {
+      typeBtnMantenimento.addEventListener('click', () => selectConsultationType('mantenimento'));
+    }
+
     // 6. Invio Form & Generazione Link
     form.addEventListener('submit', async function(e) {
       e.preventDefault();
 
       const clientNameVal = document.getElementById('client-name').value.trim();
       const relationVal = document.getElementById('client-relazione').value.trim();
-      const expiryDateVal = expiryDate.value;
       const menuLinkVal = menuLink.value.trim();
       const salonHoursVal = salonHours.value.trim();
+      const typeVal = consultationType ? consultationType.value : 'iniziale';
 
       // Raccogli trattamenti/sedute
       const finalTreatments = [];
       let totalSessions = 0;
       let totalPrice = 0;
+      let expiryDateVal = "";
       
-      document.querySelectorAll('.treatment-row').forEach(row => {
-        const select = row.querySelector('.treat-type-select');
-        const customInput = row.querySelector('.custom-treat-input');
-        const qty = parseInt(row.querySelector('.treat-qty-input').value) || 0;
-        const priceCad = parseFloat(row.querySelector('.treat-price-input').value) || 0;
-        
-        let name = select.value;
-        if (name === "Altro / Personalizzato") {
-          name = customInput.value.trim() || "Trattamento Personalizzato";
-        }
-        
-        if (name) {
-          finalTreatments.push({
-            name,
-            sessionsCount: qty,
-            pricePerSession: priceCad
-          });
-          totalSessions += qty;
-          totalPrice += qty * priceCad;
-        }
-      });
+      if (typeVal !== 'controllo') {
+        expiryDateVal = expiryDate.value;
+        document.querySelectorAll('.treatment-row').forEach(row => {
+          const select = row.querySelector('.treat-type-select');
+          const customInput = row.querySelector('.custom-treat-input');
+          const qty = parseInt(row.querySelector('.treat-qty-input').value) || 0;
+          const priceCad = parseFloat(row.querySelector('.treat-price-input').value) || 0;
+          
+          let name = select.value;
+          if (name === "Altro / Personalizzato") {
+            name = customInput.value.trim() || "Trattamento Personalizzato";
+          }
+          
+          if (name) {
+            finalTreatments.push({
+              name,
+              sessionsCount: qty,
+              pricePerSession: priceCad
+            });
+            totalSessions += qty;
+            totalPrice += qty * priceCad;
+          }
+        });
 
-      if (finalTreatments.length === 0) {
-        showToast("Trattamento mancante", "Inserisci almeno un tipo di seduta per la proposta.", "error", 3000);
-        return;
+        if (finalTreatments.length === 0) {
+          showToast("Trattamento mancante", "Inserisci almeno un tipo di seduta per la proposta.", "error", 3000);
+          return;
+        }
       }
 
       // Genera un nome cumulativo per la visualizzazione nello storico
-      const mainTreatmentName = finalTreatments.map(t => `${t.sessionsCount}x ${t.name}`).join(", ");
+      let mainTreatmentName = "Solo Relazione/Controllo";
+      if (typeVal !== 'controllo' && finalTreatments.length > 0) {
+        mainTreatmentName = finalTreatments.map(t => `${t.sessionsCount}x ${t.name}`).join(", ");
+      } else if (typeVal === 'mantenimento') {
+        mainTreatmentName = "[Mantenimento] " + finalTreatments.map(t => `${t.sessionsCount}x ${t.name}`).join(", ");
+      }
 
       if (!selectedPdfFile) {
         showToast("File mancante", "Carica il report PDF della cute per generare la scheda.", "error", 3000);
@@ -494,20 +539,22 @@ window.addEventListener('unhandledrejection', function(e) {
 
         // Raccogli i prodotti inseriti
         const finalProducts = [];
-        document.querySelectorAll('.product-row').forEach(row => {
-          const select = row.querySelector('.prod-select');
-          const customInput = row.querySelector('.custom-prod-input');
-          const qty = parseInt(row.querySelector('.prod-qty-input').value) || 1;
-          
-          let name = select.value;
-          if (name === "Altro / Personalizzato") {
-            name = customInput.value.trim() || "Prodotto Personalizzato";
-          }
-          
-          if (name) {
-            finalProducts.push({ name, qty });
-          }
-        });
+        if (typeVal !== 'controllo') {
+          document.querySelectorAll('.product-row').forEach(row => {
+            const select = row.querySelector('.prod-select');
+            const customInput = row.querySelector('.custom-prod-input');
+            const qty = parseInt(row.querySelector('.prod-qty-input').value) || 1;
+            
+            let name = select.value;
+            if (name === "Altro / Personalizzato") {
+              name = customInput.value.trim() || "Prodotto Personalizzato";
+            }
+            
+            if (name) {
+              finalProducts.push({ name, qty });
+            }
+          });
+        }
 
         if (firebaseActive) {
           // 1. Assicurati che l'utente sia autenticato prima di caricare
@@ -529,6 +576,7 @@ window.addEventListener('unhandledrejection', function(e) {
             name: clientNameVal,
             pdfUrl: pdfUrl,
             relation: relationVal,
+            type: typeVal,
             treatment: mainTreatmentName,
             sessions: totalSessions,
             price: totalPrice,
@@ -554,6 +602,7 @@ window.addEventListener('unhandledrejection', function(e) {
             name: clientNameVal,
             pdfUrl: pdfUrl,
             relation: relationVal,
+            type: typeVal,
             treatment: mainTreatmentName,
             sessions: totalSessions,
             price: totalPrice,
@@ -624,6 +673,16 @@ window.addEventListener('unhandledrejection', function(e) {
       
       treatmentsContainer.innerHTML = "";
       addTreatmentRow();
+
+      // Reset dei bottoni tipo consulenza
+      if (consultationType) {
+        consultationType.value = 'iniziale';
+        if (typeBtnIniziale) typeBtnIniziale.classList.add('active');
+        if (typeBtnControllo) typeBtnControllo.classList.remove('active');
+        if (typeBtnMantenimento) typeBtnMantenimento.classList.remove('active');
+        if (conditionalSectionsWrapper) conditionalSectionsWrapper.style.display = 'block';
+        if (expiryDate) expiryDate.setAttribute('required', 'required');
+      }
 
       loadDefaultValues();
 
@@ -1118,6 +1177,31 @@ window.addEventListener('unhandledrejection', function(e) {
       // Gestione Countdown Validità Offerta
       if (data.expiryDate) {
         initCountdown(data.expiryDate);
+      }
+
+      // Render condizionale in base alla tipologia di consulenza (iniziale, controllo, mantenimento)
+      const typeVal = data.type || 'iniziale';
+
+      const cardPercorsoSection = document.getElementById('card-percorso-section');
+      const cardMenuSection = document.getElementById('card-menu-section');
+      const percorsoTitleText = document.getElementById('percorso-title-text');
+      
+      if (typeVal === 'controllo') {
+        if (cardPercorsoSection) cardPercorsoSection.style.display = 'none';
+        if (cardProductsSection) cardProductsSection.style.display = 'none';
+        if (countdownContainer) countdownContainer.style.display = 'none';
+        if (cardMenuSection) cardMenuSection.style.display = 'none';
+      } else {
+        if (cardPercorsoSection) cardPercorsoSection.style.display = 'block';
+        if (cardMenuSection) cardMenuSection.style.display = 'block';
+        
+        if (percorsoTitleText) {
+          if (typeVal === 'mantenimento') {
+            percorsoTitleText.textContent = "Il tuo Percorso di Mantenimento";
+          } else {
+            percorsoTitleText.textContent = "Il tuo Percorso Personalizzato";
+          }
+        }
       }
 
       // Mostra contenuto e nascondi loader

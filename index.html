@@ -8,7 +8,7 @@
   <link rel="apple-touch-icon" href="https://beautri.it/wp-content/uploads/2020/02/cropped-favicon_beautri-270x270.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=22">
+  <link rel="stylesheet" href="style.css?v=23">
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -114,43 +114,65 @@
           </div>
         </div>
 
-        <!-- Sezione Percorso Personalizzato -->
-        <div class="q-card">
-          <h3 class="form-title">
-            <i data-lucide="sparkles" style="color: var(--gold); width: 22px; height: 22px;"></i>
-            Percorso Personalizzato (Sedute Proposte)
-          </h3>
-          
-          <div class="products-container" id="treatments-container" style="margin-bottom: 14px;">
-            <!-- I trattamenti inseriti dinamicamente compariranno qui -->
-          </div>
-          
-          <button type="button" class="add-prod-btn" id="add-treatment" style="margin-bottom: 20px;">
-            <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
-            Aggiungi Tipo di Seduta
-          </button>
-
-          <div style="border-top: 2px solid var(--bg); padding-top: 18px;">
-            <div class="form-group" style="max-width: 300px; margin: 0 auto 0 0;">
-              <label for="expiry-date">Offerta Valida Fino Al</label>
-              <input type="date" id="expiry-date" required>
-            </div>
+        <!-- Selezione Tipo Consulenza -->
+        <div class="q-card" style="background: transparent; box-shadow: none; padding: 0; margin-bottom: 24px;">
+          <input type="hidden" id="consultation-type" value="iniziale">
+          <div class="consultation-type-selector" style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <button type="button" class="type-btn active" id="type-btn-iniziale" data-type="iniziale" style="flex: 1; min-width: 150px;">
+              <i data-lucide="sparkles" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 6px;"></i>
+              Consulenza Iniziale
+            </button>
+            <button type="button" class="type-btn" id="type-btn-controllo" data-type="controllo" style="flex: 1; min-width: 150px;">
+              <i data-lucide="file-check-2" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 6px;"></i>
+              Consulenza Controllo
+            </button>
+            <button type="button" class="type-btn" id="type-btn-mantenimento" data-type="mantenimento" style="flex: 1; min-width: 150px;">
+              <i data-lucide="activity" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 6px;"></i>
+              Percorso Mantenimento
+            </button>
           </div>
         </div>
 
-        <!-- Sezione Prodotti Consigliati -->
-        <div class="q-card">
-          <h3 class="form-title">
-            <i data-lucide="package" style="color: var(--gold); width: 22px; height: 22px;"></i>
-            Prodotti Consigliati
-          </h3>
-          <div class="products-container" id="products-container">
-            <!-- I prodotti inseriti dinamicamente compariranno qui -->
+        <!-- CONTENITORE CONDIZIONALE PER PERCORSO E PRODOTTI -->
+        <div id="conditional-sections-wrapper">
+          <!-- Sezione Percorso Personalizzato -->
+          <div class="q-card">
+            <h3 class="form-title">
+              <i data-lucide="sparkles" style="color: var(--gold); width: 22px; height: 22px;"></i>
+              Percorso Personalizzato (Sedute Proposte)
+            </h3>
+            
+            <div class="products-container" id="treatments-container" style="margin-bottom: 14px;">
+              <!-- I trattamenti inseriti dinamicamente compariranno qui -->
+            </div>
+            
+            <button type="button" class="add-prod-btn" id="add-treatment" style="margin-bottom: 20px;">
+              <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+              Aggiungi Tipo di Seduta
+            </button>
+
+            <div style="border-top: 2px solid var(--bg); padding-top: 18px;">
+              <div class="form-group" style="max-width: 300px; margin: 0 auto 0 0;">
+                <label for="expiry-date">Offerta Valida Fino Al</label>
+                <input type="date" id="expiry-date" required>
+              </div>
+            </div>
           </div>
-          <button type="button" class="add-prod-btn" id="add-product">
-            <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
-            Aggiungi Prodotto
-          </button>
+
+          <!-- Sezione Prodotti Consigliati -->
+          <div class="q-card">
+            <h3 class="form-title">
+              <i data-lucide="package" style="color: var(--gold); width: 22px; height: 22px;"></i>
+              Prodotti Consigliati
+            </h3>
+            <div class="products-container" id="products-container">
+              <!-- I prodotti inseriti dinamicamente compariranno qui -->
+            </div>
+            <button type="button" class="add-prod-btn" id="add-product">
+              <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+              Aggiungi Prodotto
+            </button>
+          </div>
         </div>
 
         <!-- Informazioni di Default -->
@@ -314,10 +336,10 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 
   <!-- Local Config -->
-  <script src="firebase-config-v2.js?v=22">
+  <script src="firebase-config-v2.js?v=23">
   </script>
   <!-- Application Logic -->
-  <script src="app_v3.js?v=22"></script>
+  <script src="app_v3.js?v=23"></script>
 
   <script>
     // Initialize lucide icons
