@@ -8,7 +8,7 @@
   <link rel="apple-touch-icon" href="https://beautri.it/wp-content/uploads/2020/02/cropped-favicon_beautri-270x270.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=28">
+  <link rel="stylesheet" href="style.css?v=29">
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -150,13 +150,6 @@
               <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
               Aggiungi Tipo di Seduta
             </button>
-
-            <div style="border-top: 2px solid var(--bg); padding-top: 18px;">
-              <div class="form-group" style="max-width: 300px; margin: 0 auto 0 0;">
-                <label for="expiry-date">Offerta Valida Fino Al</label>
-                <input type="date" id="expiry-date" required>
-              </div>
-            </div>
           </div>
 
           <!-- Sezione Prodotti Consigliati -->
@@ -222,6 +215,18 @@
             <p style="font-size: 12px; color: var(--gray); font-style: italic; margin-top: 8px;">
               I prezzi e i risparmi si autocompilano in base al livello e sesso scelti, ma puoi modificarli liberamente. Il percorso avrà una validità di un anno (12 sedute).
             </p>
+          </div>
+        </div>
+
+        <!-- CONTENITORE CONDIZIONALE PER SCADENZA OFFERTA -->
+        <div id="expiry-date-container" class="q-card" style="display: block;">
+          <h3 class="form-title">
+            <i data-lucide="calendar" style="color: var(--gold); width: 22px; height: 22px;"></i>
+            Scadenza dell'Offerta
+          </h3>
+          <div class="form-group" style="max-width: 300px; margin: 0;">
+            <label for="expiry-date">Offerta Valida Fino Al</label>
+            <input type="date" id="expiry-date" required>
           </div>
         </div>
 
@@ -363,10 +368,10 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 
   <!-- Local Config -->
-  <script src="firebase-config-v2.js?v=28">
+  <script src="firebase-config-v2.js?v=29">
   </script>
   <!-- Application Logic -->
-  <script src="app_v3.js?v=28"></script>
+  <script src="app_v3.js?v=29"></script>
 
   <script>
     // Initialize lucide icons

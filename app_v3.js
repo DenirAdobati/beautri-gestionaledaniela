@@ -136,6 +136,7 @@ window.addEventListener('unhandledrejection', function(e) {
     const addTreatmentBtn = document.getElementById('add-treatment');
     const estimatedTotalPrice = document.getElementById('estimated-total-price');
     const expiryDate = document.getElementById('expiry-date');
+    const expiryDateContainer = document.getElementById('expiry-date-container');
     const productsContainer = document.getElementById('products-container');
     const addProductBtn = document.getElementById('add-product');
     const menuLink = document.getElementById('menu-link');
@@ -500,7 +501,11 @@ window.addEventListener('unhandledrejection', function(e) {
           maintenanceSectionsWrapper.style.display = 'none';
           maintenanceSectionsWrapper.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
         }
-        if (expiryDate) expiryDate.removeAttribute('required');
+        if (expiryDateContainer) expiryDateContainer.style.display = 'none';
+        if (expiryDate) {
+          expiryDate.disabled = true;
+          expiryDate.removeAttribute('required');
+        }
       } else if (type === 'mantenimento') {
         if (conditionalSectionsWrapper) {
           conditionalSectionsWrapper.style.display = 'none';
@@ -511,7 +516,11 @@ window.addEventListener('unhandledrejection', function(e) {
           maintenanceSectionsWrapper.querySelectorAll('input, select, textarea').forEach(el => el.disabled = false);
           updateMaintenanceDefaults();
         }
-        if (expiryDate) expiryDate.removeAttribute('required');
+        if (expiryDateContainer) expiryDateContainer.style.display = 'block';
+        if (expiryDate) {
+          expiryDate.disabled = false;
+          expiryDate.setAttribute('required', 'required');
+        }
       } else {
         // Iniziale
         if (conditionalSectionsWrapper) {
@@ -522,7 +531,11 @@ window.addEventListener('unhandledrejection', function(e) {
           maintenanceSectionsWrapper.style.display = 'none';
           maintenanceSectionsWrapper.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
         }
-        if (expiryDate) expiryDate.setAttribute('required', 'required');
+        if (expiryDateContainer) expiryDateContainer.style.display = 'block';
+        if (expiryDate) {
+          expiryDate.disabled = false;
+          expiryDate.setAttribute('required', 'required');
+        }
       }
     }
 
@@ -766,7 +779,11 @@ window.addEventListener('unhandledrejection', function(e) {
           if (maintLevelSelect) maintLevelSelect.value = 'base';
           if (maintGenderSelect) maintGenderSelect.value = 'lei';
         }
-        if (expiryDate) expiryDate.setAttribute('required', 'required');
+        if (expiryDateContainer) expiryDateContainer.style.display = 'block';
+        if (expiryDate) {
+          expiryDate.disabled = false;
+          expiryDate.setAttribute('required', 'required');
+        }
       }
 
       loadDefaultValues();
@@ -1285,7 +1302,7 @@ window.addEventListener('unhandledrejection', function(e) {
       } else if (typeVal === 'mantenimento') {
         if (cardPercorsoSection) cardPercorsoSection.style.display = 'none';
         if (cardProductsSection) cardProductsSection.style.display = 'none';
-        if (countdownContainer) countdownContainer.style.display = 'none';
+        if (countdownContainer) countdownContainer.style.display = data.expiryDate ? 'block' : 'none';
         if (cardMenuSection) cardMenuSection.style.display = 'block';
         if (cardMantenimentoSection) {
           cardMantenimentoSection.style.display = 'block';
