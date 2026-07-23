@@ -168,10 +168,19 @@ window.addEventListener('unhandledrejection', function(e) {
       }
       
       // Aggiungi un indicatore visuale dell'offline
-      const logoSpan = document.querySelector('.logo span');
-      if (logoSpan) {
-        logoSpan.innerHTML = "OFFLINE";
-        logoSpan.style.color = "var(--red)";
+      const logoEl = document.querySelector('.logo');
+      if (logoEl && !document.getElementById('offline-badge')) {
+        const badge = document.createElement('span');
+        badge.id = 'offline-badge';
+        badge.textContent = 'OFFLINE';
+        badge.style.fontSize = '10px';
+        badge.style.background = 'var(--red)';
+        badge.style.color = '#fff';
+        badge.style.padding = '2px 6px';
+        badge.style.borderRadius = '4px';
+        badge.style.marginLeft = '8px';
+        badge.style.verticalAlign = 'middle';
+        logoEl.appendChild(badge);
       }
       loadDefaultValues();
       loadClientsHistory();
