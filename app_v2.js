@@ -879,6 +879,12 @@ window.addEventListener('unhandledrejection', function(e) {
         let clientData = null;
 
         if (firebaseActive) {
+          // Forza l'autenticazione anonima del cliente prima di leggere da Firestore
+          if (auth && !auth.currentUser) {
+            console.log("Autenticazione anonima in corso per il cliente...");
+            await auth.signInAnonymously();
+          }
+          
           const doc = await db.collection('tricologia_consultations').doc(id).get();
           if (doc.exists) {
             clientData = doc.data();
