@@ -8,7 +8,7 @@
   <link rel="apple-touch-icon" href="https://beautri.it/wp-content/uploads/2020/02/cropped-favicon_beautri-270x270.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=25">
+  <link rel="stylesheet" href="style.css?v=27">
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -241,44 +241,21 @@
           </div>
         </div>
 
-        <!-- Submit Button -->
-        <div style="margin-top: 30px;">
-          <button type="submit" class="btn-gold" style="font-size: 16px;">
+        <!-- Action Buttons -->
+        <div style="margin-top: 30px; display: flex; gap: 12px; flex-wrap: wrap;">
+          <button type="submit" class="btn-gold" style="flex: 2; font-size: 16px; min-width: 200px;">
             <i data-lucide="link" style="width: 18px; height: 18px;"></i>
             Genera Link e Salva
+          </button>
+          <button type="button" class="btn-dark" id="btn-reset-form-main" style="flex: 1; font-size: 16px; background: transparent; border: 1.5px solid var(--border); color: var(--gray); min-width: 130px;">
+            <i data-lucide="refresh-cw" style="width: 18px; height: 18px;"></i>
+            Svuota Campi
           </button>
         </div>
 
       </form>
 
-      <!-- SUCCESS VIEW (DONE CARD) -->
-      <div id="success-view" class="done-card">
-        <div class="toast-icon success" style="margin-bottom: 20px;">✓</div>
-        <h2>Scheda Salvata con Successo!</h2>
-        <p>Il link personalizzato per il cliente è pronto ed è stato copiato negli appunti. Puoi anche condividerlo direttamente.</p>
-        
-        <!-- Display Link Box -->
-        <div class="link-display-box" id="generated-link-display">
-          https://deniradobati.github.io/beautri-gestionaledaniela/consultazione.html?id=c_xxxxxx
-        </div>
 
-        <!-- Action Buttons -->
-        <div class="done-actions">
-          <button type="button" class="btn-gold" id="btn-copy-link">
-            <i data-lucide="copy" style="width: 18px; height: 18px;"></i>
-            Copia Link
-          </button>
-          
-          <button type="button" class="btn-dark" id="btn-whatsapp-share" style="background: #25D366; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2);">
-            <i data-lucide="message-circle" style="width: 18px; height: 18px;"></i>
-            Condividi su WhatsApp
-          </button>
-        </div>
-
-        <button type="button" class="btn-dark" id="btn-reset-form" style="margin-top: 24px; background: transparent; border: 1.5px solid var(--border); color: var(--gray); hover: background var(--bg);">
-          Crea un'altra scheda
-        </button>
-      </div>
 
     </section>
 
@@ -386,10 +363,10 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 
   <!-- Local Config -->
-  <script src="firebase-config-v2.js?v=25">
+  <script src="firebase-config-v2.js?v=27">
   </script>
   <!-- Application Logic -->
-  <script src="app_v3.js?v=25"></script>
+  <script src="app_v3.js?v=27"></script>
 
   <script>
     // Initialize lucide icons

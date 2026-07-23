@@ -145,6 +145,7 @@ window.addEventListener('unhandledrejection', function(e) {
     const btnCopyLink = document.getElementById('btn-copy-link');
     const btnWhatsappShare = document.getElementById('btn-whatsapp-share');
     const btnResetForm = document.getElementById('btn-reset-form');
+    const btnResetFormMain = document.getElementById('btn-reset-form-main');
 
     const searchInput = document.getElementById('search-input');
     const clientsList = document.getElementById('clients-list');
@@ -709,35 +710,25 @@ window.addEventListener('unhandledrejection', function(e) {
         const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
         const landingUrl = `${baseUrl}consultazione.html?id=${clientId}`;
 
-        generatedLinkDisplay.textContent = landingUrl;
-        
         // Copia automaticamente negli appunti
+        let copied = false;
         try {
           await navigator.clipboard.writeText(landingUrl);
+          copied = true;
         } catch(err) {
           console.warn("Copia negli appunti non riuscita automaticamente:", err);
         }
 
-        // Configura il bottone di condivisione WhatsApp
-        const whatsappText = `Ciao ${clientNameVal}, ecco il link con il report fotografico della cute e la tua proposta di trattamento personalizzata Beautrì:\n\n${landingUrl}`;
-        btnWhatsappShare.onclick = function() {
-          window.open(`https://wa.me/?text=${encodeURIComponent(whatsappText)}`, '_blank');
-        };
+        // Mostra toast di successo e notifica di copia
+        if (copied) {
+          showToast("Link Copiato!", "La scheda è stata salvata ed il link è stato copiato negli appunti.", "success", 4000);
+        } else {
+          // Fallback se il browser blocca la scrittura degli appunti
+          showToast("Scheda Salvata!", `Link: ${landingUrl}`, "success", 6000);
+        }
 
-        btnCopyLink.onclick = async function() {
-          try {
-            await navigator.clipboard.writeText(landingUrl);
-            showToast("Copiato!", "Il link è stato copiato negli appunti.", "success", 1500);
-          } catch(err) {
-            showToast("Errore copia", "Copia il link manualmente.", "error", 2000);
-          }
-        };
-
-        // Mostra la Done Card e nascondi il form
-        form.style.display = "none";
-        successView.style.display = "block";
-        
-        hideToast();
+        // Reset del form immediato per prepararlo a una nuova inserzione
+        resetFormUI();
 
       } catch (err) {
         console.error(err);
@@ -745,8 +736,8 @@ window.addEventListener('unhandledrejection', function(e) {
       }
     });
 
-    // Reset del form per una nuova scheda
-    btnResetForm.addEventListener('click', function() {
+    // Funzione per il reset completo del form e dell'interfaccia
+    function resetFormUI() {
       form.reset();
       selectedPdfFile = null;
       pdfInput.value = "";
@@ -780,9 +771,13 @@ window.addEventListener('unhandledrejection', function(e) {
 
       loadDefaultValues();
 
-      successView.style.display = "none";
+      if (successView) successView.style.display = "none";
       form.style.display = "block";
-    });
+    }
+
+    // Reset del form manuale per una nuova scheda
+    if (btnResetForm) btnResetForm.addEventListener('click', resetFormUI);
+    if (btnResetFormMain) btnResetFormMain.addEventListener('click', resetFormUI);
 
     // Helper per convertire file in base64
     function convertFileToBase64(file) {
