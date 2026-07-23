@@ -36,6 +36,25 @@ window.addEventListener('unhandledrejection', function(e) {
     }
   };
 
+  const PRODUCT_PRICES = {
+    "Lozione SOFT": 41,
+    "Lozione ACTIVE": 45,
+    "Lozione PRO": 49,
+    "Shampoo Nutriente": 29,
+    "Shampoo Caduta GOLD": 29,
+    "Shampoo Caduta SILVER": 29,
+    "Shampoo Caduta PLATINUM": 29,
+    "Shampoo Purificante": 29,
+    "Shampoo Equilibrante": 29,
+    "Shampoo Forfora": 29,
+    "Shampoo Delicato": 26,
+    "Emulsione Lenitiva": 58,
+    "Emulsione Avvolgente": 28,
+    "Maschera Rigenerante": 37,
+    "Maschera Nutriente": 37,
+    "Conditioner Idratante": 29
+  };
+
   // Prodotti caricati in memoria (Daniela)
   let recommendedProducts = [];
 
@@ -431,11 +450,21 @@ window.addEventListener('unhandledrejection', function(e) {
           <label>Quantità</label>
           <input type="number" min="1" value="1" required class="prod-qty-input">
         </div>
+        <div class="form-group">
+          <label>Prezzo Totale</label>
+          <div class="prod-price-display" style="height: 44px; display: flex; align-items: center; background: var(--bg); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 0 10px; font-weight: 600; color: var(--dark); box-sizing: border-box; font-size: 14px; user-select: none;">
+            € 0,00
+          </div>
+          <input type="number" min="0" step="0.5" class="custom-prod-price-input" placeholder="Prezzo Cad. (€)" style="display: none; height: 44px; width: 100%; box-sizing: border-box; padding: 0 10px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); font-weight: 600; font-size: 14px;">
+        </div>
         <button type="button" class="remove-prod-btn" title="Rimuovi prodotto">&times;</button>
       `;
 
       const select = productRow.querySelector('.prod-select');
       const customInput = productRow.querySelector('.custom-prod-input');
+      const qtyInput = productRow.querySelector('.prod-qty-input');
+      const priceDisplay = productRow.querySelector('.prod-price-display');
+      const customPriceInput = productRow.querySelector('.custom-prod-price-input');
 
       // Gestione rimozione prodotto
       productRow.querySelector('.remove-prod-btn').addEventListener('click', function() {
@@ -443,7 +472,24 @@ window.addEventListener('unhandledrejection', function(e) {
         recommendedProducts = recommendedProducts.filter(p => p.id !== prodId);
       });
 
-      // Gestione mostra/nascondi custom input
+      function updateRowPrice() {
+        const prodVal = select.value;
+        const qtyVal = parseInt(qtyInput.value) || 1;
+        
+        if (prodVal === 'Altro / Personalizzato') {
+          customPriceInput.style.display = 'block';
+          priceDisplay.style.display = 'none';
+          customPriceInput.setAttribute('required', 'required');
+        } else {
+          customPriceInput.style.display = 'none';
+          priceDisplay.style.display = 'flex';
+          customPriceInput.removeAttribute('required');
+          const unitPrice = PRODUCT_PRICES[prodVal] || 0;
+          priceDisplay.textContent = `€ ${(unitPrice * qtyVal).toFixed(2)}`;
+        }
+      }
+
+      // Gestione mostra/nascondi custom input e aggiornamento prezzo
       select.addEventListener('change', function() {
         if (this.value === 'Altro / Personalizzato') {
           customInput.style.display = 'block';
@@ -452,7 +498,11 @@ window.addEventListener('unhandledrejection', function(e) {
           customInput.style.display = 'none';
           customInput.removeAttribute('required');
         }
+        updateRowPrice();
       });
+
+      qtyInput.addEventListener('input', updateRowPrice);
+      customPriceInput.addEventListener('input', updateRowPrice);
 
       productsContainer.appendChild(productRow);
       recommendedProducts.push({ id: prodId });
@@ -633,14 +683,21 @@ window.addEventListener('unhandledrejection', function(e) {
             const select = row.querySelector('.prod-select');
             const customInput = row.querySelector('.custom-prod-input');
             const qty = parseInt(row.querySelector('.prod-qty-input').value) || 1;
+            const customPriceInput = row.querySelector('.custom-prod-price-input');
             
             let name = select.value;
+            let price = 0;
             if (name === "Altro / Personalizzato") {
               name = customInput.value.trim() || "Prodotto Personalizzato";
+              const unitPrice = parseFloat(customPriceInput.value) || 0;
+              price = unitPrice * qty;
+            } else {
+              const unitPrice = PRODUCT_PRICES[name] || 0;
+              price = unitPrice * qty;
             }
             
             if (name) {
-              finalProducts.push({ name, qty });
+              finalProducts.push({ name, qty, price });
             }
           });
         }
@@ -1266,9 +1323,24 @@ window.addEventListener('unhandledrejection', function(e) {
         data.products.forEach(p => {
           const li = document.createElement('li');
           li.className = 'prod-item';
+          
+          let priceText = '';
+          if (p.price) {
+            priceText = `<span style="font-weight: 800; color: var(--gold-hover); font-size: 15px; margin-left: auto;">€ ${parseFloat(p.price).toFixed(2)}</span>`;
+          } else {
+            // Calcola retroattivamente per le consulenze passate se il prodotto è in listino
+            const listPrice = PRODUCT_PRICES[p.name];
+            if (listPrice) {
+              priceText = `<span style="font-weight: 800; color: var(--gold-hover); font-size: 15px; margin-left: auto;">€ ${(listPrice * p.qty).toFixed(2)}</span>`;
+            }
+          }
+
           li.innerHTML = `
-            <span class="prod-name">${p.name}</span>
-            <span class="prod-qty">Q.tà: ${p.qty}</span>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="prod-name">${p.name}</span>
+              <span class="prod-qty">Q.tà: ${p.qty}</span>
+            </div>
+            ${priceText}
           `;
           displayProductsList.appendChild(li);
         });
