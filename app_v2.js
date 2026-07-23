@@ -909,11 +909,11 @@ window.addEventListener('unhandledrejection', function(e) {
         if (clientData) {
           renderClientData(clientData);
         } else {
-          showErrorState();
+          showErrorState("Nessuna consulenza trovata con ID '" + id + "' nel database.");
         }
       } catch (err) {
         console.error("Errore caricamento dati cliente:", err);
-        showErrorState();
+        showErrorState(err.message || err);
       }
     }
 
@@ -1110,9 +1110,15 @@ window.addEventListener('unhandledrejection', function(e) {
       const timerInterval = setInterval(updateTimer, 1000);
     }
 
-    function showErrorState() {
+    function showErrorState(message) {
       clientLoader.style.display = "none";
       clientError.style.display = "block";
+      if (message) {
+        const p = clientError.querySelector('p');
+        if (p) {
+          p.innerHTML = `<strong>Dettaglio errore:</strong> ${message}`;
+        }
+      }
     }
   }
 })();
