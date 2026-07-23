@@ -137,6 +137,7 @@ window.addEventListener('unhandledrejection', function(e) {
     const typeBtnMantenimento = document.getElementById('type-btn-mantenimento');
     const conditionalSectionsWrapper = document.getElementById('conditional-sections-wrapper');
     const maintenanceSectionsWrapper = document.getElementById('maintenance-sections-wrapper');
+    const productsSectionWrapper = document.getElementById('products-section-wrapper');
     const maintLevelSelect = document.getElementById('maint-level-select');
     const maintGenderSelect = document.getElementById('maint-gender-select');
     const maintPriceUnicaInput = document.getElementById('maint-price-unica-input');
@@ -551,6 +552,10 @@ window.addEventListener('unhandledrejection', function(e) {
           maintenanceSectionsWrapper.style.display = 'none';
           maintenanceSectionsWrapper.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
         }
+        if (productsSectionWrapper) {
+          productsSectionWrapper.style.display = 'none';
+          productsSectionWrapper.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
+        }
         if (expiryDateContainer) expiryDateContainer.style.display = 'none';
         if (expiryDate) {
           expiryDate.disabled = true;
@@ -566,6 +571,10 @@ window.addEventListener('unhandledrejection', function(e) {
           maintenanceSectionsWrapper.querySelectorAll('input, select, textarea').forEach(el => el.disabled = false);
           updateMaintenanceDefaults();
         }
+        if (productsSectionWrapper) {
+          productsSectionWrapper.style.display = 'block';
+          productsSectionWrapper.querySelectorAll('input, select, textarea').forEach(el => el.disabled = false);
+        }
         if (expiryDateContainer) expiryDateContainer.style.display = 'block';
         if (expiryDate) {
           expiryDate.disabled = false;
@@ -580,6 +589,10 @@ window.addEventListener('unhandledrejection', function(e) {
         if (maintenanceSectionsWrapper) {
           maintenanceSectionsWrapper.style.display = 'none';
           maintenanceSectionsWrapper.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
+        }
+        if (productsSectionWrapper) {
+          productsSectionWrapper.style.display = 'block';
+          productsSectionWrapper.querySelectorAll('input, select, textarea').forEach(el => el.disabled = false);
         }
         if (expiryDateContainer) expiryDateContainer.style.display = 'block';
         if (expiryDate) {
@@ -678,7 +691,7 @@ window.addEventListener('unhandledrejection', function(e) {
 
         // Raccogli i prodotti inseriti
         const finalProducts = [];
-        if (typeVal === 'iniziale') {
+        if (typeVal === 'iniziale' || typeVal === 'mantenimento') {
           document.querySelectorAll('.product-row').forEach(row => {
             const select = row.querySelector('.prod-select');
             const customInput = row.querySelector('.custom-prod-input');
@@ -835,6 +848,10 @@ window.addEventListener('unhandledrejection', function(e) {
           maintenanceSectionsWrapper.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
           if (maintLevelSelect) maintLevelSelect.value = 'base';
           if (maintGenderSelect) maintGenderSelect.value = 'lei';
+        }
+        if (productsSectionWrapper) {
+          productsSectionWrapper.style.display = 'block';
+          productsSectionWrapper.querySelectorAll('input, select, textarea').forEach(el => el.disabled = false);
         }
         if (expiryDateContainer) expiryDateContainer.style.display = 'block';
         if (expiryDate) {
@@ -1402,7 +1419,7 @@ window.addEventListener('unhandledrejection', function(e) {
         if (cardMantenimentoSection) cardMantenimentoSection.style.display = 'none';
       } else if (typeVal === 'mantenimento') {
         if (cardPercorsoSection) cardPercorsoSection.style.display = 'none';
-        if (cardProductsSection) cardProductsSection.style.display = 'none';
+        if (cardProductsSection) cardProductsSection.style.display = (data.products && data.products.length > 0) ? 'block' : 'none';
         if (countdownContainer) countdownContainer.style.display = data.expiryDate ? 'block' : 'none';
         if (cardMenuSection) cardMenuSection.style.display = 'block';
         if (cardMantenimentoSection) {

@@ -8,7 +8,7 @@
   <link rel="apple-touch-icon" href="https://beautri.it/wp-content/uploads/2020/02/cropped-favicon_beautri-270x270.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=32">
+  <link rel="stylesheet" href="style.css?v=33">
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -151,21 +151,6 @@
               Aggiungi Tipo di Seduta
             </button>
           </div>
-
-          <!-- Sezione Prodotti Consigliati -->
-          <div class="q-card">
-            <h3 class="form-title">
-              <i data-lucide="package" style="color: var(--gold); width: 22px; height: 22px;"></i>
-              Prodotti Consigliati
-            </h3>
-            <div class="products-container" id="products-container">
-              <!-- I prodotti inseriti dinamicamente compariranno qui -->
-            </div>
-            <button type="button" class="add-prod-btn" id="add-product">
-              <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
-              Aggiungi Prodotto
-            </button>
-          </div>
         </div>
 
         <!-- CONTENITORE CONDIZIONALE PER MANTENIMENTO -->
@@ -216,6 +201,21 @@
               I prezzi e i risparmi si autocompilano in base al livello e sesso scelti, ma puoi modificarli liberamente. Il percorso avrà una validità di un anno (12 sedute).
             </p>
           </div>
+        </div>
+
+        <!-- CONTENITORE CONDIZIONALE PER PRODOTTI CONSIGLIATI -->
+        <div id="products-section-wrapper" class="q-card" style="display: block;">
+          <h3 class="form-title">
+            <i data-lucide="package" style="color: var(--gold); width: 22px; height: 22px;"></i>
+            Prodotti Consigliati
+          </h3>
+          <div class="products-container" id="products-container">
+            <!-- I prodotti inseriti dinamicamente compariranno qui -->
+          </div>
+          <button type="button" class="add-prod-btn" id="add-product">
+            <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+            Aggiungi Prodotto
+          </button>
         </div>
 
         <!-- CONTENITORE CONDIZIONALE PER SCADENZA OFFERTA -->
@@ -374,10 +374,10 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 
   <!-- Local Config -->
-  <script src="firebase-config-v2.js?v=32">
+  <script src="firebase-config-v2.js?v=33">
   </script>
   <!-- Application Logic -->
-  <script src="app_v3.js?v=32"></script>
+  <script src="app_v3.js?v=33"></script>
 
   <script>
     // Initialize lucide icons
