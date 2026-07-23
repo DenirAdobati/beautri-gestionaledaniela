@@ -206,6 +206,7 @@ window.addEventListener('unhandledrejection', function(e) {
             <option value="LENIRE">LENIRE</option>
             <option value="DETOSSINARE">DETOSSINARE</option>
             <option value="NUTRIRE">NUTRIRE</option>
+            <option value="LASER A FOTOBIOSTIMOLAZIONE">LASER A FOTOBIOSTIMOLAZIONE</option>
             <option value="Altro / Personalizzato">Altro / Personalizzato...</option>
           </select>
           <input type="text" class="custom-treat-input" placeholder="Specifica..." style="display: none; margin-top: 5px;">
