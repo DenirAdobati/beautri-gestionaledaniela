@@ -1142,3 +1142,12 @@ select:focus {
 .type-btn.active i {
   color: var(--gold);
 }
+
+/* Accordion style for Default Info */
+.default-info-accordion summary::-webkit-details-marker {
+  display: none;
+}
+
+.default-info-accordion[open] .accordion-chevron {
+  transform: rotate(180deg);
+}

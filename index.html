@@ -8,7 +8,7 @@
   <link rel="apple-touch-icon" href="https://beautri.it/wp-content/uploads/2020/02/cropped-favicon_beautri-270x270.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=29">
+  <link rel="stylesheet" href="style.css?v=30">
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -230,21 +230,27 @@
           </div>
         </div>
 
-        <!-- Informazioni di Default -->
-        <div class="q-card">
-          <h3 class="form-title">
-            <i data-lucide="info" style="color: var(--gold); width: 22px; height: 22px;"></i>
-            Informazioni di Default
-          </h3>
-          <div class="form-group">
-            <label for="menu-link">Link Menù Trattamenti</label>
-            <input type="url" id="menu-link" placeholder="https://..." required autocomplete="off">
+        <!-- Informazioni di Default (Accordion comprimibile) -->
+        <details class="q-card default-info-accordion" style="cursor: pointer;">
+          <summary style="list-style: none; display: flex; justify-content: space-between; align-items: center; user-select: none;">
+            <h3 class="form-title" style="margin-bottom: 0; border-bottom: none; padding-bottom: 0; display: flex; align-items: center; gap: 8px;">
+              <i data-lucide="info" style="color: var(--gold); width: 22px; height: 22px;"></i>
+              Informazioni di Default (Orari e Menù)
+            </h3>
+            <i data-lucide="chevron-down" class="accordion-chevron" style="color: var(--gray); transition: transform 0.2s;"></i>
+          </summary>
+          
+          <div style="border-top: 1.5px solid var(--border); padding-top: 16px; margin-top: 16px; cursor: default;" onclick="event.stopPropagation();">
+            <div class="form-group">
+              <label for="menu-link">Link Menù Trattamenti</label>
+              <input type="url" id="menu-link" placeholder="https://..." required autocomplete="off">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="salon-hours">Orari di Apertura</label>
+              <textarea id="salon-hours" rows="6" placeholder="Inserisci gli orari..." required></textarea>
+            </div>
           </div>
-          <div class="form-group">
-            <label for="salon-hours">Orari di Apertura</label>
-            <textarea id="salon-hours" rows="6" placeholder="Inserisci gli orari..." required></textarea>
-          </div>
-        </div>
+        </details>
 
         <!-- Action Buttons -->
         <div style="margin-top: 30px; display: flex; gap: 12px; flex-wrap: wrap;">
@@ -368,10 +374,10 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 
   <!-- Local Config -->
-  <script src="firebase-config-v2.js?v=29">
+  <script src="firebase-config-v2.js?v=30">
   </script>
   <!-- Application Logic -->
-  <script src="app_v3.js?v=29"></script>
+  <script src="app_v3.js?v=30"></script>
 
   <script>
     // Initialize lucide icons
