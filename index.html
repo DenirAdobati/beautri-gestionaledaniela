@@ -56,228 +56,222 @@
           <div class="form-group" style="text-align: left;">
             <label for="login-password">Password</label>
             <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password">
-          </div>
-          <button type="submit" class="btn-gold" style="margin-top: 10px;">
-            <i data-lucide="log-in" style="width: 18px; height: 18px;"></i>
-            Accedi al Gestionale
-          </button>
-        </form>
-      </div>
-    </div>
+  <!-- TABS CONTENT CONTAINER -->
+  <div id="app-content">
 
-    <!-- TABS CONTENT CONTAINER -->
-    <div id="app-content">
-
-      <!-- TAB: NUOVA CONSULENZA -->
-      <section id="tab-nuova" class="tab-content active">
+    <!-- TAB: NUOVA CONSULENZA -->
+    <section id="tab-nuova" class="tab-content active">
+      
+      <!-- FORM CREAZIONE -->
+      <form id="consultation-form">
         
-        <!-- FORM CREAZIONE -->
-        <form id="consultation-form">
-          
-          <!-- Sezione Cliente -->
-          <div class="q-card">
-            <h3 class="form-title">
-              <i data-lucide="user" style="color: var(--gold); width: 22px; height: 22px;"></i>
-              Dati del Cliente
-            </h3>
-            <div class="form-group">
-              <label for="client-name">Nome e Cognome</label>
-              <input type="text" id="client-name" placeholder="Es. Mario Rossi" required autocomplete="off">
-            </div>
-            
-            <div class="form-group">
-              <label>Report Fotografico Cute e Capelli (PDF)</label>
-              <div class="dropzone-area" id="pdf-dropzone">
-                <i data-lucide="file-text" class="dropzone-icon"></i>
-                <div class="dropzone-text">Trascina qui il PDF o clicca per sfogliare</div>
-                <div class="dropzone-subtext">Verranno accettati esclusivamente file PDF (.pdf)</div>
-                <input type="file" id="pdf-input" accept="application/pdf" required>
-              </div>
-              <div class="file-info-box" id="file-info">
-                <span class="file-info-name" id="file-name-label">nomefile.pdf</span>
-                <button type="button" class="file-remove-btn" id="file-remove" title="Rimuovi file">
-                  <i data-lucide="x" style="width: 18px; height: 18px; vertical-align: middle;"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Sezione Percorso Personalizzato -->
-          <div class="q-card">
-            <h3 class="form-title">
-              <i data-lucide="sparkles" style="color: var(--gold); width: 22px; height: 22px;"></i>
-              Percorso Personalizzato (Sedute Proposte)
-            </h3>
-            
-            <div class="products-container" id="treatments-container" style="margin-bottom: 14px;">
-              <!-- I trattamenti inseriti dinamicamente compariranno qui -->
-            </div>
-            
-            <button type="button" class="add-prod-btn" id="add-treatment" style="margin-bottom: 20px;">
-              <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
-              Aggiungi Tipo di Seduta
-            </button>
-
-            <div style="border-top: 2px solid var(--bg); padding-top: 18px;">
-              <div class="form-group" style="max-width: 300px; margin: 0 auto 0 0;">
-                <label for="expiry-date">Offerta Valida Fino Al</label>
-                <input type="date" id="expiry-date" required>
-              </div>
-            </div>
-          </div>
-
-          <!-- Sezione Prodotti Consigliati -->
-          <div class="q-card">
-            <h3 class="form-title">
-              <i data-lucide="package" style="color: var(--gold); width: 22px; height: 22px;"></i>
-              Prodotti Consigliati
-            </h3>
-            <div class="products-container" id="products-container">
-              <!-- I prodotti inseriti dinamicamente compariranno qui -->
-            </div>
-            <button type="button" class="add-prod-btn" id="add-product">
-              <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
-              Aggiungi Prodotto
-            </button>
-          </div>
-
-          <!-- Sezione Default e Link -->
-          <div class="q-card">
-            <h3 class="form-title">
-              <i data-lucide="link" style="color: var(--gold); width: 22px; height: 22px;"></i>
-              Informazioni di Default
-            </h3>
-            <div class="form-group">
-              <label for="menu-link">Link Menù Trattamenti</label>
-              <input type="text" id="menu-link" value="https://menu.beautri.it" placeholder="https://menu.beautri.it" required>
-            </div>
-            <div class="form-group">
-              <label for="salon-hours">Orari del Centro</label>
-              <textarea id="salon-hours" required rows="7">Lunedì: Chiuso
-Martedì: 13:30 - 21:00
-Mercoledì: 13:30 - 21:00
-Giovedì: 09:00 - 12:00 / 14:00 - 18:45
-Venerdì: 09:00 - 12:00 / 14:00 - 19:30
-Sabato: 08:00 - 17:30
-Domenica: Chiuso</textarea>
-            </div>
-          </div>
-
-          <!-- Genera Link Bottone -->
-          <div style="margin-top: 24px;">
-            <button type="submit" class="btn-gold" id="btn-submit-consultation">
-              <i data-lucide="link-2" style="width: 18px; height: 18px;"></i>
-              Genera Link per il Cliente
-            </button>
-          </div>
-
-        </form>
-
-        <!-- VIEW SUCCESS (Done Card) -->
-        <div id="success-view" class="done-card" style="display: none;">
-          <div class="done-icon">✓</div>
-          <h2>Link Generato!</h2>
-          <p>La consulenza è stata salvata ed è pronta per essere inviata al cliente.</p>
-          
-          <div class="link-display-box">
-            <span class="link-text" id="generated-link-display">https://beautri.it/landing?id=123</span>
-            <button type="button" class="btn-icon-only" id="btn-copy-link" title="Copia negli appunti">
-              <i data-lucide="copy" style="width: 16px; height: 16px;"></i>
-            </button>
-          </div>
-
-          <div class="done-btns">
-            <button type="button" class="btn-gold" id="btn-whatsapp-share">
-              <i data-lucide="message-square" style="width: 18px; height: 18px;"></i>
-              Invia su WhatsApp
-            </button>
-            <button type="button" class="btn-dark" id="btn-reset-form">
-              <i data-lucide="plus-circle" style="width: 18px; height: 18px;"></i>
-              Crea Nuova Scheda
-            </button>
-          </div>
-        </div>
-
-      </section>
-
-      <!-- TAB: STORICO CLIENTI -->
-      <section id="tab-storico" class="tab-content">
+        <!-- Sezione Cliente -->
         <div class="q-card">
           <h3 class="form-title">
-            <i data-lucide="users" style="color: var(--gold); width: 22px; height: 22px;"></i>
-            Elenco Consulenze Inviate
+            <i data-lucide="user" style="color: var(--gold); width: 22px; height: 22px;"></i>
+            Dati del Cliente
           </h3>
-          
-          <div class="search-container">
-            <input type="text" id="search-input" placeholder="Cerca cliente per nome o cognome..." autocomplete="off">
-            <button type="button" class="btn-icon-only" id="btn-search" title="Cerca">
-              <i data-lucide="search" style="width: 18px; height: 18px;"></i>
-            </button>
+          <div class="form-group">
+            <label for="client-name">Nome e Cognome</label>
+            <input type="text" id="client-name" placeholder="Es. Mario Rossi" required autocomplete="off">
           </div>
-
-          <div class="clients-list" id="clients-list">
-            <!-- I clienti verranno mostrati qui dinamicamente -->
-            <div class="no-clients">Caricamento storico clienti in corso...</div>
+          
+          <div class="form-group">
+            <label>Report Fotografico Cute e Capelli (PDF)</label>
+            <div class="dropzone-area" id="pdf-dropzone">
+              <i data-lucide="file-text" class="dropzone-icon"></i>
+              <div class="dropzone-text">Trascina qui il PDF o clicca per sfogliare</div>
+              <div class="dropzone-subtext">Verranno accettati esclusivamente file PDF (.pdf)</div>
+              <input type="file" id="pdf-input" accept="application/pdf" required>
+            </div>
+            <div class="file-info-box" id="file-info">
+              <span class="file-info-name" id="file-name-label">nomefile.pdf</span>
+              <button type="button" class="file-remove-btn" id="file-remove" title="Rimuovi file">
+                <i data-lucide="x" style="width: 18px; height: 18px; vertical-align: middle;"></i>
+              </button>
+            </div>
           </div>
         </div>
-      </section>
 
-    </div>
-  </main>
+        <!-- Sezione Relazione -->
+        <div class="q-card">
+          <h3 class="form-title">
+            <i data-lucide="file-text" style="color: var(--gold); width: 22px; height: 22px;"></i>
+            Relazione della Consulenza
+          </h3>
+          <div class="form-group">
+            <label for="client-relazione">Note e Relazione Tecnica</label>
+            <textarea id="client-relazione" placeholder="Scrivi qui la relazione della consulenza, l'anamnesi o i dettagli emersi..." rows="6" style="width: 100%; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.5; resize: vertical; box-sizing: border-box; background: var(--bg); color: var(--dark); transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--gold)';" onblur="this.style.borderColor='var(--border)';"></textarea>
+          </div>
+        </div>
 
-  <!-- SETTINGS OVERLAY & DRAWER -->
+        <!-- Sezione Percorso Personalizzato -->
+        <div class="q-card">
+          <h3 class="form-title">
+            <i data-lucide="sparkles" style="color: var(--gold); width: 22px; height: 22px;"></i>
+            Percorso Personalizzato (Sedute Proposte)
+          </h3>
+          
+          <div class="products-container" id="treatments-container" style="margin-bottom: 14px;">
+            <!-- I trattamenti inseriti dinamicamente compariranno qui -->
+          </div>
+          
+          <button type="button" class="add-prod-btn" id="add-treatment" style="margin-bottom: 20px;">
+            <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+            Aggiungi Tipo di Seduta
+          </button>
+
+          <div style="border-top: 2px solid var(--bg); padding-top: 18px;">
+            <div class="form-group" style="max-width: 300px; margin: 0 auto 0 0;">
+              <label for="expiry-date">Offerta Valida Fino Al</label>
+              <input type="date" id="expiry-date" required>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sezione Prodotti Consigliati -->
+        <div class="q-card">
+          <h3 class="form-title">
+            <i data-lucide="package" style="color: var(--gold); width: 22px; height: 22px;"></i>
+            Prodotti Consigliati
+          </h3>
+          <div class="products-container" id="products-container">
+            <!-- I prodotti inseriti dinamicamente compariranno qui -->
+          </div>
+          <button type="button" class="add-prod-btn" id="add-product">
+            <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+            Aggiungi Prodotto
+          </button>
+        </div>
+
+        <!-- Informazioni di Default -->
+        <div class="q-card">
+          <h3 class="form-title">
+            <i data-lucide="info" style="color: var(--gold); width: 22px; height: 22px;"></i>
+            Informazioni di Default
+          </h3>
+          <div class="form-group">
+            <label for="menu-link">Link Menù Trattamenti</label>
+            <input type="url" id="menu-link" placeholder="https://..." required autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label for="salon-hours">Orari di Apertura</label>
+            <textarea id="salon-hours" rows="6" placeholder="Inserisci gli orari..." required></textarea>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div style="margin-top: 30px;">
+          <button type="submit" class="btn-gold" style="font-size: 16px;">
+            <i data-lucide="link" style="width: 18px; height: 18px;"></i>
+            Genera Link e Salva
+          </button>
+        </div>
+
+      </form>
+
+      <!-- SUCCESS VIEW (DONE CARD) -->
+      <div id="success-view" class="done-card">
+        <div class="toast-icon success" style="margin-bottom: 20px;">✓</div>
+        <h2>Scheda Salvata con Successo!</h2>
+        <p>Il link personalizzato per il cliente è pronto ed è stato copiato negli appunti. Puoi anche condividerlo direttamente.</p>
+        
+        <!-- Display Link Box -->
+        <div class="link-display-box" id="generated-link-display">
+          https://deniradobati.github.io/beautri-gestionaledaniela/consultazione.html?id=c_xxxxxx
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="done-actions">
+          <button type="button" class="btn-gold" id="btn-copy-link">
+            <i data-lucide="copy" style="width: 18px; height: 18px;"></i>
+            Copia Link
+          </button>
+          
+          <button type="button" class="btn-dark" id="btn-whatsapp-share" style="background: #25D366; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2);">
+            <i data-lucide="message-circle" style="width: 18px; height: 18px;"></i>
+            Condividi su WhatsApp
+          </button>
+        </div>
+
+        <button type="button" class="btn-dark" id="btn-reset-form" style="margin-top: 24px; background: transparent; border: 1.5px solid var(--border); color: var(--gray); hover: background var(--bg);">
+          Crea un'altra scheda
+        </button>
+      </div>
+
+    </section>
+
+    <!-- TAB: STORICO CLIENTI -->
+    <section id="tab-storico" class="tab-content">
+      <div class="q-card" style="padding: 16px;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <div style="position: relative;">
+            <i data-lucide="search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--gray); width: 18px; height: 18px;"></i>
+            <input type="text" id="search-input" placeholder="Cerca cliente per nome..." style="padding-left: 44px; margin-bottom: 0;">
+          </div>
+        </div>
+      </div>
+
+      <div id="clients-list" style="display: flex; flex-direction: column; gap: 16px;">
+        <!-- Lista clienti popolata dinamicamente via JS -->
+      </div>
+    </section>
+
+  </div>
+
+  <!-- SETTINGS DRAWER (SLIDE FROM RIGHT) -->
   <div class="settings-overlay" id="settings-overlay"></div>
   <div class="settings-drawer" id="settings-drawer">
-    <div class="settings-header">
-      <h3>Configurazione Database</h3>
-      <button class="settings-close" id="settings-close">&times;</button>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1.5px solid var(--border); padding-bottom: 14px;">
+      <h3 style="margin: 0; font-size: 18px; font-weight: 800; color: var(--dark);">Configurazione Database</h3>
+      <button type="button" id="settings-close" style="background: none; border: none; cursor: pointer; color: var(--gray); hover: color var(--dark);">
+        <i data-lucide="x" style="width: 22px; height: 22px;"></i>
+      </button>
     </div>
-    
-    <p style="font-size: 12px; color: var(--gray);">
-      Configura le chiavi Firebase per sincronizzare il database in tempo reale. I dati rimangono salvati localmente su questo browser.
-    </p>
 
     <form id="settings-form">
-      <div class="form-group" style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px; background: var(--gray-light); padding: 10px; border-radius: var(--radius-sm);">
-        <input type="checkbox" id="set-firebase-enable" style="width: 20px; height: 20px; accent-color: var(--gold); cursor: pointer;" checked>
-        <label for="set-firebase-enable" style="margin-bottom: 0; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--black);">Abilita Connessione Firebase</label>
+      <div class="form-group" style="display: flex; align-items: center; gap: 10px; background: var(--bg); padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border); margin-bottom: 20px;">
+        <input type="checkbox" id="set-firebase-enable" style="width: 20px; height: 20px; cursor: pointer; accent-color: var(--gold);">
+        <label for="set-firebase-enable" style="margin: 0; font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 13px; letter-spacing: .03em;">Abilita Connessione Firebase</label>
       </div>
+
       <div class="form-group">
         <label for="set-api-key">API Key</label>
         <input type="password" id="set-api-key" placeholder="AIzaSy...">
       </div>
+
       <div class="form-group">
         <label for="set-project-id">Project ID</label>
-        <input type="text" id="set-project-id" placeholder="beautri-gestionaledaniela">
+        <input type="text" id="set-project-id" placeholder="Es. beautri-tricologia">
       </div>
+
       <div class="form-group">
         <label for="set-auth-domain">Auth Domain</label>
-        <input type="text" id="set-auth-domain" placeholder="project.firebaseapp.com">
+        <input type="text" id="set-auth-domain" placeholder="Es. beautri-tricologia.firebaseapp.com">
       </div>
+
       <div class="form-group">
         <label for="set-storage-bucket">Storage Bucket</label>
-        <input type="text" id="set-storage-bucket" placeholder="project.firebasestorage.app">
+        <input type="text" id="set-storage-bucket" placeholder="Es. beautri-tricologia.appspot.com">
       </div>
-      <div class="form-group">
+
+      <div class="form-group" style="margin-bottom: 24px;">
         <label for="set-app-id">App ID</label>
-        <input type="text" id="set-app-id" placeholder="1:12345:web:abcd...">
+        <input type="text" id="set-app-id" placeholder="Es. 1:12345:web:abcd">
       </div>
-      
-      <button type="submit" class="btn-gold" style="margin-top: 10px;">
-        <i data-lucide="save" style="width: 16px; height: 16px;"></i>
+
+      <button type="submit" class="btn-gold" style="width: 100%; margin-bottom: 12px;">
+        <i data-lucide="save" style="width: 18px; height: 18px;"></i>
         Salva Impostazioni
       </button>
-      <button type="button" id="btn-reset-settings" style="margin-top: 8px; width: 100%; border: 1.5px solid var(--border); background: transparent; padding: 10px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 700; color: var(--dark); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+
+      <button type="button" id="btn-restore-defaults" class="btn-dark" style="width: 100%; background: transparent; border: 1.5px solid var(--border); color: var(--gray); font-size: 14px;">
         <i data-lucide="rotate-ccw" style="width: 16px; height: 16px;"></i>
         Ripristina Predefiniti
       </button>
     </form>
-
-    <div style="margin-top: auto; border-top: 1px solid var(--border); padding-top: 15px; display: flex; flex-direction: column; gap: 8px;">
-      <button type="button" class="btn-dark" id="btn-logout" style="display: none;">
-        <i data-lucide="log-out" style="width: 16px; height: 16px;"></i>
-        Disconnetti Daniela
-      </button>
+    
+    <div style="margin-top: 30px; border-top: 1px solid var(--border); padding-top: 14px; text-align: center;">
       <div style="font-size: 10px; color: var(--gray); text-align: center;" id="app-version-status">
         Gestione Tricologia v1.0.0
       </div>
@@ -311,9 +305,10 @@ Domenica: Chiuso</textarea>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 
   <!-- Local Config -->
-  <script src="firebase-config-v2.js?v=16"></script>
+  <script src="firebase-config-v2.js?v=17">
+  </script>
   <!-- Application Logic -->
-  <script src="app_v3.js?v=16"></script>
+  <script src="app_v3.js?v=17"></script>
 
   <script>
     // Initialize lucide icons

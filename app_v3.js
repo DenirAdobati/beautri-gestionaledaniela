@@ -441,6 +441,7 @@ window.addEventListener('unhandledrejection', function(e) {
       e.preventDefault();
 
       const clientNameVal = document.getElementById('client-name').value.trim();
+      const relationVal = document.getElementById('client-relazione').value.trim();
       const expiryDateVal = expiryDate.value;
       const menuLinkVal = menuLink.value.trim();
       const salonHoursVal = salonHours.value.trim();
@@ -527,6 +528,7 @@ window.addEventListener('unhandledrejection', function(e) {
             id: clientId,
             name: clientNameVal,
             pdfUrl: pdfUrl,
+            relation: relationVal,
             treatment: mainTreatmentName,
             sessions: totalSessions,
             price: totalPrice,
@@ -551,6 +553,7 @@ window.addEventListener('unhandledrejection', function(e) {
             id: clientId,
             name: clientNameVal,
             pdfUrl: pdfUrl,
+            relation: relationVal,
             treatment: mainTreatmentName,
             sessions: totalSessions,
             price: totalPrice,
@@ -960,6 +963,18 @@ window.addEventListener('unhandledrejection', function(e) {
           alert("Report PDF non caricato correttamente.");
         }
       };
+
+      // Relazione della Consulenza
+      const cardRelationSection = document.getElementById('card-relation-section');
+      const displayRelation = document.getElementById('display-relation');
+      if (cardRelationSection && displayRelation) {
+        if (data.relation) {
+          displayRelation.textContent = data.relation;
+          cardRelationSection.style.display = "block";
+        } else {
+          cardRelationSection.style.display = "none";
+        }
+      }
 
       // Percorso
       displayTreatmentsList.innerHTML = "";
