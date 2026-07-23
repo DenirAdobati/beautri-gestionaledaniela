@@ -1,12 +1,12 @@
 // firebase-config.js - Configurazione Firebase per il gestionale Beautri Tricologia
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCv0TJXEKZtFnkncBfio8182Nk9ZXEkipI",
-  authDomain: "srl-finance-hub.firebaseapp.com",
-  projectId: "srl-finance-hub",
-  storageBucket: "srl-finance-hub.firebasestorage.app",
-  messagingSenderId: "509187918510",
-  appId: "1:509187918510:web:df9e0b3216d74fbcb0fb3f"
+  apiKey: "AIzaSyAyxn1hEnRn_O6N0FbcUfsjo21IfRofo1o",
+  authDomain: "beautri-gestionaledaniela.firebaseapp.com",
+  projectId: "beautri-gestionaledaniela",
+  storageBucket: "beautri-gestionaledaniela.firebasestorage.app",
+  messagingSenderId: "829151175498",
+  appId: "1:829151175498:web:3c4effce0a6ac19c8e97b3"
 };
 
 // Esporta la configurazione globalmente per l'applicazione
