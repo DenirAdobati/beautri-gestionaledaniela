@@ -14,6 +14,7 @@ window.addEventListener('unhandledrejection', function(e) {
   let storage = null;
   let auth = null;
   let firebaseActive = false;
+  let firebaseInitError = null;
 
   // Dati di default
   const DEFAULT_MENU = "https://menu.beautri.it";
@@ -65,6 +66,7 @@ window.addEventListener('unhandledrejection', function(e) {
       }
     } catch (error) {
       console.error("Errore inizializzazione Firebase:", error);
+      firebaseInitError = error;
     }
   }
 
@@ -141,16 +143,27 @@ window.addEventListener('unhandledrejection', function(e) {
     loadDefaultValues();
     loadClientsHistory();
 
+    const versionStatus = document.getElementById('app-version-status');
+
     if (firebaseActive) {
+      if (versionStatus) {
+        versionStatus.innerHTML = `Gestione Tricologia v1.0.0<br><span style="color: var(--gold); font-weight: 600;">Connesso a Firebase: ${firebase.app().options.projectId}</span>`;
+      }
       auth.signInAnonymously()
         .then(() => {
           console.log("Autenticazione anonima completata con successo.");
         })
         .catch(error => {
           console.error("Autenticazione anonima fallita. Verifica che sia abilitata nella console di Firebase:", error);
+          if (versionStatus) {
+            versionStatus.innerHTML = `Gestione Tricologia v1.0.0<br><span style="color: var(--red); font-weight: 600;">Errore Auth: ${error.message}</span>`;
+          }
         });
     } else {
       // Modalità Offline (senza auth)
+      if (versionStatus) {
+        versionStatus.innerHTML = `Gestione Tricologia v1.0.0<br><span style="color: var(--red); font-weight: 600;">Modalità Offline</span>`;
+      }
       
       // Aggiungi un indicatore visuale dell'offline
       const logoSpan = document.querySelector('.logo span');
@@ -880,6 +893,10 @@ window.addEventListener('unhandledrejection', function(e) {
 
     async function loadClientData(id) {
       try {
+        if (firebaseInitError) {
+          throw new Error("Errore inizializzazione database: " + (firebaseInitError.message || firebaseInitError));
+        }
+
         let clientData = null;
 
         if (firebaseActive) {
