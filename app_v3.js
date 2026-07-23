@@ -489,22 +489,38 @@ window.addEventListener('unhandledrejection', function(e) {
       if (typeBtnControllo) typeBtnControllo.classList.toggle('active', type === 'controllo');
       if (typeBtnMantenimento) typeBtnMantenimento.classList.toggle('active', type === 'mantenimento');
 
-      // Mostra o nasconde le sezioni
+      // Mostra o nasconde le sezioni e abilita/disabilita i relativi input
       if (type === 'controllo') {
-        if (conditionalSectionsWrapper) conditionalSectionsWrapper.style.display = 'none';
-        if (maintenanceSectionsWrapper) maintenanceSectionsWrapper.style.display = 'none';
+        if (conditionalSectionsWrapper) {
+          conditionalSectionsWrapper.style.display = 'none';
+          conditionalSectionsWrapper.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
+        }
+        if (maintenanceSectionsWrapper) {
+          maintenanceSectionsWrapper.style.display = 'none';
+          maintenanceSectionsWrapper.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
+        }
         if (expiryDate) expiryDate.removeAttribute('required');
       } else if (type === 'mantenimento') {
-        if (conditionalSectionsWrapper) conditionalSectionsWrapper.style.display = 'none';
+        if (conditionalSectionsWrapper) {
+          conditionalSectionsWrapper.style.display = 'none';
+          conditionalSectionsWrapper.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
+        }
         if (maintenanceSectionsWrapper) {
           maintenanceSectionsWrapper.style.display = 'block';
+          maintenanceSectionsWrapper.querySelectorAll('input, select, textarea').forEach(el => el.disabled = false);
           updateMaintenanceDefaults();
         }
         if (expiryDate) expiryDate.removeAttribute('required');
       } else {
         // Iniziale
-        if (conditionalSectionsWrapper) conditionalSectionsWrapper.style.display = 'block';
-        if (maintenanceSectionsWrapper) maintenanceSectionsWrapper.style.display = 'none';
+        if (conditionalSectionsWrapper) {
+          conditionalSectionsWrapper.style.display = 'block';
+          conditionalSectionsWrapper.querySelectorAll('input, select, textarea').forEach(el => el.disabled = false);
+        }
+        if (maintenanceSectionsWrapper) {
+          maintenanceSectionsWrapper.style.display = 'none';
+          maintenanceSectionsWrapper.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
+        }
         if (expiryDate) expiryDate.setAttribute('required', 'required');
       }
     }
@@ -749,9 +765,13 @@ window.addEventListener('unhandledrejection', function(e) {
         if (typeBtnIniziale) typeBtnIniziale.classList.add('active');
         if (typeBtnControllo) typeBtnControllo.classList.remove('active');
         if (typeBtnMantenimento) typeBtnMantenimento.classList.remove('active');
-        if (conditionalSectionsWrapper) conditionalSectionsWrapper.style.display = 'block';
+        if (conditionalSectionsWrapper) {
+          conditionalSectionsWrapper.style.display = 'block';
+          conditionalSectionsWrapper.querySelectorAll('input, select, textarea').forEach(el => el.disabled = false);
+        }
         if (maintenanceSectionsWrapper) {
           maintenanceSectionsWrapper.style.display = 'none';
+          maintenanceSectionsWrapper.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
           if (maintLevelSelect) maintLevelSelect.value = 'base';
           if (maintGenderSelect) maintGenderSelect.value = 'lei';
         }
