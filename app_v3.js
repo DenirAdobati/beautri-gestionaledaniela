@@ -551,7 +551,7 @@ window.addEventListener('unhandledrejection', function(e) {
 
         // Genera il link personalizzato per il cliente
         const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
-        const landingUrl = `${baseUrl}cliente.html?id=${clientId}`;
+        const landingUrl = `${baseUrl}consultazione.html?id=${clientId}`;
 
         generatedLinkDisplay.textContent = landingUrl;
         
@@ -692,7 +692,7 @@ window.addEventListener('unhandledrejection', function(e) {
         `;
 
         const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
-        const clientLandingUrl = `${baseUrl}cliente.html?id=${client.id}`;
+        const clientLandingUrl = `${baseUrl}consultazione.html?id=${client.id}`;
 
         // Eventi bottoni
         card.querySelector('.btn-view').onclick = () => window.open(clientLandingUrl, '_blank');
