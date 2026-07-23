@@ -1111,9 +1111,8 @@ window.addEventListener('unhandledrejection', function(e) {
       // WhatsApp Contact
       const waText = `Ciao Daniela, ho appena visualizzato la mia consulenza personalizzata del ${formattedDate}. Vorrei avere maggiori informazioni sul mio percorso!`;
       btnWhatsappContact.onclick = function() {
-        // Apri chat di WhatsApp col centro (puoi specificare un numero telefonico fisso o lasciarlo generico per chat aperta)
-        // Usiamo un link di WhatsApp generico che indirizzerà Daniela stessa
-        window.open(`https://wa.me/?text=${encodeURIComponent(waText)}`, '_blank');
+        // Apri chat di WhatsApp col centro al numero +39 3661970861
+        window.open(`https://wa.me/393661970861?text=${encodeURIComponent(waText)}`, '_blank');
       };
 
       // Gestione Countdown Validità Offerta
