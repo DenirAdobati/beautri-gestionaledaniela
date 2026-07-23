@@ -1,7 +1,7 @@
 // firebase-config.js - Configurazione Firebase per il gestionale Beautri Tricologia
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAyxn1hEnRn_O6N0FbcUfsjo21IfRofo1o",
+  apiKey: "AIzaSyAyxn1hEnRn_O6N0FbcUfsjo21IfRofolo",
   authDomain: "beautri-gestionaledaniela.firebaseapp.com",
   projectId: "beautri-gestionaledaniela",
   storageBucket: "beautri-gestionaledaniela.firebasestorage.app",
