@@ -791,6 +791,18 @@ window.addEventListener('unhandledrejection', function(e) {
       }, 1500);
     };
 
+    const btnResetSettings = document.getElementById('btn-reset-settings');
+    if (btnResetSettings) {
+      btnResetSettings.onclick = function() {
+        localStorage.removeItem('beautri_firebase_config');
+        localStorage.removeItem('beautri_firebase_enabled');
+        showToast("Configurazione Ripristinata", "Riavvio in corso con le chiavi predefinite...", "success", 1500);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      };
+    }
+
     // Helper Toast
     function showToast(title, desc, type, duration = 0) {
       toastTitle.textContent = title;
