@@ -1471,8 +1471,8 @@ window.addEventListener('unhandledrejection', function(e) {
       const first = S.answers[q.id + '_first'] || '';
       const last  = S.answers[q.id + '_last']  || '';
       return `<div class="name-row">
-        <div class="inp-group"><label>Nome</label><input type="text" value="${first}" placeholder="Nome" oninput="S.answers['${q.id}_first']=this.value"></div>
-        <div class="inp-group"><label>Cognome</label><input type="text" value="${last}" placeholder="Cognome" oninput="S.answers['${q.id}_last']=this.value"></div>
+        <div class="inp-group"><label>Nome</label><input type="text" value="${first}" placeholder="Nome" oninput="siSetAnswer('${q.id}_first',this.value)"></div>
+        <div class="inp-group"><label>Cognome</label><input type="text" value="${last}" placeholder="Cognome" oninput="siSetAnswer('${q.id}_last',this.value)"></div>
       </div>`;
     }
 
@@ -1503,7 +1503,7 @@ window.addEventListener('unhandledrejection', function(e) {
         html += `<button type="button" class="opt${sel}${col}" onclick="siToggleC(${q.id},'${escQ(o)}')"><span class="opt-check"></span>${o}</button>`;
       });
       html += '</div>';
-      html += `<div class="other-row"><span class="other-lbl">Altro:</span><input class="other-inp" type="text" value="${other}" placeholder="Specifica…" oninput="S.otherTxt['${q.id}']=this.value"></div>`;
+      html += `<div class="other-row"><span class="other-lbl">Altro:</span><input class="other-inp" type="text" value="${other}" placeholder="Specifica…" oninput="siSetOtherTxt('${q.id}',this.value)"></div>`;
       return html;
     }
 
@@ -1522,7 +1522,7 @@ window.addEventListener('unhandledrejection', function(e) {
 
     function rTextarea(q) {
       const val = S.answers[q.id] || '';
-      return `<textarea placeholder="Scrivi qui…" oninput="S.answers['${q.id}']=this.value">${val}</textarea>`;
+      return `<textarea placeholder="Scrivi qui…" oninput="siSetAnswer('${q.id}',this.value)">${val}</textarea>`;
     }
 
     function rMatrixGravity() {
@@ -1576,7 +1576,7 @@ window.addEventListener('unhandledrejection', function(e) {
       });
       html += '</div>';
       const other = S.otherTxt['incid'] || '';
-      html += `<div class="other-row"><span class="other-lbl">Altro:</span><input class="other-inp" type="text" value="${other}" placeholder="Specifica…" oninput="S.otherTxt['incid']=this.value"></div>`;
+      html += `<div class="other-row"><span class="other-lbl">Altro:</span><input class="other-inp" type="text" value="${other}" placeholder="Specifica…" oninput="siSetOtherTxt('incid',this.value)"></div>`;
       return html;
     }
 
@@ -1816,6 +1816,15 @@ window.addEventListener('unhandledrejection', function(e) {
     window.siPickIncidTipo = siPickIncidTipo;
     window.siToggleIncidTab = siToggleIncidTab;
     window.siResetForm = siResetForm;
+
+    function siSetAnswer(key, val) {
+      S.answers[key] = val;
+    }
+    function siSetOtherTxt(key, val) {
+      S.otherTxt[key] = val;
+    }
+    window.siSetAnswer = siSetAnswer;
+    window.siSetOtherTxt = siSetOtherTxt;
 
     function generaHTMLPdf() {
       const nome = S.answers['1_first'] || '';
