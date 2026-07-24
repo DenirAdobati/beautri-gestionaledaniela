@@ -1097,6 +1097,8 @@ window.addEventListener('unhandledrejection', function(e) {
       if (duration > 0) {
         setTimeout(hideToast, duration);
       }
+    }
+
     // Ripristina il tab storico se specificato nella query string (es: per tornare indietro da landing)
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('tab') === 'history') {
