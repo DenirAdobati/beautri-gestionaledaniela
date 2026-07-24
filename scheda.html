@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Beautri Tricologia — Scheda Interna</title>
+  <link rel="icon" type="image/png" href="https://beautri.it/wp-content/uploads/2020/02/cropped-favicon_beautri-270x270.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --gold: #EAB308;
+      --gold-dark: #CA8A04;
+      --gold-light: #FEF9C3;
+      --dark: #12161C;
+      --card-bg: #FFFFFF;
+      --bg: #F8F7F4;
+      --gray: #6B7280;
+      --gray-light: #F3F4F6;
+      --border: #E5E7EB;
+      --radius: 12px;
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg);
+      color: var(--dark);
+      line-height: 1.5;
+      padding: 24px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      padding: 40px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+
+    /* Print Header (hidden on print) */
+    .no-print-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 16px;
+      border-bottom: 1.5px solid var(--border);
+    }
+
+    .brand-logo {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      color: var(--dark);
+      text-transform: uppercase;
+    }
+
+    .brand-logo span {
+      color: var(--gold);
+    }
+
+    .btn-gold {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--gold);
+      color: var(--dark);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(234, 179, 8, 0.2);
+    }
+
+    .btn-gold:hover {
+      background: var(--gold-dark);
+      transform: translateY(-1px);
+    }
+
+    /* Main Title and Badge */
+    .report-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--dark);
+    }
+
+    .badge-si {
+      background: rgba(234, 179, 8, 0.12);
+      color: var(--gold-dark);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Info Block */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      background: var(--bg);
+      padding: 20px;
+      border-radius: 8px;
+      border-left: 4px solid var(--gold);
+      margin-bottom: 30px;
+    }
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .info-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--gray);
+      letter-spacing: 0.05em;
+    }
+
+    .info-val {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    /* Sections */
+    .section-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--dark);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 2px solid var(--gold);
+      padding-bottom: 6px;
+      margin-top: 36px;
+      margin-bottom: 18px;
+    }
+
+    /* Answers Grid */
+    .answers-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .answer-card {
+      background: var(--gray-light);
+      padding: 12px 16px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .answer-q {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray);
+    }
+
+    .answer-a {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    /* Full-width elements */
+    .full-width {
+      grid-column: span 2;
+    }
+
+    /* Scale rendering */
+    .scale-bar-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .scale-bar {
+      flex: 1;
+      height: 8px;
+      background: var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .scale-fill {
+      height: 100%;
+      background: var(--gold);
+      border-radius: 4px;
+    }
+
+    .scale-num {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--gold-dark);
+      min-width: 40px;
+    }
+
+    /* Clinical Diagrams (Norwood / Ludwig / Incidenze) */
+    .clinical-diagrams-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .diagram-card {
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #fff;
+    }
+
+    .diagram-img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-bottom: 1.5px solid var(--border);
+    }
+
+    .diagram-label {
+      padding: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--dark);
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    /* Badges lists */
+    .badge-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .badge-item {
+      background: rgba(234, 179, 8, 0.12);
+      color: var(--gold-dark);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-item.blu {
+      background: rgba(59, 130, 246, 0.12);
+      color: #1d4ed8;
+    }
+
+    .badge-item.rosso {
+      background: rgba(239, 68, 68, 0.12);
+      color: #b91c1c;
+    }
+
+    /* Gravity Matrix Table */
+    .gravity-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    .gravity-table th, .gravity-table td {
+      border: 1px solid var(--border);
+      padding: 10px;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    .gravity-table th {
+      background: var(--gray-light);
+      font-weight: 700;
+    }
+
+    .gravity-dot-container {
+      display: flex;
+      gap: 6px;
+    }
+
+    .gravity-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--border);
+    }
+
+    .gravity-dot.active {
+      background: var(--gold);
+      box-shadow: 0 0 6px var(--gold);
+    }
+
+    /* Loader */
+    .loader-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #FFFFFF;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      border-radius: var(--radius);
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid var(--gray-light);
+      border-top: 5px solid var(--gold);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 16px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error-msg {
+      color: #EF4444;
+      font-weight: 700;
+      text-align: center;
+      padding: 40px;
+    }
+
+    /* Printing styles */
+    @media print {
+      body {
+        background: #FFFFFF;
+        padding: 0;
+      }
+
+      .container {
+        box-shadow: none;
+        padding: 0;
+        max-width: 100%;
+      }
+
+      .no-print, .no-print-header {
+        display: none !important;
+      }
+
+      .answer-card {
+        background: #F9FAFB !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .info-grid {
+        background: #F9FAFB !important;
+        border-left: 4px solid var(--gold) !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .badge-si {
+        border: 1px solid var(--gold) !important;
+        background: transparent !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Loader -->
+    <div id="loader" class="loader-overlay">
+      <div class="spinner"></div>
+      <p style="font-weight: 600; color: var(--gray);">Caricamento scheda cliente...</p>
+    </div>
+
+    <!-- Header No-Print -->
+    <div class="no-print-header">
+      <div class="brand-logo">BEAU<span>TRÌ</span></div>
+      <button class="btn-gold no-print" onclick="window.print()">
+        <svg style="width:16px; height:16px; fill:currentColor;" viewBox="0 0 24 24">
+          <path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/>
+        </svg>
+        Stampa Scheda
+      </button>
+    </div>
+
+    <!-- Main Content Area -->
+    <div id="content" style="display: none;">
+      <div class="report-title-row">
+        <h1>Scheda Tricologica Interna</h1>
+        <div class="badge-si">Uso Interno</div>
+      </div>
+
+      <!-- Info Grid -->
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Cliente</span>
+          <span class="info-val" id="client-name">-</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Data Compilazione</span>
+          <span class="info-val" id="client-date">-</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Caso Clinico</span>
+          <span class="info-val" id="client-caso" style="text-transform: uppercase;">-</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">ID Scheda</span>
+          <span class="info-val" id="client-id" style="font-size:12px; color: var(--gray); font-family: monospace;">-</span>
+        </div>
+      </div>
+
+      <!-- SEZIONI DINAMICHE -->
+      <div id="sections-container"></div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK Compat -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config-v2.js?v=38"></script>
+
+  <script>
+    // Configurazione domande per rendere le etichette descrittive ed ordinate
+    const QUESTIONS_DB = {
+      // Fase Conoscitiva
+      "2": { label: "Sesso", section: "Fase Conoscitiva" },
+      "3": { label: "Età", section: "Fase Conoscitiva" },
+      "4": { label: "Altezza", section: "Fase Conoscitiva" },
+      "5": { label: "Peso", section: "Fase Conoscitiva" },
+      "6": { label: "Anamnesi personale", section: "Fase Conoscitiva", isCheck: true },
+      "7": { label: "Frequenza lavaggi settimanali", section: "Fase Conoscitiva" },
+      "8": { label: "Ultimo lavaggio effettuato", section: "Fase Conoscitiva" },
+      "9": { label: "Tipologia prodotti utilizzati", section: "Fase Conoscitiva" },
+      
+      // Fase di Indagine
+      "10": { label: "Esigenza / causa primaria", section: "Fase di Indagine", isCheck: true },
+      "11": { label: "Valori ematici rilevati", section: "Fase di Indagine", isCheck: true },
+      "12": { label: "Lamenti di forfora/capelli grassi", section: "Fase di Indagine" },
+      "13": { label: "Tracce di forfora sui vestiti/cute", section: "Fase di Indagine" },
+      "14": { label: "Percezione prurito cuoio capelluto", section: "Fase di Indagine" },
+      "15": { label: "Dolore/fastidio alla base dei capelli", section: "Fase di Indagine" },
+      "16": { label: "Livello di sudorazione", section: "Fase di Indagine" },
+      "17": { label: "Ore medie di sonno a notte", section: "Fase di Indagine" },
+      "18": { label: "Qualità del sonno", section: "Fase di Indagine", isScale: true },
+      "19": { label: "Sensazione di riposo al risveglio", section: "Fase di Indagine" },
+      "20": { label: "Difficoltà ad addormentarsi", section: "Fase di Indagine" },
+      "21": { label: "Risvegli notturni continui", section: "Fase di Indagine" },
+      "22": { label: "Sonno leggero", section: "Fase di Indagine" },
+      "23": { label: "Livello percezione stress", section: "Fase di Indagine" },
+      "24": { label: "Impatto fisico/mentale del lavoro", section: "Fase di Indagine" },
+      "25": { label: "Tendenza a pensare/rimuginare molto", section: "Fase di Indagine" },
+      "26": { label: "Riflessione continua giorno/notte", section: "Fase di Indagine" },
+      "27": { label: "Presenza di disturbi gastrointestinali", section: "Fase di Indagine" },
+
+      // Uomo Giovane
+      "28": { label: "Padre calvo/con diradamento", section: "Caso Specifico", cases: ["uomo"] },
+      "29": { label: "Madre con problemi di capelli", section: "Caso Specifico", cases: ["uomo"] },
+      "30": { label: "Nonno materno calvo/con diradamento", section: "Caso Specifico", cases: ["uomo"] },
+      "31": { label: "Orario abituale di sonno", section: "Caso Specifico", cases: ["uomo"] },
+      "32": { label: "Presenza di capelli grassi", section: "Caso Specifico", cases: ["uomo"] },
+      "33": { label: "Autopercezione diradamento", section: "Caso Specifico", cases: ["uomo"] },
+
+      // Donna Giovane
+      "34": { label: "Carenze riscontrate (ferro, vit D, tiroide)", section: "Caso Specifico", cases: ["donna"] },
+      "35": { label: "Utilizzo pillola anticoncezionale", section: "Caso Specifico", cases: ["donna"] },
+      "36": { label: "Regolarità del ciclo mestruale", section: "Caso Specifico", cases: ["donna"] },
+      "37": { label: "Autovalutazione tono dell'umore", section: "Caso Specifico", cases: ["donna"] },
+      "38": { label: "Frequenza trattamenti chimici aggressivi", section: "Caso Specifico", cases: ["donna"] },
+      "39": { label: "Capelli secchi, spenti o opachi", section: "Caso Specifico", cases: ["donna"] },
+      "40": { label: "Mancanza di volume dei capelli", section: "Caso Specifico", cases: ["donna"] },
+      "41": { label: "Autopercezione diradamento", section: "Caso Specifico", cases: ["donna"] },
+
+      // Neo Mamma
+      "42": { label: "Tempo trascorso dal parto", section: "Caso Specifico", cases: ["mamma"] },
+      "43": { label: "Carenze post-parto o in gravidanza", section: "Caso Specifico", cases: ["mamma"] },
+      "44": { label: "Allattamento in corso", section: "Caso Specifico", cases: ["mamma"] },
+      "45": { label: "Frequenza trattamenti chimici", section: "Caso Specifico", cases: ["mamma"] },
+      "46": { label: "Capelli secchi/spenti/privi di luce", section: "Caso Specifico", cases: ["mamma"] },
+      "47": { label: "Mancanza di volume", section: "Caso Specifico", cases: ["mamma"] },
+
+      // Donna Mezza Età (Menopausa)
+      "48": { label: "Presenza di problemi di salute", section: "Caso Specifico", cases: ["menopausa"] },
+      "49": { label: "Carenze ematiche/disturbi tiroide", section: "Caso Specifico", cases: ["menopausa"] },
+      "50": { label: "Dolore/dolenzia alla cute o capelli", section: "Caso Specifico", cases: ["menopausa"] },
+      "51": { label: "Caduta abbondante durante lavaggio", section: "Caso Specifico", cases: ["menopausa"] },
+      "52": { label: "Autovalutazione tono dell'umore", section: "Caso Specifico", cases: ["menopausa"] },
+      "53": { label: "Autopercezione diradamento", section: "Caso Specifico", cases: ["menopausa"] },
+      "54": { label: "Frequenza trattamenti chimici", section: "Caso Specifico", cases: ["menopausa"] },
+      "55": { label: "Capelli secchi/spenti/opachi", section: "Caso Specifico", cases: ["menopausa"] },
+      "56": { label: "Mancanza di volume nei capelli", section: "Caso Specifico", cases: ["menopausa"] },
+
+      // Uomo Mezza Età
+      "60": { label: "Età di inizio comparsa diradamento", section: "Caso Specifico", cases: ["uomomezza"] },
+      "61": { label: "Trattamenti o rimedi già tentati", section: "Caso Specifico", cases: ["uomomezza"] },
+      "62": { label: "Impatto emotivo del diradamento", section: "Caso Specifico", cases: ["uomomezza"] },
+      "63": { label: "Influenza dello stress sulla vita", section: "Caso Specifico", cases: ["uomomezza"] },
+      "64": { label: "Presenza di capelli grassi", section: "Caso Specifico", cases: ["uomomezza"] },
+      "65": { label: "Autopercezione diradamento", section: "Caso Specifico", cases: ["uomomezza"] },
+
+      // Percorso Chemioterapico
+      "70": { label: "Modifica del capello durante percorso", section: "Caso Specifico", cases: ["chemio"] },
+      "71": { label: "Cambiamenti riscontrati sulla cute", section: "Caso Specifico", cases: ["chemio"] },
+      "72": { label: "Fattore di maggiore disagio/difficoltà", section: "Caso Specifico", cases: ["chemio"] },
+      "73": { label: "Farmaci assunti oltre a chemioterapia", section: "Caso Specifico", cases: ["chemio"], isTextarea: true },
+      "74": { label: "Fasi che accompagnano il percorso", section: "Caso Specifico", cases: ["chemio"] },
+
+      // Fase Visiva e Tattile
+      "102": { label: "Osservazioni Proscope (200X)", section: "Fase Visiva e Tattile", isTextarea: true },
+      "104": { label: "Caduta dei capelli (tipo ed entità)", section: "Fase Visiva e Tattile" },
+      "105": { label: "Zone colpite dal diradamento", section: "Fase Visiva e Tattile", isCheck: true },
+      "106": { label: "Cute - Aspetto lipidico", section: "Fase Visiva e Tattile" },
+      "107": { label: "Cute - Spessore rilevato", section: "Fase Visiva e Tattile" },
+      "108": { label: "Cute - Tensione cutanea", section: "Fase Visiva e Tattile" },
+      "109": { label: "Cute - Colore", section: "Fase Visiva e Tattile" },
+      "110": { label: "Presenza e tipologia forfora", section: "Fase Visiva e Tattile" },
+      "111": { label: "Intensità del prurito", section: "Fase Visiva e Tattile" },
+      "112": { label: "Odore del cuoio capelluto", section: "Fase Visiva e Tattile" },
+      "113": { label: "Sudorazione rilevata", section: "Fase Visiva e Tattile" },
+      "114": { label: "Caratteristiche strutturali capelli", section: "Fase Visiva e Tattile", isCheck: true },
+      "118": { label: "Note e considerazioni finali", section: "Fase Visiva e Tattile", isTextarea: true }
+    };
+
+    // Mappe immagini Norwood e Ludwig
+    const NORWOOD_IMAGES = {
+      'I': 'img/norwood-1.png', 'II': 'img/norwood-2.png', 'III': 'img/norwood-3.png',
+      'IIIv': 'img/norwood-3v.png', 'IV': 'img/norwood-4.png', 'IVa': 'img/norwood-4a.png',
+      'V': 'img/norwood-5.png', 'Va': 'img/norwood-5a.png', 'VI': 'img/norwood-6.png',
+      'VII': 'img/norwood-7.png', 'VIIa': 'img/norwood-7a.png'
+    };
+
+    const LUDWIG_IMAGES = {
+      'I': 'img/ludwig-1.png', 'II': 'img/ludwig-2.png', 'III': 'img/ludwig-3.png'
+    };
+
+    const INCIDENZE_IMAGES = {
+      'Digestiva': 'img/incidenza-digestiva.png',
+      'Nervosa': 'img/incidenza-nervosa.png',
+      'Fisica': 'img/incidenza-fisica.png',
+      'Psicofisica': 'img/incidenza-psicofisica.png'
+    };
+
+    let firebaseActive = false;
+    let db = null;
+
+    // Carica configurazione Firebase
+    try {
+      if (typeof firebase !== 'undefined' && typeof beautriFirebaseConfig !== 'undefined') {
+        firebase.initializeApp(beautriFirebaseConfig);
+        db = firebase.firestore();
+        firebaseActive = true;
+        console.log("Firebase collegato per visualizzazione scheda.");
+      }
+    } catch(e) {
+      console.warn("Inizializzazione Firebase fallita, caricamento in fallback offline:", e);
+    }
+
+    async function initReport() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const docId = urlParams.get('id');
+      
+      if (!docId) {
+        showError("Parametro ID mancante nell'URL.");
+        return;
+      }
+
+      try {
+        let docData = null;
+
+        if (firebaseActive) {
+          const doc = await db.collection('tricologia_consultations').doc(docId).get();
+          if (doc.exists) {
+            docData = doc.data();
+          }
+        }
+
+        // Fallback locale se non presente in Firebase o offline
+        if (!docData) {
+          const offlineList = JSON.parse(localStorage.getItem('beautri_offline_consultations') || '[]');
+          docData = offlineList.find(item => item.id === docId);
+        }
+
+        if (!docData) {
+          showError("Scheda cliente non trovata nel database o in locale.");
+          return;
+        }
+
+        renderReportData(docData);
+
+      } catch(err) {
+        console.error("Errore caricamento dati report:", err);
+        showError("Impossibile caricare i dati della scheda. " + err.message);
+      }
+    }
+
+    function renderReportData(data) {
+      // Dati generali
+      document.getElementById('client-name').textContent = data.name || 'Nessun nome';
+      document.getElementById('client-id').textContent = data.id || '-';
+      document.getElementById('client-caso').textContent = getCasoLabel(data.casoTipo);
+      
+      let dateStr = "N/D";
+      if (data.createdAt) {
+        const dateObj = data.createdAt.seconds ? new Date(data.createdAt.seconds * 1000) : new Date(data.createdAt);
+        dateStr = dateObj.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      }
+      document.getElementById('client-date').textContent = dateStr;
+
+      // Generazione Sezioni
+      const sections = {
+        "Fase Conoscitiva": [],
+        "Fase di Indagine": [],
+        "Caso Specifico": [],
+        "Fase Visiva e Tattile": []
+      };
+
+      // Mappa le risposte standard
+      Object.entries(QUESTIONS_DB).forEach(([qId, config]) => {
+        // Se la domanda appartiene a un caso specifico e il record corrente non è di quel caso, saltala
+        if (config.section === "Caso Specifico" && config.cases && !config.cases.includes(data.casoTipo)) {
+          return;
+        }
+
+        let answerVal = null;
+        
+        if (config.isCheck) {
+          const checked = data.checkAns?.[qId] || [];
+          const other = data.otherTxt?.[qId] || '';
+          let combined = [...checked];
+          if (other.trim()) combined.push(`Altro: ${other}`);
+          answerVal = combined.length > 0 ? combined : null;
+        } else if (config.isScale) {
+          answerVal = data.answers?.[qId] || null;
+        } else {
+          answerVal = data.answers?.[qId] || null;
+        }
+
+        // Caso speciale: Nome e cognome alla domanda 1 sono già in testata
+        if (qId === "1") return;
+
+        if (answerVal !== null) {
+          sections[config.section].push({
+            q: config.label,
+            a: answerVal,
+            isScale: config.isScale,
+            isCheck: config.isCheck,
+            isTextarea: config.isTextarea
+          });
+        }
+      });
+
+      const container = document.getElementById('sections-container');
+      container.innerHTML = "";
+
+      // Renderizza ogni sezione
+      Object.entries(sections).forEach(([secName, items]) => {
+        if (items.length === 0 && secName !== "Fase Visiva e Tattile") return;
+
+        const secEl = document.createElement('div');
+        secEl.className = 'section-block';
+        
+        let html = `<h2 class="section-title">${secName}</h2>`;
+        
+        // Sezione Visiva ed Icone speciali
+        if (secName === "Fase Visiva e Tattile") {
+          // Aggiungi le immagini Norwood / Ludwig / Incidenza in cima alla sezione Visiva
+          let diagHTML = '<div class="clinical-diagrams-row no-print">';
+          let diagramsCount = 0;
+
+          // Norwood
+          const norwoodVal = data.answers?.['100'];
+          if (norwoodVal && NORWOOD_IMAGES[norwoodVal]) {
+            const norwoodCard = `
+              <div class="diagram-card">
+                <img class="diagram-img" src="${NORWOOD_IMAGES[norwoodVal]}" alt="Scala Norwood ${norwoodVal}" />
+                <div class="diagram-label">Scala Norwood: ${norwoodVal}</div>
+              </div>
+            `;
+            diagHTML += norwoodCard;
+            diagramsCount++;
+          }
+
+          // Ludwig
+          const ludwigVal = data.answers?.['101'];
+          if (ludwigVal && LUDWIG_IMAGES[ludwigVal]) {
+            const ludwigCard = `
+              <div class="diagram-card">
+                <img class="diagram-img" src="${LUDWIG_IMAGES[ludwigVal]}" alt="Scala Ludwig Grado ${ludwigVal}" />
+                <div class="diagram-label">Scala Ludwig: Grado ${ludwigVal}</div>
+              </div>
+            `;
+            diagHTML += ludwigCard;
+            diagramsCount++;
+          }
+
+          // Incidenza Visiva Map
+          const incidTipoVal = data.answers?.['incid_tipo'];
+          if (incidTipoVal && INCIDENZE_IMAGES[incidTipoVal]) {
+            const incidCard = `
+              <div class="diagram-card">
+                <img class="diagram-img" src="${INCIDENZE_IMAGES[incidTipoVal]}" alt="Incidenza ${incidTipoVal}" />
+                <div class="diagram-label">Incidenza: ${incidTipoVal}</div>
+              </div>
+            `;
+            diagHTML += incidCard;
+            diagramsCount++;
+          }
+
+          diagHTML += '</div>';
+
+          if (diagramsCount > 0) {
+            html += diagHTML;
+          }
+        }
+
+        html += `<div class="answers-grid">`;
+        
+        items.forEach(item => {
+          let valHTML = "";
+          let cardClass = "";
+
+          if (item.isScale) {
+            const pct = item.a * 10;
+            valHTML = `
+              <div class="scale-bar-container">
+                <div class="scale-num">${item.a} / 10</div>
+                <div class="scale-bar">
+                  <div class="scale-fill" style="width: ${pct}%"></div>
+                </div>
+              </div>
+            `;
+          } else if (item.isCheck) {
+            valHTML = `<div class="badge-list">` + item.a.map(val => `<span class="badge-item">${val}</span>`).join('') + `</div>`;
+          } else {
+            valHTML = `<span class="answer-a">${item.a}</span>`;
+          }
+
+          if (item.isTextarea) {
+            cardClass = " full-width";
+            valHTML = `<div style="background:#fff; border: 1px solid var(--border); padding:10px; border-radius:6px; font-size:13.5px; white-space: pre-wrap; margin-top:4px;">${item.a}</div>`;
+          }
+
+          html += `
+            <div class="answer-card${cardClass}">
+              <span class="answer-q">${item.q}</span>
+              ${valHTML}
+            </div>
+          `;
+        });
+
+        // Caso Speciale: Matrice di Gravità Zone (Q103) in fondo alla sezione Visiva
+        if (secName === "Fase Visiva e Tattile" && data.gravity && Object.keys(data.gravity).length > 0) {
+          html += `
+            <div class="answer-card full-width" style="margin-top: 10px;">
+              <span class="answer-q">Gravità per Zona Clinica</span>
+              <table class="gravity-table">
+                <thead>
+                  <tr>
+                    <th>Zona Clinica</th>
+                    <th>Grado di Gravità Rilevato</th>
+                  </tr>
+                </thead>
+                <tbody>
+          `;
+          Object.entries(data.gravity).forEach(([zona, colIdx]) => {
+            let dotsHTML = '<div class="gravity-dot-container">';
+            for(let i=0; i<5; i++) {
+              const activeClass = i === colIdx ? ' active' : '';
+              dotsHTML += `<div class="gravity-dot${activeClass}"></div>`;
+            }
+            dotsHTML += '</div>';
+
+            html += `
+              <tr>
+                <td><strong>${zona}</strong></td>
+                <td>${dotsHTML} (Grado ${colIdx + 1})</td>
+              </tr>
+            `;
+          });
+          html += `
+                </tbody>
+              </table>
+            </div>
+          `;
+        }
+
+        // Caso Speciale: Patologie Riscontrate (Q116)
+        if (secName === "Fase Visiva e Tattile" && data.incidenze && data.incidenze.length > 0) {
+          let patHTML = data.incidenze.map(p => `<span class="badge-item rosso">${p}</span>`).join('');
+          html += `
+            <div class="answer-card full-width" style="margin-top: 10px;">
+              <span class="answer-q">Patologie Rilevate</span>
+              <div class="badge-list">${patHTML}</div>
+            </div>
+          `;
+        }
+
+        // Caso Speciale: Tabella Incidenze Dettaglio Rosso/Blu (Q117)
+        if (secName === "Fase Visiva e Tattile" && data.incidenzeTab && data.incidenzeTab.length > 0) {
+          let listHTML = data.incidenzeTab.map(i => {
+            const isBlu = ['Generalmente diffuso','Cuoio capelluto sottile','Cuoio capelluto grigiastro','Localizzazione del prurito zona superiore','Odore cuoio capelluto ammoniacale','Sudorazione intensa','Capelli fini'].includes(i);
+            const colorClass = isBlu ? ' blu' : ' rosso';
+            return `<span class="badge-item${colorClass}">${i}</span>`;
+          }).join('');
+          html += `
+            <div class="answer-card full-width" style="margin-top: 10px;">
+              <span class="answer-q">Dettaglio Classificazione Incidenze (Rosse / Blu)</span>
+              <div class="badge-list">${listHTML}</div>
+            </div>
+          `;
+        }
+
+        html += `</div>`; // fine answers-grid
+        secEl.innerHTML = html;
+        container.appendChild(secEl);
+      });
+
+      // Mostra contenuto
+      document.getElementById('loader').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+
+    function getCasoLabel(caso) {
+      const labels = {
+        "uomo": "Uomo Giovane",
+        "donna": "Donna Giovane",
+        "mamma": "Neo Mamma",
+        "menopausa": "Donna Mezza Età (Menopausa)",
+        "uomomezza": "Uomo Mezza Età",
+        "chemio": "Percorso Chemioterapico",
+        "generico": "Generico"
+      };
+      return labels[caso] || caso || '-';
+    }
+
+    function showError(msg) {
+      document.getElementById('loader').style.display = 'none';
+      const container = document.getElementById('sections-container');
+      container.innerHTML = `<div class="error-msg">❌ Errore: ${msg}</div>`;
+      document.getElementById('content').style.display = 'block';
+    }
+
+    // Carica al pronto
+    window.onload = initReport;
+  </script>
+</body>
+</html>

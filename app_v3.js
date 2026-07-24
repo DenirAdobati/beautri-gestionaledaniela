@@ -991,11 +991,10 @@ window.addEventListener('unhandledrejection', function(e) {
         const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
         const clientLandingUrl = `${baseUrl}consultazione.html?id=${client.id}`;
 
-        // Eventi bottoni
         card.querySelector('.btn-view').onclick = () => {
           if (isScheda) {
-            // Visualizza PDF in anteprima iframe direttamente in-page
-            pdfModalIframe.src = client.pdfUrl;
+            // Visualizza scheda.html in anteprima iframe direttamente in-page
+            pdfModalIframe.src = 'scheda.html?id=' + client.id;
             pdfModal.style.display = 'flex';
           } else {
             window.location.href = clientLandingUrl + "&admin=true";
@@ -1970,49 +1969,25 @@ window.addEventListener('unhandledrejection', function(e) {
       const nome = S.answers['1_first'] || '';
       const cognome = S.answers['1_last'] || '';
       const clientFullName = (cognome + ' ' + nome).trim() || 'Cliente Senza Nome';
-      const filenameClean = clientFullName + ' - Scheda Interna.pdf';
       const clientId = 'si_' + Date.now() + Math.random().toString(36).substring(2, 7);
 
-      showSiToast("Salvataggio in corso", "Generazione del report PDF in corso...", "loading");
+      showSiToast("Salvataggio in corso", "Salvataggio del record nel database...", "loading");
 
       try {
-        const htmlContent = generaHTMLPdf();
-        if (!htmlContent || htmlContent.length < 500) {
-          throw new Error('HTML non generato correttamente');
-        }
-
-        showSiToast("Salvataggio in corso", "Conversione del report in PDF...", "loading");
-        const pdfBase64 = await generaPdfBase64(htmlContent);
-
-        inviaAGoogleDrive(filenameClean, pdfBase64).catch(err => {
-          console.warn("Upload Google Drive fallito, ma continuiamo su Firebase:", err);
-        });
-
-        showSiToast("Salvataggio in corso", "Caricamento del PDF su Firebase...", "loading");
-        
-        if (firebaseActive && !auth.currentUser) {
-          await auth.signInAnonymously();
-        }
-
-        let pdfUrl = "";
-        if (firebaseActive) {
-          const pdfBlob = base64ToBlob(pdfBase64);
-          const storageRef = storage.ref().child(`schede_interne/${clientId}_scheda.pdf`);
-          const uploadTask = await storageRef.put(pdfBlob);
-          pdfUrl = await uploadTask.ref.getDownloadURL();
-        } else {
-          pdfUrl = "offline_mode_no_storage_url";
-        }
-
-        showSiToast("Salvataggio in corso", "Salvataggio del record nel database...", "loading");
-
         const docData = {
           id: clientId,
           name: clientFullName,
-          pdfUrl: pdfUrl,
           recordType: 'scheda_interna',
           casoTipo: S.casoTipo || 'generico',
-          createdAt: firebaseActive ? firebase.firestore.FieldValue.serverTimestamp() : Date.now()
+          createdAt: firebaseActive ? firebase.firestore.FieldValue.serverTimestamp() : Date.now(),
+          answers: S.answers,
+          checkAns: Object.fromEntries(
+            Object.entries(S.checkAns).map(([k, set]) => [k, Array.from(set || [])])
+          ),
+          otherTxt: S.otherTxt,
+          gravity: S.gravity,
+          incidenze: Array.from(S.incidenze || []),
+          incidenzeTab: Array.from(S.incidenzeTab || [])
         };
 
         if (firebaseActive) {
@@ -2024,7 +1999,7 @@ window.addEventListener('unhandledrejection', function(e) {
         }
 
         showSiToast("Scheda Salvata!", "La scheda clinica è stata salvata con successo.", "success");
-        setTimeout(hideToast, 2000);
+        setTimeout(hideToast, 1500);
 
         siResetForm();
         const tabBtnStorico = document.getElementById('btn-tab-storico');
