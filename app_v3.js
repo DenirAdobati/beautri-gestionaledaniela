@@ -2050,6 +2050,9 @@ window.addEventListener('unhandledrejection', function(e) {
       }
     }
 
+    // Inizializza il questionario della Scheda Interna che è attiva di default al caricamento
+    initQuestionnaire();
+
     // Ripristina il tab storico se specificato nella query string (es: per tornare indietro da landing)
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('tab') === 'history') {
