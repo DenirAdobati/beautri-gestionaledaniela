@@ -956,7 +956,9 @@ window.addEventListener('unhandledrejection', function(e) {
         const clientLandingUrl = `${baseUrl}consultazione.html?id=${client.id}`;
 
         // Eventi bottoni
-        card.querySelector('.btn-view').onclick = () => window.open(clientLandingUrl, '_blank');
+        card.querySelector('.btn-view').onclick = () => {
+          window.location.href = clientLandingUrl + "&admin=true";
+        };
         card.querySelector('.btn-copy').onclick = async () => {
           try {
             await navigator.clipboard.writeText(clientLandingUrl);
@@ -1095,6 +1097,15 @@ window.addEventListener('unhandledrejection', function(e) {
       if (duration > 0) {
         setTimeout(hideToast, duration);
       }
+    // Ripristina il tab storico se specificato nella query string (es: per tornare indietro da landing)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('tab') === 'history') {
+      const tabBtnStorico = document.querySelector('.tab-btn[data-tab="tab-storico"]');
+      if (tabBtnStorico) {
+        setTimeout(() => {
+          tabBtnStorico.click();
+        }, 100);
+      }
     }
 
     function hideToast() {
@@ -1116,6 +1127,14 @@ window.addEventListener('unhandledrejection', function(e) {
     const pdfModal = document.getElementById('pdf-modal');
     const pdfModalIframe = document.getElementById('pdf-modal-iframe');
     const pdfModalClose = document.getElementById('pdf-modal-close');
+    const btnBackToAdmin = document.getElementById('btn-back-to-admin');
+    
+    // Mostra il tasto indietro se visualizzato dall'amministratore Daniela (?admin=true)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('admin') === 'true' && btnBackToAdmin) {
+      btnBackToAdmin.style.display = 'flex';
+    }
+
     const displayTreatmentsList = document.getElementById('display-treatments-list');
     const displayPaymentPlan = document.getElementById('display-payment-plan');
     const cardProductsSection = document.getElementById('card-products-section');
@@ -1135,8 +1154,6 @@ window.addEventListener('unhandledrejection', function(e) {
     const displayHours = document.getElementById('display-hours');
     const btnWhatsappContact = document.getElementById('btn-whatsapp-contact');
 
-    // 1. Estrai ID dalla query string
-    const urlParams = new URLSearchParams(window.location.search);
     const clientId = urlParams.get('id');
 
     if (!clientId) {
