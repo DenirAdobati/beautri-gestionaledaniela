@@ -942,6 +942,76 @@ window.addEventListener('unhandledrejection', function(e) {
       };
     }
 
+    // Pulsante Crea Nuova Cartella
+    const btnCreateFolder = document.getElementById('btn-create-folder');
+    if (btnCreateFolder) {
+      btnCreateFolder.onclick = async () => {
+        const folderName = prompt("Inserisci il nome e cognome per la nuova cartella:");
+        if (!folderName || !folderName.trim()) return;
+
+        showToast("Creazione cartella...", "Salvataggio...", "loading");
+        try {
+          const folderId = 'folder_' + Date.now();
+          const placeholderDoc = {
+            id: folderId,
+            name: folderName.trim(),
+            recordType: 'folder_placeholder',
+            createdAt: new Date().toISOString()
+          };
+
+          if (firebaseActive) {
+            await db.collection('tricologia_consultations').doc(folderId).set(placeholderDoc);
+          } else {
+            let schedeData = JSON.parse(localStorage.getItem('beautri_offline_consultations') || '[]');
+            schedeData.push(placeholderDoc);
+            localStorage.setItem('beautri_offline_consultations', JSON.stringify(schedeData));
+          }
+
+          showToast("Cartella creata", "Cartella '" + folderName + "' creata con successo.", "success", 1500);
+          loadClientsHistory();
+        } catch(err) {
+          console.error("Errore creazione cartella:", err);
+          showToast("Errore", "Impossibile creare la cartella.", "error", 3000);
+        }
+      };
+    }
+
+    async function moveDocumentToFolder(docId, targetFolderName) {
+      showToast("Spostamento in corso", "Salvataggio...", "loading");
+      try {
+        if (firebaseActive) {
+          await db.collection('tricologia_consultations').doc(docId).update({
+            name: targetFolderName
+          });
+        } else {
+          // Aggiorna offline
+          let schedeData = JSON.parse(localStorage.getItem('beautri_offline_consultations') || '[]');
+          let localData = JSON.parse(localStorage.getItem('beautri_local_consultations') || '[]');
+
+          let found = false;
+          schedeData = schedeData.map(item => {
+            if (item.id === docId) { item.name = targetFolderName; found = true; }
+            return item;
+          });
+          if (!found) {
+            localData = localData.map(item => {
+              if (item.id === docId) { item.name = targetFolderName; }
+              return item;
+            });
+          }
+
+          localStorage.setItem('beautri_offline_consultations', JSON.stringify(schedeData));
+          localStorage.setItem('beautri_local_consultations', JSON.stringify(localData));
+        }
+
+        showToast("Spostato", "Documento inserito nella cartella " + targetFolderName, "success", 1500);
+        loadClientsHistory();
+      } catch (err) {
+        console.error("Errore spostamento:", err);
+        showToast("Errore", "Impossibile spostare il documento.", "error", 3000);
+      }
+    }
+
     function renderClientsList(items) {
       if (items.length === 0) {
         clientsList.innerHTML = '<div class="no-clients">Nessun cliente trovato nello storico.</div>';
@@ -987,7 +1057,9 @@ window.addEventListener('unhandledrejection', function(e) {
         const folderDetails = document.createElement('details');
         folderDetails.className = 'client-folder-details';
 
-        const docCount = folder.documents.length;
+        // Filtra i placeholder per contare i soli documenti reali
+        const realDocs = folder.documents.filter(d => d.recordType !== 'folder_placeholder');
+        const docCount = realDocs.length;
         const docWord = docCount === 1 ? 'documento' : 'documenti';
 
         folderDetails.innerHTML = `
@@ -1002,12 +1074,60 @@ window.addEventListener('unhandledrejection', function(e) {
           <div class="folder-content"></div>
         `;
 
+        const summary = folderDetails.querySelector('.client-folder-summary');
+        
+        // --- DRAG & DROP ON FOLDER ---
+        summary.ondragover = (e) => {
+          e.preventDefault();
+          summary.style.background = 'rgba(234, 179, 8, 0.1)';
+          summary.style.border = '2px dashed var(--gold)';
+          summary.style.borderRadius = '8px';
+        };
+        summary.ondragleave = () => {
+          summary.style.background = '';
+          summary.style.border = '';
+          summary.style.borderRadius = '';
+        };
+        summary.ondrop = async (e) => {
+          e.preventDefault();
+          summary.style.background = '';
+          summary.style.border = '';
+          summary.style.borderRadius = '';
+          const docId = e.dataTransfer.getData('text/plain');
+          if (docId) {
+            moveDocumentToFolder(docId, folder.displayName);
+          }
+        };
+
         const folderContent = folderDetails.querySelector('.folder-content');
 
+        // Se non ci sono documenti reali, mostra messaggio segnaposto
+        if (realDocs.length === 0) {
+          const emptyMsg = document.createElement('div');
+          emptyMsg.className = 'no-clients';
+          emptyMsg.style.padding = '12px';
+          emptyMsg.style.fontSize = '12px';
+          emptyMsg.textContent = "Cartella vuota. Trascina qui un file o usa 'Sposta' per inserire documenti.";
+          folderContent.appendChild(emptyMsg);
+        }
+
         folder.documents.forEach(client => {
+          // Salta il rendering del file segnaposto interno
+          if (client.recordType === 'folder_placeholder') return;
+
           const card = document.createElement('div');
           card.className = 'client-card';
           card.id = `card-${client.id}`;
+
+          // --- MAKE DRAGGABLE ---
+          card.draggable = true;
+          card.ondragstart = (e) => {
+            e.dataTransfer.setData('text/plain', client.id);
+            card.style.opacity = '0.5';
+          };
+          card.ondragend = () => {
+            card.style.opacity = '1';
+          };
 
           let dateStr = "N/D";
           if (client.createdAt) {
@@ -1041,6 +1161,9 @@ window.addEventListener('unhandledrejection', function(e) {
               <button type="button" class="btn-icon-only btn-copy" title="Copia Link" style="${hideCopyBtn ? 'display: none;' : ''}">
                 <i data-lucide="copy" style="width: 16px; height: 16px;"></i>
               </button>
+              <button type="button" class="btn-icon-only btn-move" title="Sposta in cartella">
+                <i data-lucide="folder-input" style="width: 16px; height: 16px;"></i>
+              </button>
               <button type="button" class="btn-icon-only btn-delete" style="color: var(--red); border-color: rgba(239, 68, 68, 0.2);" title="Elimina">
                 <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
               </button>
@@ -1073,6 +1196,30 @@ window.addEventListener('unhandledrejection', function(e) {
             };
           }
 
+          // --- CLICK TO MOVE ---
+          card.querySelector('.btn-move').onclick = () => {
+            const folderNames = Object.keys(groups).map(k => groups[k].displayName);
+            if (folderNames.length === 0) {
+              alert("Nessuna cartella disponibile.");
+              return;
+            }
+
+            let msg = "Sposta questo documento in una delle seguenti cartelle:\n\n";
+            folderNames.forEach((name, i) => {
+              msg += `${i + 1}. ${name}\n`;
+            });
+            msg += "\nInserisci il numero della cartella di destinazione:";
+
+            const choice = prompt(msg);
+            if (choice === null) return;
+            const idx = parseInt(choice, 10) - 1;
+            if (idx >= 0 && idx < folderNames.length) {
+              moveDocumentToFolder(client.id, folderNames[idx]);
+            } else {
+              alert("Scelta non valida.");
+            }
+          };
+
           card.querySelector('.btn-delete').onclick = async () => {
             let typeName = 'la consulenza';
             if (isScheda) typeName = 'la scheda interna';
@@ -1098,16 +1245,22 @@ window.addEventListener('unhandledrejection', function(e) {
                 card.remove();
                 showToast("Eliminato", "Elemento rimosso con successo.", "success", 1800);
                 
-                // Se la cartella è ora vuota, rimuovila
-                if (folderContent.children.length === 0) {
-                  folderDetails.remove();
+                // Aggiorna contatore
+                const newRealDocs = folderContent.querySelectorAll('.client-card');
+                if (newRealDocs.length === 0) {
+                  const hasPlaceholder = folder.documents.some(d => d.recordType === 'folder_placeholder');
+                  if (hasPlaceholder) {
+                    folderContent.innerHTML = `<div class="no-clients" style="padding: 12px; font-size: 12px;">Cartella vuota. Trascina qui un file o usa 'Sposta' per inserire documenti.</div>`;
+                    folderDetails.querySelector('.folder-count').textContent = `0 documenti`;
+                  } else {
+                    folderDetails.remove();
+                  }
                 } else {
-                  const newCount = folderContent.children.length;
+                  const newCount = newRealDocs.length;
                   const newWord = newCount === 1 ? 'documento' : 'documenti';
                   folderDetails.querySelector('.folder-count').textContent = `${newCount} ${newWord}`;
                 }
 
-                // Se non ci sono più cartelle
                 if (clientsList.children.length === 0) {
                   clientsList.innerHTML = '<div class="no-clients">Nessun cliente trovato nello storico.</div>';
                 }
