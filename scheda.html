@@ -361,6 +361,9 @@
 
     /* Printing styles */
     @media print {
+      @page {
+        margin: 12mm 15mm;
+      }
       body {
         background: #FFFFFF;
         padding: 0;
@@ -451,7 +454,7 @@
   <!-- Firebase SDK Compat -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-  <script src="firebase-config-v2.js?v=46"></script>
+  <script src="firebase-config-v2.js?v=47"></script>
 
   <script>
     // Configurazione domande per rendere le etichette descrittive ed ordinate
