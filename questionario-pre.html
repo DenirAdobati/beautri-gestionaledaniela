@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Scheda Beautrìco — Questionario Pre-Consulenza</title>
+  <link rel="icon" type="image/png" href="https://beautri.it/wp-content/uploads/2020/02/cropped-favicon_beautri-270x270.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --gold: #E4BA3F;
+      --gold-dark: #CA8A04;
+      --dark: #000000;
+      --bg: #FFFFFF;
+      --gray: #6B7280;
+      --gray-light: #F3F4F6;
+      --border: #E5E7EB;
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Karla', 'Inter', sans-serif;
+      background-color: var(--bg);
+      color: var(--dark);
+      line-height: 1.5;
+      overflow-x: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Container */
+    .q-container {
+      width: 100%;
+      max-width: 720px;
+      padding: 40px 24px;
+      position: relative;
+      min-height: 480px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* Steps navigation header */
+    .progress-wrapper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: var(--gray-light);
+      z-index: 100;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: var(--gold);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* Card */
+    .step-card {
+      display: none;
+      animation: fadeIn 0.4s ease-in-out forwards;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .step-card.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Titles & Headings */
+    h1, h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--dark);
+      line-height: 1.3;
+    }
+
+    h1 em, h2 em {
+      font-style: italic;
+      color: var(--gold-dark);
+    }
+
+    .description {
+      font-size: 15px;
+      color: var(--gray);
+      margin-top: 4px;
+    }
+
+    /* Form Inputs */
+    .input-text {
+      width: 100%;
+      border: none;
+      border-bottom: 2px solid var(--border);
+      padding: 12px 4px;
+      font-size: 20px;
+      font-family: inherit;
+      color: var(--dark);
+      background: transparent;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .input-text:focus {
+      border-color: var(--gold);
+    }
+
+    /* Contact Info Row */
+    .inp-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    .inp-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .inp-group label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--gray);
+      letter-spacing: 0.05em;
+    }
+
+    /* Address Grid */
+    .address-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .address-grid .full-w {
+      grid-column: span 2;
+    }
+
+    /* Multiple Choices List */
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 320px;
+      overflow-y: auto;
+      padding-right: 8px;
+      margin-top: 10px;
+    }
+
+    /* Custom Scrollbar for options */
+    .options-list::-webkit-scrollbar {
+      width: 6px;
+    }
+    .options-list::-webkit-scrollbar-track {
+      background: var(--gray-light);
+      border-radius: 3px;
+    }
+    .options-list::-webkit-scrollbar-thumb {
+      background: var(--gold);
+      border-radius: 3px;
+    }
+
+    .opt-btn {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      background: rgba(228, 186, 63, 0.05);
+      border: 1px solid rgba(228, 186, 63, 0.2);
+      padding: 14px 20px;
+      border-radius: var(--radius);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--dark);
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s ease;
+      gap: 12px;
+    }
+
+    .opt-btn:hover {
+      background: rgba(228, 186, 63, 0.1);
+      border-color: var(--gold);
+    }
+
+    .opt-btn.selected {
+      background: rgba(228, 186, 63, 0.18);
+      border-color: var(--gold);
+      box-shadow: 0 0 0 1px var(--gold);
+    }
+
+    .check-box, .radio-box {
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--gray);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: #FFF;
+      transition: all 0.2s ease;
+    }
+
+    .radio-box {
+      border-radius: 50%;
+    }
+
+    .opt-btn.selected .check-box {
+      border-color: var(--gold-dark);
+      background: var(--gold);
+    }
+
+    .opt-btn.selected .radio-box {
+      border-color: var(--gold-dark);
+      background: var(--gold);
+    }
+
+    .check-box::after {
+      content: '';
+      width: 4px;
+      height: 8px;
+      border: solid #FFF;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+      display: none;
+      margin-bottom: 2px;
+    }
+
+    .radio-box::after {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: #FFF;
+      border-radius: 50%;
+      display: none;
+    }
+
+    .opt-btn.selected .check-box::after {
+      display: block;
+    }
+
+    .opt-btn.selected .radio-box::after {
+      display: block;
+    }
+
+    .other-row {
+      margin-top: 8px;
+      padding: 0 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .other-lbl {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gold-dark);
+    }
+
+    .other-inp {
+      flex: 1;
+      border: none;
+      border-bottom: 1.5px solid var(--border);
+      padding: 6px 0;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+    }
+
+    .other-inp:focus {
+      border-color: var(--gold);
+    }
+
+    /* Buttons Row */
+    .nav-buttons {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 30px;
+    }
+
+    .btn-submit, .btn-back {
+      padding: 12px 24px;
+      font-size: 15px;
+      font-weight: 700;
+      border-radius: var(--radius);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-submit {
+      background: var(--gold);
+      color: var(--dark);
+      border: none;
+      box-shadow: 0 4px 12px rgba(228, 186, 63, 0.25);
+    }
+
+    .btn-submit:hover {
+      background: var(--gold-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn-back {
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--gray);
+    }
+
+    .btn-back:hover {
+      border-color: var(--gray);
+      color: var(--dark);
+    }
+
+    /* Textarea */
+    textarea {
+      width: 100%;
+      height: 120px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      font-size: 16px;
+      font-family: inherit;
+      resize: none;
+      outline: none;
+      margin-top: 10px;
+    }
+
+    textarea:focus {
+      border-color: var(--gold);
+    }
+
+    /* File Upload Area */
+    .file-upload-box {
+      border: 2px dashed rgba(228, 186, 63, 0.4);
+      border-radius: var(--radius);
+      padding: 30px;
+      text-align: center;
+      background: rgba(228, 186, 63, 0.02);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 10px;
+    }
+
+    .file-upload-box:hover {
+      background: rgba(228, 186, 63, 0.05);
+      border-color: var(--gold);
+    }
+
+    .file-name-preview {
+      margin-top: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gold-dark);
+    }
+
+    /* Loader Modal */
+    .loader-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 1000;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid var(--gray-light);
+      border-top: 5px solid var(--gold);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 16px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Embedded Video Section */
+    .video-container {
+      position: relative;
+      padding-bottom: 56.25%; /* 16:9 ratio */
+      height: 0;
+      overflow: hidden;
+      max-width: 100%;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      margin-top: 15px;
+    }
+
+    .video-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Progress bar -->
+  <div class="progress-wrapper">
+    <div class="progress-bar" id="p-bar"></div>
+  </div>
+
+  <!-- Loader Overlay -->
+  <div id="loader-overlay" class="loader-overlay">
+    <div class="spinner"></div>
+    <h3 id="loader-text" style="font-weight:700; color:var(--dark);">Invio risposte in corso...</h3>
+  </div>
+
+  <div class="q-container">
+    <form id="pre-form" onsubmit="event.preventDefault();">
+
+      <!-- STEP 0: Welcome Screen -->
+      <div class="step-card active" id="step-0">
+        <h1 style="font-size: 28px; text-align: center;"><em>✨ La tua consulenza Beautrìco inizia da qui</em></h1>
+        <p class="description" style="text-align: center; font-size:16px; margin-top:15px; line-height: 1.6;">
+          Dedicati un momento per te stesso/a e compila la <strong>Scheda Beautrìco</strong>. Questo permetterà a Daniela, prima di incontrarti, di riflettere sui tuoi obiettivi e le tue aspettative, così da poter personalizzare al meglio <em>la tua consulenza</em>.
+        </p>
+        <div class="nav-buttons" style="justify-content: center; margin-top:20px;">
+          <button type="button" class="btn-submit" onclick="goNext()" style="font-size: 16px; padding: 14px 32px;">
+            CLICCA QUI PER INIZIARE
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 1: Name and Surname -->
+      <div class="step-card" id="step-1">
+        <h2>Iniziamo da te! <em>Come ti chiami?</em></h2>
+        <div class="inp-row">
+          <div class="inp-group">
+            <label>Nome</label>
+            <input type="text" class="input-text" id="ans-1-first" placeholder="Nome" required>
+          </div>
+          <div class="inp-group">
+            <label>Cognome</label>
+            <input type="text" class="input-text" id="ans-1-last" placeholder="Cognome" required>
+          </div>
+        </div>
+        <div class="nav-buttons">
+          <button type="button" class="btn-submit" onclick="goNext()">Avanti →</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Date of Birth -->
+      <div class="step-card" id="step-2">
+        <h2>Quando sei <em>nata/o?</em></h2>
+        <p class="description">Inserisci la tua data di nascita</p>
+        <input type="date" class="input-text" id="ans-2" required>
+        <div class="nav-buttons">
+          <button type="button" class="btn-back" onclick="goBack()">← Indietro</button>
+          <button type="button" class="btn-submit" onclick="goNext()">Avanti →</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: Job -->
+      <div class="step-card" id="step-3">
+        <h2>Di cosa <em>ti occupi</em> nella vita?</h2>
+        <input type="text" class="input-text" id="ans-3" placeholder="La tua professione…" required>
+        <div class="nav-buttons">
+          <button type="button" class="btn-back" onclick="goBack()">← Indietro</button>
+          <button type="button" class="btn-submit" onclick="goNext()">Avanti →</button>
+        </div>
+      </div>
+
+      <!-- STEP 4: Address -->
+      <div class="step-card" id="step-4">
+        <h2>Dove <em>abiti?</em></h2>
+        <div class="address-grid">
+          <div class="inp-group full-w">
+            <label>Indirizzo</label>
+            <input type="text" class="input-text" id="ans-4-addr" placeholder="Via / Piazza e N. Civico" required>
+          </div>
+          <div class="inp-group full-w">
+            <label>Indirizzo Linea 2 (Opzionale)</label>
+            <input type="text" class="input-text" id="ans-4-addr2" placeholder="Scala, Interno…">
+          </div>
+          <div class="inp-group">
+            <label>Città</label>
+            <input type="text" class="input-text" id="ans-4-city" placeholder="Città" required>
+          </div>
+          <div class="inp-group">
+            <label>Provincia / Regione</label>
+            <input type="text" class="input-text" id="ans-4-prov" placeholder="Provincia" required>
+          </div>
+          <div class="inp-group">
+            <label>CAP</label>
+            <input type="text" class="input-text" id="ans-4-zip" placeholder="CAP" required>
+          </div>
+          <div class="inp-group">
+            <label>Nazione</label>
+            <input type="text" class="input-text" id="ans-4-country" placeholder="Italia" value="Italia" required>
+          </div>
+        </div>
+        <div class="nav-buttons">
+          <button type="button" class="btn-back" onclick="goBack()">← Indietro</button>
+          <button type="button" class="btn-submit" onclick="goNext()">Avanti →</button>
+        </div>
+      </div>
+
+      <!-- STEP 5: Email -->
+      <div class="step-card" id="step-5">
+        <h2>La tua <em>email</em></h2>
+        <input type="email" class="input-text" id="ans-5" placeholder="nome@esempio.it" required>
+        <div class="nav-buttons">
+          <button type="button" class="btn-back" onclick="goBack()">← Indietro</button>
+          <button type="button" class="btn-submit" onclick="goNext()">Avanti →</button>
+        </div>
+      </div>
+
+      <!-- STEP 6: Phone Number -->
+      <div class="step-card" id="step-6">
+        <h2>Il tuo <em>numero di telefono</em></h2>
+        <p class="description">Per ricevere il report della consulenza direttamente sul tuo smartphone</p>
+        <input type="tel" class="input-text" id="ans-6" placeholder="+39 333 1234567" required>
+        <div class="nav-buttons">
+          <button type="button" class="btn-back" onclick="goBack()">← Indietro</button>
+          <button type="button" class="btn-submit" onclick="goNext()">Avanti →</button>
+        </div>
+      </div>
+
+      <!-- STEP 7: Why did you decide to do the consultation? (Checkbox) -->
+      <div class="step-card" id="step-7">
+        <h2>Perché hai deciso di voler fare la nostra consulenza <em>"Beautrico"?</em></h2>
+        <p class="description">Scegli tutto ciò che senti vero per te, anche più di una risposta.</p>
+        <div class="options-list" id="opts-7">
+          <!-- Dinamico -->
+        </div>
+        <div class="other-row">
+          <span class="other-lbl">Altro:</span>
+          <input type="text" class="other-inp" id="ans-7-other" placeholder="Specifica…">
+        </div>
+        <div class="nav-buttons">
+          <button type="button" class="btn-back" onclick="goBack()">← Indietro</button>
+          <button type="button" class="btn-submit" onclick="goNext()">Avanti →</button>
+        </div>
+      </div>
+
+      <!-- STEP 8: Capelli desiderati (Checkbox) -->
+      <div class="step-card" id="step-8">
+        <h2>Se potessi scegliere, <em>cosa vorresti</em> per i tuoi capelli?</h2>
+        <p class="description">Puoi selezionare più risposte.</p>
+        <div class="options-list" id="opts-8">
+          <!-- Dinamico -->
+        </div>
+        <div class="other-row">
+          <span class="other-lbl">Altro:</span>
+          <input type="text" class="other-inp" id="ans-8-other" placeholder="Specifica…">
+        </div>
+        <div class="nav-buttons">
+          <button type="button" class="btn-back" onclick="goBack()">← Indietro</button>
+          <button type="button" class="btn-submit" onclick="goNext()">Avanti →</button>
+        </div>
+      </div>
+
+      <!-- STEP 9: Tempo cambiamenti (Radio) -->
+      <div class="step-card" id="step-9">
+        <h2>In quanto tempo ti piacerebbe iniziare a <em>vedere dei cambiamenti?</em></h2>
+        <div class="options-list" id="opts-9">
+          <!-- Dinamico -->
+        </div>
+        <div class="nav-buttons">
+          <button type="button" class="btn-back" onclick="goBack()">← Indietro</button>
+          <button type="button" class="btn-submit" onclick="goNext()">Avanti →</button>
+        </div>
+      </div>
+
+      <!-- STEP 10: Rapporto capelli (Textarea) -->
+      <div class="step-card" id="step-10">
+        <h2>Raccontaci il tuo <em>rapporto con i tuoi capelli</em>, oggi</h2>
+        <p class="description">Non c'è una risposta giusta: scrivi liberamente sensazioni, emozioni, abitudini...</p>
+        <textarea id="ans-10" placeholder="Scrivi qui liberamente…" required></textarea>
+        <div class="nav-buttons">
+          <button type="button" class="btn-back" onclick="goBack()">← Indietro</button>
+          <button type="button" class="btn-submit" onclick="goNext()">Avanti →</button>
+        </div>
+      </div>
+
+      <!-- STEP 11: Situazione attuale (Checkbox) -->
+      <div class="step-card" id="step-11">
+        <h2>In quale di queste <em>situazioni</em> ti trovi attualmente?</h2>
+        <p class="description">Puoi selezionare più risposte.</p>
+        <div class="options-list" id="opts-11">
+          <!-- Dinamico -->
+        </div>
+        <div class="nav-buttons">
+          <button type="button" class="btn-back" onclick="goBack()">← Indietro</button>
+          <button type="button" class="btn-submit" onclick="goNext()">Avanti →</button>
+        </div>
+      </div>
+
+      <!-- STEP 12: Livello influenza (Radio) -->
+      <div class="step-card" id="step-12">
+        <h2>Quanto il rapporto con i tuoi capelli <em>ti influenza?</em></h2>
+        <div class="options-list" id="opts-12">
+          <!-- Dinamico -->
+        </div>
+        <div class="nav-buttons">
+          <button type="button" class="btn-back" onclick="goBack()">← Indietro</button>
+          <button type="button" class="btn-submit" onclick="goNext()">Avanti →</button>
+        </div>
+      </div>
+
+      <!-- STEP 13: Cosa hai già provato (Checkbox) -->
+      <div class="step-card" id="step-13">
+        <h2>Cosa hai <em>già provato</em> per prenderti cura della tua cute e dei tuoi capelli?</h2>
+        <p class="description">Puoi selezionare più risposte.</p>
+        <div class="options-list" id="opts-13">
+          <!-- Dinamico -->
+        </div>
+        <div class="other-row">
+          <span class="other-lbl">Altro:</span>
+          <input type="text" class="other-inp" id="ans-13-other" placeholder="Specifica…">
+        </div>
+        <div class="nav-buttons">
+          <button type="button" class="btn-back" onclick="goBack()">← Indietro</button>
+          <button type="button" class="btn-submit" onclick="goNext()">Avanti →</button>
+        </div>
+      </div>
+
+      <!-- STEP 14: Foto prodotti (File, Optional) -->
+      <div class="step-card" id="step-14">
+        <h2>Se vuoi, mostraci cosa stai <em>usando</em> in questo momento</h2>
+        <p class="description">Una foto può permettere a Daniela di controllare gli ingredienti dei tuoi attuali prodotti (Facoltativo).</p>
+        
+        <input type="file" id="ans-14-file" accept="image/*" style="display: none;" onchange="handleFileSelected(this)">
+        <div class="file-upload-box" onclick="document.getElementById('ans-14-file').click()">
+          <svg style="width: 48px; height: 48px; color: var(--gold); margin-bottom: 8px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21 15 16 10 5 21"/>
+          </svg>
+          <p style="font-weight: 700; font-size:15px;">Fai una foto o carica dal dispositivo</p>
+          <p class="description" style="font-size:12px;">Immagini in formato JPG, PNG</p>
+          <div class="file-name-preview" id="file-preview-name">Nessun file selezionato</div>
+        </div>
+
+        <div class="nav-buttons">
+          <button type="button" class="btn-back" onclick="goBack()">← Indietro</button>
+          <button type="button" class="btn-submit" onclick="goNext()">Avanti →</button>
+        </div>
+      </div>
+
+      <!-- STEP 15: Risultati trattamenti (Radio) -->
+      <div class="step-card" id="step-15">
+        <h2>Ciò che hai fatto ti ha permesso di ottenere dei <em>risultati?</em></h2>
+        <div class="options-list" id="opts-15">
+          <!-- Dinamico -->
+        </div>
+        <div class="other-row">
+          <span class="other-lbl">Altro:</span>
+          <input type="text" class="other-inp" id="ans-15-other" placeholder="Specifica…">
+        </div>
+        <div class="nav-buttons">
+          <button type="button" class="btn-back" onclick="goBack()">← Indietro</button>
+          <button type="button" class="btn-submit" onclick="goNext()">Avanti →</button>
+        </div>
+      </div>
+
+      <!-- STEP 16: Cosa vorresti fare (Checkbox) -->
+      <div class="step-card" id="step-16">
+        <h2>Cosa ti piacerebbe fare ancora che <em>non hai mai fatto?</em></h2>
+        <p class="description">Puoi selezionare più risposte.</p>
+        <div class="options-list" id="opts-16">
+          <!-- Dinamico -->
+        </div>
+        <div class="other-row">
+          <span class="other-lbl">Altro:</span>
+          <input type="text" class="other-inp" id="ans-16-other" placeholder="Specifica…">
+        </div>
+        <div class="nav-buttons">
+          <button type="button" class="btn-back" onclick="goBack()">← Indietro</button>
+          <button type="button" class="btn-submit" onclick="submitForm()">Invia Risposte</button>
+        </div>
+      </div>
+
+      <!-- STEP 17: Thank you screen -->
+      <div class="step-card" id="step-17">
+        <h2 style="text-align: center;"><em>Daniela ha qualcosa da dirti. 💛</em></h2>
+        <p class="description" style="text-align: center; font-size:15px; margin-bottom:15px;">Hai compilato correttamente la tua Scheda Beautrìco.</p>
+        <div class="video-container">
+          <iframe src="https://www.youtube.com/embed/1XyECwiU2Qs" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Firebase SDK Compat -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+  <script src="firebase-config-v2.js?v=41"></script>
+
+  <script>
+    // Configurazione domande
+    const OPTIONS_DB = {
+      "7": [
+        "Sto perdendo troppi capelli",
+        "Ho dolore quando tocco i capelli",
+        "Ho prurito e un cuoio capelluto dolorante",
+        "Sento i miei capelli più sottili",
+        "Voglio contrastare la caduta stagionale",
+        "Ho capelli sempre sporchi e appesantiti",
+        "Ho un'eccessiva desquamazione",
+        "Ho tantissima forfora e prurito",
+        "Sento calore ed ho rossore persistente in alcune zone o in tutto il cuoio capelluto",
+        "Voglio prevenire un futuro diradamento genetico",
+        "Per gestire al meglio i miei capelli, per creare una corretta routine giornaliera",
+        "Voglio essere ascoltata/o e capita/o per il mio disagio (dato dallo stato di salute di cute e capelli)",
+        "Voglio gestire al meglio la caduta di capelli post parto",
+        "Devo o sto affrontando un percorso di chemioterapia e voglio capire meglio come affrontare questo periodo delicato",
+        "Vivo giornalmente con problemi di psoriasi e voglio una soluzione",
+        "Ho delle chiazze completamente senza capelli in testa",
+        "I miei capelli sono flosci e non hanno corpo",
+        "Ho capelli rovinati, con doppie punte e destrutturati",
+        "Sto affrontando la menopausa e non riesco più a gestire i miei capelli",
+        "Non capisco come mai i miei capelli non sono più quelli di prima",
+        "Perdo costantemente i capelli",
+        "Sono in gravidanza e non so come gestire i miei capelli",
+        "Semplicemente voglio saper gestire i miei capelli correttamente durante tutto l'anno (con prodotti personalizzati), Cambiando la routine stagione per stagione."
+      ],
+      "8": [
+        "Avere una chioma più folta",
+        "Ispessire i capelli",
+        "Rendere i capelli meno fragili",
+        "Eliminare la forfora",
+        "Eliminare il sebo",
+        "Dare più volume ai capelli",
+        "Avere capelli meno crespi",
+        "Avere più luminosità",
+        "Riparare i capelli danneggiati",
+        "Avere lenito il cuoio capelluto",
+        "Avere capelli che si sporcano meno velocemente",
+        "Saper gestire meglio i miei capelli",
+        "Avere le risposte che ho sempre cercato"
+      ],
+      "9": [
+        "1 Mese",
+        "3 Mesi",
+        "5 Mesi",
+        "Oltre"
+      ],
+      "11": [
+        "Disagio personale",
+        "Disagio sociale",
+        "A volte ci penso",
+        "Non mi creo problemi",
+        "Mi focalizzo su altro",
+        "Mai stata/o cosi serena/o",
+        "Sono preoccupata/o"
+      ],
+      "12": [
+        "Mi piacciono come sono",
+        "Vorrei essere diversamente",
+        "Penso spesso a come dovrei essere",
+        "Sono consapevole di avere un'anomalia ma non mi faccio problemi",
+        "Vorrei ritornare come anni fa"
+      ],
+      "13": [
+        "Non ho mai fatto nulla",
+        "Faccio il fai da te",
+        "Prendo idee dai social media",
+        "Mi sono rivolta/o ad un dermatologo",
+        "Seguo una cura farmacologica",
+        "Mi sono rivolta/o al mio parrucchiere",
+        "Mi sono rivolta/o ad un centro tricologico",
+        "Seguo i consigli del farmacista",
+        "Mi confronto con amici e parenti",
+        "Ho fatto tanto senza avere risultati",
+        "Non ho pazienza e costanza, va bene cosi",
+        "Poco niente ma è ora che corro ai ripari"
+      ],
+      "15": [
+        "No",
+        "Non più di tanto",
+        "Sì"
+      ],
+      "16": [
+        "Prendermi cura con consapevolezza",
+        "Eseguire un trapianto dei capelli",
+        "Rivolgermi ad una clinica",
+        "Eseguire un percorso che mi accompagni a raggiungere i miei obbiettivi",
+        "Essere seguita/o giornalmente da personale qualificato",
+        "Utilizzare prodotti personalizzati che non fanno male ai miei capelli",
+        "Non essere lasciata/o solo dopo aver acquistato i prodotti",
+        "Più supporto in tutto e per tutto (nell'utilizzo dei prodotti, modalità, coaching...)"
+      ]
+    };
+
+    let currentStep = 0;
+    const totalSteps = 17;
+    const answers = {};
+    const checkAns = {};
+    const otherTxt = {};
+    let selectedFile = null;
+
+    let firebaseActive = false;
+    let db = null;
+    let storage = null;
+
+    // Connessione Firebase
+    try {
+      if (typeof firebase !== 'undefined' && window.FIREBASE_CONFIG_LOCAL) {
+        firebase.initializeApp(window.FIREBASE_CONFIG_LOCAL);
+        db = firebase.firestore();
+        storage = firebase.storage();
+        firebaseActive = true;
+      }
+    } catch(e) {
+      console.warn("Connessione Firebase Offline:", e);
+    }
+
+    // Inizializzazione form e opzioni
+    function initOptions() {
+      // Step 7 (Multiple)
+      renderCheckboxGroup("opts-7", OPTIONS_DB["7"], "7");
+      // Step 8 (Multiple)
+      renderCheckboxGroup("opts-8", OPTIONS_DB["8"], "8");
+      // Step 9 (Single)
+      renderRadioGroup("opts-9", OPTIONS_DB["9"], "9");
+      // Step 11 (Multiple)
+      renderCheckboxGroup("opts-11", OPTIONS_DB["11"], "11");
+      // Step 12 (Single)
+      renderRadioGroup("opts-12", OPTIONS_DB["12"], "12");
+      // Step 13 (Multiple)
+      renderCheckboxGroup("opts-13", OPTIONS_DB["13"], "13");
+      // Step 15 (Single)
+      renderRadioGroup("opts-15", OPTIONS_DB["15"], "15");
+      // Step 16 (Multiple)
+      renderCheckboxGroup("opts-16", OPTIONS_DB["16"], "16");
+    }
+
+    function renderCheckboxGroup(containerId, list, qKey) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = "";
+      checkAns[qKey] = new Set();
+
+      list.forEach((opt, idx) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "opt-btn";
+        btn.innerHTML = `<span class="check-box"></span><span class="lbl-txt">${opt}</span>`;
+        btn.onclick = () => toggleCheckbox(btn, qKey, opt);
+        container.appendChild(btn);
+      });
+    }
+
+    function toggleCheckbox(btn, qKey, opt) {
+      const set = checkAns[qKey];
+      if (set.has(opt)) {
+        set.delete(opt);
+        btn.classList.remove("selected");
+      } else {
+        set.add(opt);
+        btn.classList.add("selected");
+      }
+    }
+
+    function renderRadioGroup(containerId, list, qKey) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = "";
+
+      list.forEach((opt, idx) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "opt-btn opt-radio-btn";
+        btn.innerHTML = `<span class="radio-box"></span><span class="lbl-txt">${opt}</span>`;
+        btn.onclick = () => selectRadio(container, btn, qKey, opt);
+        container.appendChild(btn);
+      });
+    }
+
+    function selectRadio(container, btn, qKey, opt) {
+      container.querySelectorAll(".opt-btn").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      answers[qKey] = opt;
+    }
+
+    // Navigazione
+    function updateProgress() {
+      const pct = (currentStep / totalSteps) * 100;
+      document.getElementById("p-bar").style.width = pct + "%";
+    }
+
+    function showStep(stepIdx) {
+      document.querySelectorAll(".step-card").forEach(c => c.classList.remove("active"));
+      document.getElementById("step-" + stepIdx).classList.add("active");
+      currentStep = stepIdx;
+      updateProgress();
+      window.scrollTo(0, 0);
+    }
+
+    function goNext() {
+      if (!validateCurrentStep()) return;
+      showStep(currentStep + 1);
+    }
+
+    function goBack() {
+      if (currentStep > 0) {
+        showStep(currentStep - 1);
+      }
+    }
+
+    function validateCurrentStep() {
+      // Step 1: Nome e cognome
+      if (currentStep === 1) {
+        const first = document.getElementById("ans-1-first").value.trim();
+        const last = document.getElementById("ans-1-last").value.trim();
+        if (!first || !last) {
+          alert("Inserisci sia il nome che il cognome per continuare.");
+          return false;
+        }
+        answers["1_first"] = first;
+        answers["1_last"] = last;
+      }
+      
+      // Step 2: Data di nascita
+      if (currentStep === 2) {
+        const date = document.getElementById("ans-2").value;
+        if (!date) {
+          alert("Per favore, inserisci la tua data di nascita.");
+          return false;
+        }
+        answers["2"] = date;
+      }
+
+      // Step 3: Lavoro
+      if (currentStep === 3) {
+        const job = document.getElementById("ans-3").value.trim();
+        if (!job) {
+          alert("Inserisci di cosa ti occupi per continuare.");
+          return false;
+        }
+        answers["3"] = job;
+      }
+
+      // Step 4: Indirizzo
+      if (currentStep === 4) {
+        const addr = document.getElementById("ans-4-addr").value.trim();
+        const city = document.getElementById("ans-4-city").value.trim();
+        const prov = document.getElementById("ans-4-prov").value.trim();
+        const zip = document.getElementById("ans-4-zip").value.trim();
+        const country = document.getElementById("ans-4-country").value.trim();
+        if (!addr || !city || !prov || !zip || !country) {
+          alert("Compila tutti i campi obbligatori dell'indirizzo.");
+          return false;
+        }
+        answers["4_addr"] = addr;
+        answers["4_addr2"] = document.getElementById("ans-4-addr2").value.trim();
+        answers["4_city"] = city;
+        answers["4_prov"] = prov;
+        answers["4_zip"] = zip;
+        answers["4_country"] = country;
+      }
+
+      // Step 5: Email
+      if (currentStep === 5) {
+        const email = document.getElementById("ans-5").value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email || !emailRegex.test(email)) {
+          alert("Inserisci un indirizzo email valido.");
+          return false;
+        }
+        answers["5"] = email;
+      }
+
+      // Step 6: Telefono
+      if (currentStep === 6) {
+        const tel = document.getElementById("ans-6").value.trim();
+        if (!tel) {
+          alert("Inserisci un numero di telefono valido.");
+          return false;
+        }
+        answers["6"] = tel;
+      }
+
+      // Step 7: Perché
+      if (currentStep === 7) {
+        answers["7-other"] = document.getElementById("ans-7-other").value.trim();
+      }
+
+      // Step 8: Capelli
+      if (currentStep === 8) {
+        answers["8-other"] = document.getElementById("ans-8-other").value.trim();
+      }
+
+      // Step 9: Tempo
+      if (currentStep === 9) {
+        if (!answers["9"]) {
+          alert("Seleziona un'opzione per continuare.");
+          return false;
+        }
+      }
+
+      // Step 10: Rapporto
+      if (currentStep === 10) {
+        const text = document.getElementById("ans-10").value.trim();
+        if (!text) {
+          alert("Raccontaci qualcosa sul tuo rapporto con i capelli per continuare.");
+          return false;
+        }
+        answers["10"] = text;
+      }
+
+      // Step 11: Situazione
+      if (currentStep === 11) {
+        // Nessun controllo bloccante
+      }
+
+      // Step 12: Influenza
+      if (currentStep === 12) {
+        if (!answers["12"]) {
+          alert("Seleziona un'opzione per continuare.");
+          return false;
+        }
+      }
+
+      // Step 13: Cosa hai provato
+      if (currentStep === 13) {
+        answers["13-other"] = document.getElementById("ans-13-other").value.trim();
+      }
+
+      // Step 15: Risultati
+      if (currentStep === 15) {
+        if (!answers["15"]) {
+          alert("Seleziona un'opzione per continuare.");
+          return false;
+        }
+        answers["15-other"] = document.getElementById("ans-15-other").value.trim();
+      }
+
+      return true;
+    }
+
+    function handleFileSelected(input) {
+      if (input.files && input.files[0]) {
+        selectedFile = input.files[0];
+        document.getElementById("file-preview-name").textContent = selectedFile.name + " (" + (selectedFile.size / 1024).toFixed(1) + " KB)";
+      }
+    }
+
+    // Submit a Firestore
+    async function submitForm() {
+      // Ultimo controllo step 16
+      answers["16-other"] = document.getElementById("ans-16-other").value.trim();
+
+      const loader = document.getElementById("loader-overlay");
+      loader.style.display = "flex";
+
+      try {
+        let imageUrl = "";
+
+        // Caricamento foto su Storage
+        if (selectedFile && firebaseActive) {
+          document.getElementById("loader-text").textContent = "Caricamento foto prodotti in corso...";
+          const fileId = Date.now() + "_" + selectedFile.name;
+          const storageRef = storage.ref().child(`prodotti_pre/${fileId}`);
+          const uploadTask = await storageRef.put(selectedFile);
+          imageUrl = await uploadTask.ref.getDownloadURL();
+        }
+
+        document.getElementById("loader-text").textContent = "Salvataggio risposte...";
+
+        const clientId = 'pre_' + Date.now() + Math.random().toString(36).substring(2, 7);
+        const name = (answers["1_last"] + " " + answers["1_first"]).trim();
+
+        // Converti i set in array per serializzarli in JSON
+        const checkAnsSerialized = {};
+        Object.entries(checkAns).forEach(([k, set]) => {
+          checkAnsSerialized[k] = Array.from(set || []);
+        });
+
+        const docData = {
+          id: clientId,
+          name: name,
+          recordType: 'questionario_pre',
+          status: 'originale', // 'originale' all'inizio, poi può essere modificata da Daniela
+          createdAt: firebaseActive ? firebase.firestore.FieldValue.serverTimestamp() : Date.now(),
+          answers: answers,
+          checkAns: checkAnsSerialized,
+          productImageUrl: imageUrl
+        };
+
+        if (firebaseActive) {
+          await db.collection('tricologia_consultations').doc(clientId).set(docData);
+        } else {
+          // Salva in locale come fallback offline
+          const offlineList = JSON.parse(localStorage.getItem('beautri_offline_consultations') || '[]');
+          offlineList.push(docData);
+          localStorage.setItem('beautri_offline_consultations', JSON.stringify(offlineList));
+        }
+
+        // Vai alla schermata finale di ringraziamento
+        loader.style.display = "none";
+        showStep(17);
+
+      } catch(err) {
+        console.error("Errore durante l'invio:", err);
+        loader.style.display = "none";
+        alert("Si è verificato un errore durante l'invio della scheda: " + err.message + ". Riprova.");
+      }
+    }
+
+    // Avvio al caricamento della pagina
+    window.onload = () => {
+      initOptions();
+      updateProgress();
+    };
+  </script>
+</body>
+</html>

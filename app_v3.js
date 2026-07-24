@@ -961,10 +961,15 @@ window.addEventListener('unhandledrejection', function(e) {
         }
 
         const isScheda = client.recordType === 'scheda_interna';
+        const isPreConsulenza = client.recordType === 'questionario_pre';
+        const hideCopyBtn = isScheda || isPreConsulenza;
         
         let subText = "";
         if (isScheda) {
           subText = `<span style="background: rgba(234, 179, 8, 0.15); color: var(--gold); padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; margin-right: 6px;">SCHEDA INTERNA</span> Caso: ${(client.casoTipo || 'generico').toUpperCase()}`;
+        } else if (isPreConsulenza) {
+          const modText = client.status === 'modificato' ? ' (MODIFICATO)' : '';
+          subText = `<span style="background: rgba(59, 130, 246, 0.15); color: #1d4ed8; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; margin-right: 6px;">PRE-CONSULENZA${modText}</span>`;
         } else {
           subText = `${client.treatment} (${client.sessions} sedute - €${(client.price || 0).toFixed(2)})`;
         }
@@ -976,10 +981,10 @@ window.addEventListener('unhandledrejection', function(e) {
             <span class="client-date">Inviato il ${dateStr}</span>
           </div>
           <div class="client-actions">
-            <button type="button" class="btn-icon-only btn-view" title="${isScheda ? 'Visualizza PDF' : 'Visualizza Landing Page'}">
-              <i data-lucide="${isScheda ? 'file-text' : 'eye'}" style="width: 16px; height: 16px;"></i>
+            <button type="button" class="btn-icon-only btn-view" title="${(isScheda || isPreConsulenza) ? 'Visualizza Scheda' : 'Visualizza Landing Page'}">
+              <i data-lucide="${(isScheda || isPreConsulenza) ? 'file-text' : 'eye'}" style="width: 16px; height: 16px;"></i>
             </button>
-            <button type="button" class="btn-icon-only btn-copy" title="Copia Link" style="${isScheda ? 'display: none;' : ''}">
+            <button type="button" class="btn-icon-only btn-copy" title="Copia Link" style="${hideCopyBtn ? 'display: none;' : ''}">
               <i data-lucide="copy" style="width: 16px; height: 16px;"></i>
             </button>
             <button type="button" class="btn-icon-only btn-delete" style="color: var(--red); border-color: rgba(239, 68, 68, 0.2);" title="Elimina Scheda">
@@ -996,12 +1001,16 @@ window.addEventListener('unhandledrejection', function(e) {
             // Visualizza scheda.html in anteprima iframe direttamente in-page
             pdfModalIframe.src = 'scheda.html?id=' + client.id;
             pdfModal.style.display = 'flex';
+          } else if (isPreConsulenza) {
+            // Visualizza visualizza-pre.html in anteprima iframe direttamente in-page
+            pdfModalIframe.src = 'visualizza-pre.html?id=' + client.id;
+            pdfModal.style.display = 'flex';
           } else {
             window.location.href = clientLandingUrl + "&admin=true";
           }
         };
 
-        if (!isScheda) {
+        if (!hideCopyBtn) {
           card.querySelector('.btn-copy').onclick = async () => {
             try {
               await navigator.clipboard.writeText(clientLandingUrl);

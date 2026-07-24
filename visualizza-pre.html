@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Beautri Tricologia — Scheda Pre-Consulenza Cliente</title>
+  <link rel="icon" type="image/png" href="https://beautri.it/wp-content/uploads/2020/02/cropped-favicon_beautri-270x270.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --gold: #EAB308;
+      --gold-dark: #CA8A04;
+      --gold-light: #FEF9C3;
+      --dark: #12161C;
+      --card-bg: #FFFFFF;
+      --bg: #F8F7F4;
+      --gray: #6B7280;
+      --gray-light: #F3F4F6;
+      --border: #E5E7EB;
+      --radius: 12px;
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg);
+      color: var(--dark);
+      line-height: 1.5;
+      padding: 24px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      padding: 40px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+
+    /* Print Header (hidden on print) */
+    .no-print-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 16px;
+      border-bottom: 1.5px solid var(--border);
+    }
+
+    .brand-logo {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      color: var(--dark);
+      text-transform: uppercase;
+    }
+
+    .brand-logo span {
+      color: var(--gold);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-gold, .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-gold {
+      background: var(--gold);
+      color: var(--dark);
+      border: none;
+      box-shadow: 0 4px 12px rgba(234, 179, 8, 0.2);
+    }
+
+    .btn-gold:hover {
+      background: var(--gold-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--gray);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--gray);
+      color: var(--dark);
+    }
+
+    /* Main Title and Badge */
+    .report-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--dark);
+    }
+
+    .badge-pre {
+      background: rgba(59, 130, 246, 0.12);
+      color: #1d4ed8;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Info Block */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      background: var(--bg);
+      padding: 20px;
+      border-radius: 8px;
+      border-left: 4px solid var(--gold);
+      margin-bottom: 30px;
+    }
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .info-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--gray);
+      letter-spacing: 0.05em;
+    }
+
+    .info-val {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    /* Answers Grid */
+    .answers-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .answer-card {
+      background: var(--gray-light);
+      padding: 16px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .answer-q {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray);
+    }
+
+    .answer-a {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    .full-width {
+      grid-column: span 2;
+    }
+
+    .badge-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .badge-item {
+      background: rgba(234, 179, 8, 0.12);
+      color: var(--gold-dark);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* Loader */
+    .loader-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #FFFFFF;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      border-radius: var(--radius);
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid var(--gray-light);
+      border-top: 5px solid var(--gold);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 16px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error-msg {
+      color: #EF4444;
+      font-weight: 700;
+      text-align: center;
+      padding: 40px;
+    }
+
+    /* Edit Mode inputs styling */
+    .edit-input, .edit-textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s ease;
+      background: #FFF;
+    }
+
+    .edit-input:focus, .edit-textarea:focus {
+      border-color: var(--gold);
+    }
+
+    .edit-textarea {
+      height: 100px;
+      resize: vertical;
+    }
+
+    /* Edit header controls */
+    .edit-controls-bar {
+      display: none;
+      background: #FEF08A;
+      color: #713F12;
+      padding: 12px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+    }
+
+    /* Product Image preview */
+    .product-img-box {
+      border: 1px solid var(--border);
+      padding: 8px;
+      border-radius: 8px;
+      background: #FFF;
+      max-width: 320px;
+      margin-top: 6px;
+    }
+
+    .product-img-preview {
+      width: 100%;
+      height: auto;
+      max-height: 200px;
+      object-fit: contain;
+      border-radius: 6px;
+      display: block;
+    }
+
+    @media print {
+      body {
+        background: #FFFFFF;
+        padding: 0;
+      }
+
+      .container {
+        box-shadow: none;
+        padding: 0;
+        max-width: 100%;
+      }
+
+      .no-print, .no-print-header, .edit-controls-bar {
+        display: none !important;
+      }
+
+      .answer-card {
+        background: #F9FAFB !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .info-grid {
+        background: #F9FAFB !important;
+        border-left: 4px solid var(--gold) !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Loader -->
+    <div id="loader" class="loader-overlay">
+      <div class="spinner"></div>
+      <p style="font-weight: 600; color: var(--gray);">Caricamento questionario cliente...</p>
+    </div>
+
+    <!-- Header No-Print -->
+    <div class="no-print-header">
+      <div class="brand-logo">BEAU<span>TRÌ</span></div>
+      <div class="btn-row no-print">
+        <button class="btn-outline" id="btn-edit" onclick="enableEditMode()">
+          <svg style="width:14px; height:14px; fill:currentColor; vertical-align: middle;" viewBox="0 0 24 24">
+            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+          </svg>
+          Modifica ed Integra
+        </button>
+        <button class="btn-gold" onclick="window.print()">
+          <svg style="width:14px; height:14px; fill:currentColor; vertical-align: middle;" viewBox="0 0 24 24">
+            <path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/>
+          </svg>
+          Stampa Originale
+        </button>
+      </div>
+    </div>
+
+    <!-- Edit mode controls bar -->
+    <div class="edit-controls-bar" id="edit-bar">
+      <span>Modalità Modifica Attiva — Daniela, modifica e integra le risposte qui sotto.</span>
+      <div class="btn-row">
+        <button class="btn-outline" onclick="cancelEditMode()" style="padding: 6px 12px; font-size:12px;">Annulla</button>
+        <button class="btn-gold" onclick="saveChanges()" style="padding: 6px 12px; font-size:12px; background:var(--dark); color:#FFF; box-shadow:none;">Salva Modifiche</button>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div id="content" style="display: none;">
+      <div class="report-title-row">
+        <h1>Questionario Pre-Consulenza</h1>
+        <div class="badge-pre" id="doc-badge">Pre-Consulenza</div>
+      </div>
+
+      <!-- Info Grid -->
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Cliente</span>
+          <span class="info-val" id="client-name">-</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Data Ricezione</span>
+          <span class="info-val" id="client-date">-</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Professione</span>
+          <span class="info-val" id="client-job">-</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">ID Questionario</span>
+          <span class="info-val" id="client-id" style="font-size:12px; color: var(--gray); font-family: monospace;">-</span>
+        </div>
+      </div>
+
+      <!-- Grid Risposte -->
+      <div class="answers-grid" id="grid-container"></div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK Compat -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config-v2.js?v=41"></script>
+
+  <script>
+    // Mappa delle etichette descrittive per il layout admin
+    const QUESTIONS_MAP = {
+      "1_first": "Nome",
+      "1_last": "Cognome",
+      "2": "Data di nascita",
+      "3": "Professione",
+      "4_addr": "Indirizzo",
+      "4_addr2": "Indirizzo Linea 2",
+      "4_city": "Città",
+      "4_prov": "Provincia / Regione",
+      "4_zip": "CAP",
+      "4_country": "Nazione",
+      "5": "Email",
+      "6": "Telefono",
+      "7": "Motivo per cui ha deciso di fare la consulenza",
+      "8": "Obiettivi / Risultati desiderati per i capelli",
+      "9": "Tempo entro cui vorrebbe vedere dei cambiamenti",
+      "10": "Rapporto attuale con i propri capelli",
+      "11": "Situazione di disagio / percezione attuale",
+      "12": "Quanto il rapporto con i capelli influenzi la vita",
+      "13": "Trattamenti / Cure che ha già provato in passato",
+      "15": "Livello di efficacia / risultati ottenuti in passato",
+      "16": "Trattamenti o rimedi che le piacerebbe provare in futuro"
+    };
+
+    let docData = null;
+    let firebaseActive = false;
+    let db = null;
+    let isEditing = false;
+
+    // Connessione Firebase
+    try {
+      if (typeof firebase !== 'undefined' && window.FIREBASE_CONFIG_LOCAL) {
+        firebase.initializeApp(window.FIREBASE_CONFIG_LOCAL);
+        db = firebase.firestore();
+        firebaseActive = true;
+      }
+    } catch(e) {
+      console.warn("Firebase non connesso in visualizza-pre:", e);
+    }
+
+    async function loadDocument() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const docId = urlParams.get('id');
+
+      if (!docId) {
+        showError("Parametro ID mancante nell'URL.");
+        return;
+      }
+
+      try {
+        if (firebaseActive) {
+          const doc = await db.collection('tricologia_consultations').doc(docId).get();
+          if (doc.exists) {
+            docData = doc.data();
+          }
+        }
+
+        // Fallback locale offline
+        if (!docData) {
+          const offlineList = JSON.parse(localStorage.getItem('beautri_offline_consultations') || '[]');
+          docData = offlineList.find(item => item.id === docId);
+        }
+
+        if (!docData) {
+          showError("Questionario pre-consulenza non trovato nel database.");
+          return;
+        }
+
+        renderDocument();
+
+      } catch(err) {
+        console.error("Errore nel caricamento del questionario:", err);
+        showError("Impossibile caricare il questionario cliente. " + err.message);
+      }
+    }
+
+    function renderDocument() {
+      // Info intestazione
+      document.getElementById('client-name').textContent = docData.name || '-';
+      document.getElementById('client-job').textContent = docData.answers?.['3'] || '-';
+      document.getElementById('client-id').textContent = docData.id || '-';
+      
+      let dateStr = "N/D";
+      if (docData.createdAt) {
+        const dateObj = docData.createdAt.seconds ? new Date(docData.createdAt.seconds * 1000) : new Date(docData.createdAt);
+        dateStr = dateObj.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      }
+      document.getElementById('client-date').textContent = dateStr;
+
+      // Aggiorna Badge se modificata
+      const docBadge = document.getElementById('doc-badge');
+      if (docData.status === 'modificato') {
+        docBadge.textContent = "Pre-Consulenza (Modificato)";
+        docBadge.style.background = "rgba(16, 185, 129, 0.12)";
+        docBadge.style.color = "#047857";
+      } else {
+        docBadge.textContent = "Pre-Consulenza";
+        docBadge.style.background = "rgba(59, 130, 246, 0.12)";
+        docBadge.style.color = "#1d4ed8";
+      }
+
+      // Renderizza risposte nella griglia
+      const container = document.getElementById('grid-container');
+      container.innerHTML = "";
+
+      // Domande personali
+      addAnswerCard(container, "2", "Data di nascita");
+      addAnswerCard(container, "5", "Email");
+      addAnswerCard(container, "6", "Telefono");
+      addAnswerCard(container, "4_addr", "Indirizzo residenza", true);
+
+      // Domande a crocette/testo
+      addAnswerCard(container, "7", "Motivo della consulenza", true, true);
+      addAnswerCard(container, "8", "Cosa vorrebbe per i suoi capelli", true, true);
+      addAnswerCard(container, "9", "Tempo desiderato per i cambiamenti");
+      addAnswerCard(container, "10", "Rapporto attuale con i capelli", true, false, true);
+      addAnswerCard(container, "11", "Situazioni in cui si trova attualmente", true, true);
+      addAnswerCard(container, "12", "Quanto influisce il rapporto con i capelli");
+      addAnswerCard(container, "13", "Cosa ha già provato in passato", true, true);
+      addAnswerCard(container, "15", "Efficacia dei trattamenti passati");
+      addAnswerCard(container, "16", "Cosa vorrebbe fare ancora", true, true);
+
+      // Foto prodotti
+      if (docData.productImageUrl) {
+        const photoCard = document.createElement("div");
+        photoCard.className = "answer-card full-width";
+        photoCard.innerHTML = `
+          <span class="answer-q">Foto prodotti allegata dal cliente</span>
+          <div class="product-img-box">
+            <a href="${docData.productImageUrl}" target="_blank" title="Clicca per ingrandire">
+              <img src="${docData.productImageUrl}" class="product-img-preview" alt="Foto prodotti cliente">
+            </a>
+          </div>
+        `;
+        container.appendChild(photoCard);
+      }
+
+      // Mostra layout
+      document.getElementById('loader').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+
+    function addAnswerCard(container, qKey, label, isFullWidth = false, isCheck = false, isTextarea = false) {
+      const card = document.createElement("div");
+      card.className = "answer-card" + (isFullWidth ? " full-width" : "");
+      
+      let html = `<span class="answer-q">${label}</span>`;
+      
+      if (isEditing) {
+        // Modalità Modifica attiva
+        if (isTextarea) {
+          const val = docData.answers?.[qKey] || '';
+          html += `<textarea class="edit-textarea" data-qkey="${qKey}">${val}</textarea>`;
+        } else if (isCheck) {
+          // Checkbox separate da virgola o testo modificabile
+          const arr = docData.checkAns?.[qKey] || [];
+          const other = docData.answers?.[qKey + "-other"] || '';
+          let val = arr.join(", ");
+          if (other.trim()) val += (val ? ", " : "") + "Altro: " + other;
+          html += `<input type="text" class="edit-input" data-qkey="${qKey}" data-ischeck="true" value="${val}" placeholder="Opzioni separate da virgola…">`;
+        } else {
+          // Input normale
+          const val = docData.answers?.[qKey] || '';
+          html += `<input type="text" class="edit-input" data-qkey="${qKey}" value="${val}">`;
+        }
+      } else {
+        // Modalità Visualizzazione normale
+        if (isCheck) {
+          const arr = docData.checkAns?.[qKey] || [];
+          const other = docData.answers?.[qKey + "-other"] || '';
+          let badgesHTML = arr.map(v => `<span class="badge-item">${v}</span>`).join('');
+          if (other.trim()) badgesHTML += `<span class="badge-item" style="background:#FEF3C7; color:#B45309;">Altro: ${other}</span>`;
+          html += `<div class="badge-list">${badgesHTML || '-'}</div>`;
+        } else {
+          const val = docData.answers?.[qKey] || '-';
+          if (isTextarea) {
+            html += `<div style="background:#fff; border: 1px solid var(--border); padding:10px; border-radius:6px; font-size:13.5px; white-space: pre-wrap; margin-top:4px;">${val}</div>`;
+          } else {
+            html += `<span class="answer-a">${val}</span>`;
+          }
+        }
+      }
+
+      card.innerHTML = html;
+      container.appendChild(card);
+    }
+
+    // Abilita la modalità modifica
+    function enableEditMode() {
+      isEditing = true;
+      document.getElementById('edit-bar').style.display = 'flex';
+      document.getElementById('btn-edit').style.display = 'none';
+      renderDocument();
+    }
+
+    // Annulla modifiche
+    function cancelEditMode() {
+      isEditing = false;
+      document.getElementById('edit-bar').style.display = 'none';
+      document.getElementById('btn-edit').style.display = 'inline-flex';
+      loadDocument(); // Ricarica originale dal database
+    }
+
+    // Salva le modifiche modificate da Daniela
+    async function saveChanges() {
+      const loader = document.getElementById('loader');
+      loader.style.display = 'flex';
+      loader.querySelector('p').textContent = "Salvataggio modifiche in corso...";
+
+      try {
+        const grid = document.getElementById('grid-container');
+        
+        // Estrai tutti i valori dagli input modificati
+        grid.querySelectorAll('.edit-input, .edit-textarea').forEach(el => {
+          const qKey = el.dataset.qkey;
+          const isCheck = el.dataset.ischeck === "true";
+          const val = el.value.trim();
+
+          if (isCheck) {
+            // Separa di nuovo le opzioni per virgola
+            const parts = val.split(",").map(p => p.trim()).filter(p => p.length > 0);
+            
+            // Trova se c'è un campo "Altro:"
+            const regularChoices = [];
+            let otherText = "";
+            parts.forEach(p => {
+              if (p.toLowerCase().startsWith("altro:")) {
+                otherText = p.substring(6).trim();
+              } else {
+                regularChoices.push(p);
+              }
+            });
+
+            if (!docData.checkAns) docData.checkAns = {};
+            docData.checkAns[qKey] = regularChoices;
+            if (otherText) {
+              if (!docData.answers) docData.answers = {};
+              docData.answers[qKey + "-other"] = otherText;
+            } else {
+              if (docData.answers) delete docData.answers[qKey + "-other"];
+            }
+
+          } else {
+            if (!docData.answers) docData.answers = {};
+            docData.answers[qKey] = val;
+          }
+        });
+
+        // Aggiorna anagrafica principale se cambiata
+        const nameVal = (docData.answers?.['1_last'] + " " + docData.answers?.['1_first']).trim();
+        if (nameVal) docData.name = nameVal;
+
+        // Imposta lo stato a modificato
+        docData.status = 'modificato';
+
+        // Salva su Firebase o locale
+        if (firebaseActive) {
+          await db.collection('tricologia_consultations').doc(docData.id).set(docData);
+        } else {
+          const offlineList = JSON.parse(localStorage.getItem('beautri_offline_consultations') || '[]');
+          const idx = offlineList.findIndex(item => item.id === docData.id);
+          if (idx !== -1) {
+            offlineList[idx] = docData;
+            localStorage.setItem('beautri_offline_consultations', JSON.stringify(offlineList));
+          }
+        }
+
+        isEditing = false;
+        document.getElementById('edit-bar').style.display = 'none';
+        document.getElementById('btn-edit').style.display = 'inline-flex';
+        
+        renderDocument();
+
+      } catch(err) {
+        console.error("Errore salvataggio modifiche:", err);
+        alert("Impossibile salvare le modifiche: " + err.message);
+        loader.style.display = 'none';
+      }
+    }
+
+    function showError(msg) {
+      document.getElementById('loader').style.display = 'none';
+      const container = document.getElementById('grid-container');
+      container.innerHTML = `<div class="error-msg">❌ Errore: ${msg}</div>`;
+      document.getElementById('content').style.display = 'block';
+    }
+
+    window.onload = loadDocument;
+  </script>
+</body>
+</html>
