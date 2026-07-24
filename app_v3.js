@@ -949,113 +949,178 @@ window.addEventListener('unhandledrejection', function(e) {
       }
 
       clientsList.innerHTML = "";
+
+      // 1. Raggruppa i documenti per nome cliente normalizzato
+      const groups = {};
       items.forEach(client => {
-        const card = document.createElement('div');
-        card.className = 'client-card';
-        card.id = `card-${client.id}`;
-
-        let dateStr = "N/D";
-        if (client.createdAt) {
-          const dateObj = client.createdAt.seconds ? new Date(client.createdAt.seconds * 1000) : new Date(client.createdAt);
-          dateStr = dateObj.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        }
-
-        const isScheda = client.recordType === 'scheda_interna';
-        const isPreConsulenza = client.recordType === 'questionario_pre';
-        const hideCopyBtn = isScheda || isPreConsulenza;
-        
-        let subText = "";
-        if (isScheda) {
-          subText = `<span style="background: rgba(234, 179, 8, 0.15); color: var(--gold); padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; margin-right: 6px;">SCHEDA INTERNA</span> Caso: ${(client.casoTipo || 'generico').toUpperCase()}`;
-        } else if (isPreConsulenza) {
-          const modText = client.status === 'modificato' ? ' (MODIFICATO)' : '';
-          subText = `<span style="background: rgba(59, 130, 246, 0.15); color: #1d4ed8; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; margin-right: 6px;">PRE-CONSULENZA${modText}</span>`;
-        } else {
-          subText = `${client.treatment} (${client.sessions} sedute - €${(client.price || 0).toFixed(2)})`;
-        }
-
-        card.innerHTML = `
-          <div class="client-meta">
-            <span class="client-name">${client.name}</span>
-            <span class="client-sub">${subText}</span>
-            <span class="client-date">Inviato il ${dateStr}</span>
-          </div>
-          <div class="client-actions">
-            <button type="button" class="btn-icon-only btn-view" title="${(isScheda || isPreConsulenza) ? 'Visualizza Scheda' : 'Visualizza Landing Page'}">
-              <i data-lucide="${(isScheda || isPreConsulenza) ? 'file-text' : 'eye'}" style="width: 16px; height: 16px;"></i>
-            </button>
-            <button type="button" class="btn-icon-only btn-copy" title="Copia Link" style="${hideCopyBtn ? 'display: none;' : ''}">
-              <i data-lucide="copy" style="width: 16px; height: 16px;"></i>
-            </button>
-            <button type="button" class="btn-icon-only btn-delete" style="color: var(--red); border-color: rgba(239, 68, 68, 0.2);" title="Elimina Scheda">
-              <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
-            </button>
-          </div>
-        `;
-
-        const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
-        const clientLandingUrl = `${baseUrl}consultazione.html?id=${client.id}`;
-
-        card.querySelector('.btn-view').onclick = () => {
-          if (isScheda) {
-            // Visualizza scheda.html in anteprima iframe direttamente in-page
-            pdfModalIframe.src = 'scheda.html?id=' + client.id;
-            pdfModal.style.display = 'flex';
-          } else if (isPreConsulenza) {
-            // Visualizza visualizza-pre.html in anteprima iframe direttamente in-page
-            pdfModalIframe.src = 'visualizza-pre.html?id=' + client.id;
-            pdfModal.style.display = 'flex';
-          } else {
-            window.location.href = clientLandingUrl + "&admin=true";
-          }
-        };
-
-        if (!hideCopyBtn) {
-          card.querySelector('.btn-copy').onclick = async () => {
-            try {
-              await navigator.clipboard.writeText(clientLandingUrl);
-              showToast("Copiato!", "Il link è stato copiato negli appunti.", "success", 1500);
-            } catch(err) {
-              showToast("Errore copia", "Impossibile copiare.", "error", 2000);
-            }
+        const rawName = client.name || 'Cliente Senza Nome';
+        const normName = rawName.trim().toLowerCase().replace(/\s+/g, ' ');
+        if (!groups[normName]) {
+          groups[normName] = {
+            displayName: rawName, // Preserviamo la grafia originaria
+            documents: []
           };
         }
+        groups[normName].documents.push(client);
+      });
 
-        card.querySelector('.btn-delete').onclick = async () => {
-          const typeName = isScheda ? 'la scheda interna' : 'la consulenza';
-          if (confirm(`Sei sicuro di voler eliminare ${typeName} di ${client.name}? Questa azione non può essere annullata.`)) {
-            showToast("Eliminazione in corso", "Rimozione in corso...", "loading");
-            try {
-              if (firebaseActive) {
-                // Rimuovi da Firestore
-                await db.collection('tricologia_consultations').doc(client.id).delete();
-              } else {
-                // Rimuovi da localStorage
-                if (isScheda) {
-                  let schedeData = JSON.parse(localStorage.getItem('beautri_offline_consultations') || '[]');
-                  schedeData = schedeData.filter(item => item.id !== client.id);
-                  localStorage.setItem('beautri_offline_consultations', JSON.stringify(schedeData));
-                } else {
-                  let localData = JSON.parse(localStorage.getItem('beautri_local_consultations') || '[]');
-                  localData = localData.filter(item => item.id !== client.id);
-                  localStorage.setItem('beautri_local_consultations', JSON.stringify(localData));
-                }
-              }
-              
-              card.remove();
-              showToast("Eliminato", "Elemento rimosso con successo.", "success", 1800);
-              
-              // Se la lista è ora vuota
-              if (clientsList.children.length === 0) {
-                clientsList.innerHTML = '<div class="no-clients">Nessun cliente trovato nello storico.</div>';
-              }
-            } catch(e) {
-              showToast("Errore", "Impossibile rimuovere l'elemento.", "error", 3000);
-            }
+      // Helper per ricavare una data valida (timestamp o millisecondi)
+      function getTimestamp(client) {
+        if (!client.createdAt) return 0;
+        return client.createdAt.seconds ? (client.createdAt.seconds * 1000) : new Date(client.createdAt).getTime();
+      }
+
+      // 2. Converti in un array di cartelle e ordinale per data dell'attività più recente
+      const folders = Object.values(groups).map(g => {
+        // Ordina i documenti della cartella: il più recente prima
+        g.documents.sort((a, b) => getTimestamp(b) - getTimestamp(a));
+        // L'attività più recente determina l'ordine della cartella
+        g.latestActivity = getTimestamp(g.documents[0]);
+        return g;
+      });
+
+      // Ordina le cartelle: la cartella con attività più recente va in cima
+      folders.sort((a, b) => b.latestActivity - a.latestActivity);
+
+      // 3. Renderizza le cartelle
+      folders.forEach(folder => {
+        const folderDetails = document.createElement('details');
+        folderDetails.className = 'client-folder-details';
+
+        const docCount = folder.documents.length;
+        const docWord = docCount === 1 ? 'documento' : 'documenti';
+
+        folderDetails.innerHTML = `
+          <summary class="client-folder-summary">
+            <div class="folder-header">
+              <i data-lucide="folder" style="width: 18px; height: 18px; color: var(--gold); margin-right: 4px; vertical-align: middle;"></i>
+              <span class="folder-name">${folder.displayName}</span>
+              <span class="folder-count">${docCount} ${docWord}</span>
+            </div>
+            <i data-lucide="chevron-down" class="chevron-icon"></i>
+          </summary>
+          <div class="folder-content"></div>
+        `;
+
+        const folderContent = folderDetails.querySelector('.folder-content');
+
+        folder.documents.forEach(client => {
+          const card = document.createElement('div');
+          card.className = 'client-card';
+          card.id = `card-${client.id}`;
+
+          let dateStr = "N/D";
+          if (client.createdAt) {
+            const dateObj = client.createdAt.seconds ? new Date(client.createdAt.seconds * 1000) : new Date(client.createdAt);
+            dateStr = dateObj.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' });
           }
-        };
 
-        clientsList.appendChild(card);
+          const isScheda = client.recordType === 'scheda_interna';
+          const isPreConsulenza = client.recordType === 'questionario_pre';
+          const hideCopyBtn = isScheda || isPreConsulenza;
+          
+          let subText = "";
+          if (isScheda) {
+            subText = `<span style="background: rgba(234, 179, 8, 0.15); color: var(--gold); padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; margin-right: 6px;">SCHEDA INTERNA</span> Caso: ${(client.casoTipo || 'generico').toUpperCase()}`;
+          } else if (isPreConsulenza) {
+            const modText = client.status === 'modificato' ? ' (MODIFICATO)' : '';
+            subText = `<span style="background: rgba(59, 130, 246, 0.15); color: #1d4ed8; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; margin-right: 6px;">PRE-CONSULENZA${modText}</span>`;
+          } else {
+            subText = `${client.treatment} (${client.sessions} sedute - €${(client.price || 0).toFixed(2)})`;
+          }
+
+          card.innerHTML = `
+            <div class="client-meta">
+              <span class="client-sub" style="font-size: 14px; font-weight:600; color: var(--black); white-space: normal; overflow: visible; text-overflow: clip;">${subText}</span>
+              <span class="client-date">Registrato il ${dateStr}</span>
+            </div>
+            <div class="client-actions">
+              <button type="button" class="btn-icon-only btn-view" title="${(isScheda || isPreConsulenza) ? 'Visualizza Scheda' : 'Visualizza Landing Page'}">
+                <i data-lucide="${(isScheda || isPreConsulenza) ? 'file-text' : 'eye'}" style="width: 16px; height: 16px;"></i>
+              </button>
+              <button type="button" class="btn-icon-only btn-copy" title="Copia Link" style="${hideCopyBtn ? 'display: none;' : ''}">
+                <i data-lucide="copy" style="width: 16px; height: 16px;"></i>
+              </button>
+              <button type="button" class="btn-icon-only btn-delete" style="color: var(--red); border-color: rgba(239, 68, 68, 0.2);" title="Elimina">
+                <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+              </button>
+            </div>
+          `;
+
+          const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
+          const clientLandingUrl = `${baseUrl}consultazione.html?id=${client.id}`;
+
+          card.querySelector('.btn-view').onclick = () => {
+            if (isScheda) {
+              pdfModalIframe.src = 'scheda.html?id=' + client.id;
+              pdfModal.style.display = 'flex';
+            } else if (isPreConsulenza) {
+              pdfModalIframe.src = 'visualizza-pre.html?id=' + client.id;
+              pdfModal.style.display = 'flex';
+            } else {
+              window.location.href = clientLandingUrl + "&admin=true";
+            }
+          };
+
+          if (!hideCopyBtn) {
+            card.querySelector('.btn-copy').onclick = async () => {
+              try {
+                await navigator.clipboard.writeText(clientLandingUrl);
+                showToast("Copiato!", "Il link è stato copiato negli appunti.", "success", 1500);
+              } catch(err) {
+                showToast("Errore copia", "Impossibile copiare.", "error", 2000);
+              }
+            };
+          }
+
+          card.querySelector('.btn-delete').onclick = async () => {
+            let typeName = 'la consulenza';
+            if (isScheda) typeName = 'la scheda interna';
+            if (isPreConsulenza) typeName = 'il questionario pre-consulenza';
+
+            if (confirm(`Sei sicuro di voler eliminare ${typeName} di ${client.name}? Questa azione non può essere annullata.`)) {
+              showToast("Eliminazione in corso", "Rimozione in corso...", "loading");
+              try {
+                if (firebaseActive) {
+                  await db.collection('tricologia_consultations').doc(client.id).delete();
+                } else {
+                  if (isScheda || isPreConsulenza) {
+                    let schedeData = JSON.parse(localStorage.getItem('beautri_offline_consultations') || '[]');
+                    schedeData = schedeData.filter(item => item.id !== client.id);
+                    localStorage.setItem('beautri_offline_consultations', JSON.stringify(schedeData));
+                  } else {
+                    let localData = JSON.parse(localStorage.getItem('beautri_local_consultations') || '[]');
+                    localData = localData.filter(item => item.id !== client.id);
+                    localStorage.setItem('beautri_local_consultations', JSON.stringify(localData));
+                  }
+                }
+                
+                card.remove();
+                showToast("Eliminato", "Elemento rimosso con successo.", "success", 1800);
+                
+                // Se la cartella è ora vuota, rimuovila
+                if (folderContent.children.length === 0) {
+                  folderDetails.remove();
+                } else {
+                  const newCount = folderContent.children.length;
+                  const newWord = newCount === 1 ? 'documento' : 'documenti';
+                  folderDetails.querySelector('.folder-count').textContent = `${newCount} ${newWord}`;
+                }
+
+                // Se non ci sono più cartelle
+                if (clientsList.children.length === 0) {
+                  clientsList.innerHTML = '<div class="no-clients">Nessun cliente trovato nello storico.</div>';
+                }
+              } catch(e) {
+                showToast("Errore", "Impossibile rimuovere l'elemento.", "error", 3000);
+              }
+            }
+          };
+
+          folderContent.appendChild(card);
+        });
+
+        clientsList.appendChild(folderDetails);
       });
 
       // Rendi le nuove icone
