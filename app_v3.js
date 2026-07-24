@@ -126,6 +126,10 @@ window.addEventListener('unhandledrejection', function(e) {
     const nav = document.getElementById('app-nav');
     const tabNuova = document.getElementById('tab-nuova');
     const tabStorico = document.getElementById('tab-storico');
+    const tabSchedaInterna = document.getElementById('tab-scheda-interna');
+    const pdfModal = document.getElementById('pdf-modal');
+    const pdfModalIframe = document.getElementById('pdf-modal-iframe');
+    const pdfModalClose = document.getElementById('pdf-modal-close');
     const appContent = document.getElementById('app-content');
     const loginView = document.getElementById('login-view');
     const loginForm = document.getElementById('login-form');
@@ -256,11 +260,16 @@ window.addEventListener('unhandledrejection', function(e) {
         this.classList.add('active');
 
         const tabId = this.getAttribute('data-tab');
+        tabNuova.classList.remove('active');
+        tabStorico.classList.remove('active');
+        if (tabSchedaInterna) tabSchedaInterna.classList.remove('active');
+
         if (tabId === 'tab-nuova') {
           tabNuova.classList.add('active');
-          tabStorico.classList.remove('active');
-        } else {
-          tabNuova.classList.remove('active');
+        } else if (tabId === 'tab-scheda-interna') {
+          if (tabSchedaInterna) tabSchedaInterna.classList.add('active');
+          initQuestionnaire();
+        } else if (tabId === 'tab-storico') {
           tabStorico.classList.add('active');
           loadClientsHistory(); // Ricarica lo storico ogni volta che si cambia tab
         }
@@ -895,7 +904,9 @@ window.addEventListener('unhandledrejection', function(e) {
           });
         } else {
           // Leggi da localStorage
-          items = JSON.parse(localStorage.getItem('beautri_local_consultations') || '[]');
+          const consultations = JSON.parse(localStorage.getItem('beautri_local_consultations') || '[]');
+          const schedeInterne = JSON.parse(localStorage.getItem('beautri_offline_consultations') || '[]');
+          items = [...consultations, ...schedeInterne];
           // Ordina per data decrescente
           items.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         }
@@ -913,6 +924,22 @@ window.addEventListener('unhandledrejection', function(e) {
         console.error("Errore recupero storico:", err);
         clientsList.innerHTML = '<div class="no-clients" style="color: var(--red);">Impossibile caricare lo storico dei clienti.</div>';
       }
+    }
+
+    // PDF Close handler wire
+    if (pdfModalClose) {
+      pdfModalClose.onclick = () => {
+        pdfModal.style.display = 'none';
+        pdfModalIframe.src = '';
+      };
+    }
+    if (pdfModal) {
+      pdfModal.onclick = (e) => {
+        if (e.target === pdfModal) {
+          pdfModal.style.display = 'none';
+          pdfModalIframe.src = '';
+        }
+      };
     }
 
     function renderClientsList(items) {
@@ -933,17 +960,26 @@ window.addEventListener('unhandledrejection', function(e) {
           dateStr = dateObj.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' });
         }
 
+        const isScheda = client.recordType === 'scheda_interna';
+        
+        let subText = "";
+        if (isScheda) {
+          subText = `<span style="background: rgba(234, 179, 8, 0.15); color: var(--gold); padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; margin-right: 6px;">SCHEDA INTERNA</span> Caso: ${(client.casoTipo || 'generico').toUpperCase()}`;
+        } else {
+          subText = `${client.treatment} (${client.sessions} sedute - €${(client.price || 0).toFixed(2)})`;
+        }
+
         card.innerHTML = `
           <div class="client-meta">
             <span class="client-name">${client.name}</span>
-            <span class="client-sub">${client.treatment} (${client.sessions} sedute - €${client.price.toFixed(2)})</span>
+            <span class="client-sub">${subText}</span>
             <span class="client-date">Inviato il ${dateStr}</span>
           </div>
           <div class="client-actions">
-            <button type="button" class="btn-icon-only btn-view" title="Visualizza Landing Page">
-              <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+            <button type="button" class="btn-icon-only btn-view" title="${isScheda ? 'Visualizza PDF' : 'Visualizza Landing Page'}">
+              <i data-lucide="${isScheda ? 'file-text' : 'eye'}" style="width: 16px; height: 16px;"></i>
             </button>
-            <button type="button" class="btn-icon-only btn-copy" title="Copia Link">
+            <button type="button" class="btn-icon-only btn-copy" title="Copia Link" style="${isScheda ? 'display: none;' : ''}">
               <i data-lucide="copy" style="width: 16px; height: 16px;"></i>
             </button>
             <button type="button" class="btn-icon-only btn-delete" style="color: var(--red); border-color: rgba(239, 68, 68, 0.2);" title="Elimina Scheda">
@@ -957,45 +993,56 @@ window.addEventListener('unhandledrejection', function(e) {
 
         // Eventi bottoni
         card.querySelector('.btn-view').onclick = () => {
-          window.location.href = clientLandingUrl + "&admin=true";
-        };
-        card.querySelector('.btn-copy').onclick = async () => {
-          try {
-            await navigator.clipboard.writeText(clientLandingUrl);
-            showToast("Copiato!", "Il link è stato copiato negli appunti.", "success", 1500);
-          } catch(err) {
-            showToast("Errore copia", "Impossibile copiare.", "error", 2000);
+          if (isScheda) {
+            // Visualizza PDF in anteprima iframe direttamente in-page
+            pdfModalIframe.src = client.pdfUrl;
+            pdfModal.style.display = 'flex';
+          } else {
+            window.location.href = clientLandingUrl + "&admin=true";
           }
         };
 
+        if (!isScheda) {
+          card.querySelector('.btn-copy').onclick = async () => {
+            try {
+              await navigator.clipboard.writeText(clientLandingUrl);
+              showToast("Copiato!", "Il link è stato copiato negli appunti.", "success", 1500);
+            } catch(err) {
+              showToast("Errore copia", "Impossibile copiare.", "error", 2000);
+            }
+          };
+        }
+
         card.querySelector('.btn-delete').onclick = async () => {
-          if (confirm(`Sei sicuro di voler eliminare la consulenza di ${client.name}? Questa azione non può essere annullata.`)) {
-            showToast("Eliminazione in corso", "Rimozione della scheda...", "loading");
+          const typeName = isScheda ? 'la scheda interna' : 'la consulenza';
+          if (confirm(`Sei sicuro di voler eliminare ${typeName} di ${client.name}? Questa azione non può essere annullata.`)) {
+            showToast("Eliminazione in corso", "Rimozione in corso...", "loading");
             try {
               if (firebaseActive) {
                 // Rimuovi da Firestore
                 await db.collection('tricologia_consultations').doc(client.id).delete();
-                // NOTA: il PDF in storage potrebbe rimanere ma lo eliminiamo per pulizia se necessario
-                try {
-                  // Estrai il percorso del file dall'URL o ricrealo
-                  // Usiamo un approccio semplice per non appesantire
-                } catch(e){}
               } else {
                 // Rimuovi da localStorage
-                let localData = JSON.parse(localStorage.getItem('beautri_local_consultations') || '[]');
-                localData = localData.filter(item => item.id !== client.id);
-                localStorage.setItem('beautri_local_consultations', JSON.stringify(localData));
+                if (isScheda) {
+                  let schedeData = JSON.parse(localStorage.getItem('beautri_offline_consultations') || '[]');
+                  schedeData = schedeData.filter(item => item.id !== client.id);
+                  localStorage.setItem('beautri_offline_consultations', JSON.stringify(schedeData));
+                } else {
+                  let localData = JSON.parse(localStorage.getItem('beautri_local_consultations') || '[]');
+                  localData = localData.filter(item => item.id !== client.id);
+                  localStorage.setItem('beautri_local_consultations', JSON.stringify(localData));
+                }
               }
               
               card.remove();
-              showToast("Eliminato", "Consulenza rimossa con successo.", "success", 1800);
+              showToast("Eliminato", "Elemento rimosso con successo.", "success", 1800);
               
               // Se la lista è ora vuota
               if (clientsList.children.length === 0) {
                 clientsList.innerHTML = '<div class="no-clients">Nessun cliente trovato nello storico.</div>';
               }
             } catch(e) {
-              showToast("Errore", "Impossibile rimuovere la scheda.", "error", 3000);
+              showToast("Errore", "Impossibile rimuovere l'elemento.", "error", 3000);
             }
           }
         };
@@ -1073,6 +1120,926 @@ window.addEventListener('unhandledrejection', function(e) {
           window.location.reload();
         }, 1500);
       };
+    }
+
+    // ═══════════════════════════════════════
+    // SEZIONE INTEGRATA: SCHEDA INTERNA (QUESTIONARIO)
+    // ═══════════════════════════════════════
+
+    // Costanti e configurazioni
+    const HTML2PDF_API_KEY = 'kpmUzBuAUjJTxjjvYHB8DnzIwn6vh6ahcqbKoUCj8sU3X7qiQdyTwZYLltQedyLh';
+    const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby0Z8WWJui6NSTG1dpiD3RFUkzQWqgimkfPT7wZ3_hXLbW90qb_HfHAh_Qf1RP2ZQDc/exec';
+
+    // Domande
+    const Q_CONOSCITIVA = [
+      { id:1, sec:'Fase Conoscitiva', q:'Qual è il tuo nome?', type:'name' },
+      { id:2, sec:'Fase Conoscitiva', q:'Sesso', type:'radio', opts:['Maschio','Femmina'] },
+      { id:3, sec:'Fase Conoscitiva', q:'Età', type:'radio-grid2', opts:['0–10 anni','10–20 anni','20–30 anni','30–40 anni','40–50 anni','50–60 anni','> 60 anni'] },
+      { id:4, sec:'Fase Conoscitiva', q:'Altezza', type:'radio-grid3', opts:['< 150 cm','150–160 cm','160–170 cm','170–180 cm','180–190 cm','> 190 cm'] },
+      { id:5, sec:'Fase Conoscitiva', q:'Peso', type:'radio-grid3', opts:['< 50 kg','50–60 kg','60–70 kg','70–80 kg','80–90 kg','90–100 kg','> 100 kg'] },
+      { id:6, sec:'Fase Conoscitiva', q:'Anamnesi personale', type:'check-other', opts:['Attività sportiva'] },
+      { id:7, sec:'Fase Conoscitiva', q:'Quante volte lavi i capelli a settimana?', type:'radio', opts:['Tutti i giorni e spesso 2 volte al giorno','Tutti i giorni','Una volta ogni 2 giorni','2 volte a settimana','Una volta a settimana'] },
+      { id:8, sec:'Fase Conoscitiva', q:'Quando hai lavato l\'ultima volta i capelli?', type:'radio-grid2', opts:['Oggi','Ieri','2 giorni fa','Più di 2 giorni fa'] },
+      { id:9, sec:'Fase Conoscitiva', q:'Che prodotti utilizzi di solito?', type:'radio', opts:['Prodotti generici comprati al supermercato','Prodotti specifici comprati in farmacia','Prodotti specifici comprati in salone / negozi specializzati'] }
+    ];
+
+    const Q_INDAGINE = [
+      { id:10, sec:'Fase di Indagine', q:'Esigenza / causa', type:'check-other', opts:['Problemi fisici negli ultimi anni','Operazioni','Diete'] },
+      { id:11, sec:'Fase di Indagine', q:'Valori ematici', type:'check-other', opts:['Analisi del sangue','Ferro'] },
+      { id:12, sec:'Fase di Indagine', q:'Lamenti forfora e/o capelli grassi?', type:'radio', opts:['Sì','No'] },
+      { id:13, sec:'Fase di Indagine', q:'Ti capita di trovare tracce di forfora sui vestiti o adese al cuoio capelluto?', type:'radio', opts:['Sì','No'] },
+      { id:14, sec:'Fase di Indagine', q:'Percepisci la sensazione di prurito sul cuoio capelluto?', type:'radio-grid2', opts:['Sì','No','Lieve','Intenso'] },
+      { id:15, sec:'Fase di Indagine', q:'Percepisci un fastidio o un dolore alla base dei capelli?', type:'radio', opts:['Sì','No'] },
+      { id:16, sec:'Fase di Indagine', q:'La tua sudorazione è eccessiva?', type:'radio-grid3', opts:['Intensa','Normale','Leggera'] },
+      { id:17, sec:'Fase di Indagine', q:'Quante ore dormi di solito?', type:'radio', opts:['Meno di 6 ore','Tra le 6 e le 8 ore','Più di 8 ore al giorno'] },
+      { id:18, sec:'Fase di Indagine', q:'Com\'è la qualità del sonno? (1 = pessima — 10 = ottima)', type:'scale' },
+      { id:19, sec:'Fase di Indagine', q:'Ti alzi riposato/a?', type:'radio-grid3', opts:['Sì','Poco','No'] },
+      { id:20, sec:'Fase di Indagine', q:'Hai difficoltà ad addormentarti?', type:'radio-grid3', opts:['Sì','No','Abbastanza'] },
+      { id:21, sec:'Fase di Indagine', q:'Ti svegli di continuo?', type:'radio-grid3', opts:['Sì','No','Abbastanza'] },
+      { id:22, sec:'Fase di Indagine', q:'Hai il sonno leggero?', type:'radio-grid3', opts:['Sì','No','Abbastanza'] },
+      { id:23, sec:'Fase di Indagine', q:'Ti senti stressato/a?', type:'radio-grid3', opts:['Sì','No','Abbastanza'] },
+      { id:24, sec:'Fase di Indagine', q:'Il tuo lavoro ti mette a dura prova mentalmente e fisicamente? (es. turni di notte)', type:'radio-grid3', opts:['Sì','No','Abbastanza'] },
+      { id:25, sec:'Fase di Indagine', q:'Sei una persona che pensa molto?', type:'radio-grid3', opts:['Sì','No','Abbastanza'] },
+      { id:26, sec:'Fase di Indagine', q:'Rifletti molto su qualsiasi cosa, sia di giorno che di notte?', type:'radio-grid3', opts:['Sì','No','Abbastanza'] },
+      { id:27, sec:'Fase di Indagine', q:'Hai particolari disturbi gastrointestinali?', type:'radio-grid3', opts:['Sì','No','Abbastanza'] }
+    ];
+
+    const Q_UOMO = [
+      { id:28, sec:'Uomo Giovane', q:'Tuo padre ha perso i capelli?', type:'check-other', opts:['Sì','No'] },
+      { id:29, sec:'Uomo Giovane', q:'Tua madre ha perso i capelli?', type:'check-other', opts:['Sì','No'] },
+      { id:30, sec:'Uomo Giovane', q:'Il nonno, padre di tua madre, ha perso i capelli?', type:'check-other', opts:['Sì','No','In parte Sì'] },
+      { id:31, sec:'Uomo Giovane', q:'A che ora vai a dormire?', type:'radio', opts:['Quasi sempre prima delle 24:00','A volte vado a letto dopo le 24:00','Spesso vado a letto dopo le 24:00'] },
+      { id:32, sec:'Uomo Giovane', q:'Giudichi i tuoi capelli grassi?', type:'radio-grid3', opts:['Sì','No','A volte'] },
+      { id:33, sec:'Uomo Giovane', q:'Ti vedi diradato?', type:'check-other', opts:['Sì','No'] }
+    ];
+
+    const Q_DONNA = [
+      { id:34, sec:'Donna Giovane', q:'Hai mai riscontrato carenze di ferritina, vitamina D, anemie o disturbi della tiroide?', type:'check-other', opts:['Sì','No'] },
+      { id:35, sec:'Donna Giovane', q:'Usi la pillola?', type:'radio', opts:['Sì','No'] },
+      { id:36, sec:'Donna Giovane', q:'Se NON usi la pillola, le mestruazioni sono regolari?', type:'radio', opts:['Sì','No'] },
+      { id:37, sec:'Donna Giovane', q:'Come giudichi il tuo umore?', type:'radio', opts:['Sono spesso triste o nervosa','A volte sono nervosa e stanca','Non riesco a dormire','Mi sento bene','Non mi sento bene'] },
+      { id:38, sec:'Donna Giovane', q:'Fai spesso servizi di stiratura / permanente, colorazione / schiariture?', type:'radio-grid3', opts:['Spesso','A volte','Mai'] },
+      { id:39, sec:'Donna Giovane', q:'I capelli ti sembrano secchi, spenti o che manchino di luminosità?', type:'radio', opts:['Sì','No'] },
+      { id:40, sec:'Donna Giovane', q:'I capelli ti sembrano che manchino di volume?', type:'radio', opts:['Sì','No'] },
+      { id:41, sec:'Donna Giovane', q:'Ti vedi diradata?', type:'check-other', opts:['Sì','No'] }
+    ];
+
+    const Q_MAMMA = [
+      { id:42, sec:'Neo Mamma', q:'Da quanto hai partorito?', type:'radio-grid3', opts:['Da 3 mesi','Da 6 mesi','Da più di un anno'] },
+      { id:43, sec:'Neo Mamma', q:'Hai riscontrato in gravidanza o dopo il parto carenze di ferritina, vitamina D, anemie, acido folico, vitamina B12 o disturbi della tiroide?', type:'check-other', opts:['Sì','No'] },
+      { id:44, sec:'Neo Mamma', q:'Stai allattando?', type:'radio', opts:['Sì','No'] },
+      { id:45, sec:'Neo Mamma', q:'Fai spesso servizi di stiratura / permanente, colorazione / schiariture?', type:'radio-grid3', opts:['Spesso','A volte','Mai'] },
+      { id:46, sec:'Neo Mamma', q:'I capelli ti sembrano secchi, spenti o che manchino di luminosità?', type:'radio', opts:['Sì','No'] },
+      { id:47, sec:'Neo Mamma', q:'I capelli ti sembrano che manchino di volume?', type:'radio', opts:['Sì','No'] }
+    ];
+
+    const Q_MENOPAUSA = [
+      { id:48, sec:'Donna Mezza Età', q:'Hai problemi di salute?', type:'check-other', opts:['Sì','No'] },
+      { id:49, sec:'Donna Mezza Età', q:'Hai mai riscontrato carenze di ferritina, vitamina D, anemie o disturbi della tiroide?', type:'check-other', opts:['Sì','No'] },
+      { id:50, sec:'Donna Mezza Età', q:'Ti fanno male i capelli o la cute?', type:'radio', opts:['Sì','No'] },
+      { id:51, sec:'Donna Mezza Età', q:'Lavando la testa cadono tanti capelli?', type:'radio', opts:['Sì','No'] },
+      { id:52, sec:'Donna Mezza Età', q:'Com\'è il tuo umore?', type:'radio', opts:['Sono spesso triste o nervosa','A volte sono nervosa e stanca','Non riesco a dormire','Mi sento bene','Non mi sento bene'] },
+      { id:53, sec:'Donna Mezza Età', q:'Ti vedi diradata?', type:'check-other', opts:['Sì','No'] },
+      { id:54, sec:'Donna Mezza Età', q:'Fai spesso servizi di stiratura / permanente, colorazione / schiariture?', type:'radio-grid3', opts:['Spesso','A volte','Mai'] },
+      { id:55, sec:'Donna Mezza Età', q:'I capelli ti sembrano secchi, spenti o che manchino di luminosità?', type:'radio', opts:['Sì','No'] },
+      { id:56, sec:'Donna Mezza Età', q:'I capelli ti sembrano che manchino di volume?', type:'radio', opts:['Sì','No'] }
+    ];
+
+    const Q_UOMOMEZZA = [
+      { id:60, sec:'Uomo Mezza Età', q:'Quando hai iniziato a notare il diradamento?', type:'radio', opts:['Tra i 18 e i 30 anni','Tra i 30 e i 45 anni','Tra i 45 e i 60 anni'] },
+      { id:61, sec:'Uomo Mezza Età', q:'Hai fatto qualcosa in merito?', type:'radio', opts:['Sì','No'] },
+      { id:62, sec:'Uomo Mezza Età', q:'Quanto ti è pesata questa situazione?', type:'radio-grid3', opts:['Tanto','Poco','Non mi creo problemi'] },
+      { id:63, sec:'Uomo Mezza Età', q:'Quanto lo stress ha influenzato la tua vita?', type:'radio-grid3', opts:['Pochissimo','Tantissimo','Non saprei'] },
+      { id:64, sec:'Uomo Mezza Età', q:'Giudichi i tuoi capelli grassi?', type:'radio-grid3', opts:['Sì','No','A volte'] },
+      { id:65, sec:'Uomo Mezza Età', q:'Ti vedi diradato?', type:'check-other', opts:['Sì','No'] }
+    ];
+
+    const Q_CHEMIO = [
+      { id:70, sec:'Percorso Chemioterapico', q:'Come è cambiato il tuo capello durante il percorso?', type:'radio', opts:['Li ho persi tutti','Sono deboli','Si sono diradati parecchio','Ancora uguali'] },
+      { id:71, sec:'Percorso Chemioterapico', q:'Il tuo cuoio capelluto ha subito cambiamenti?', type:'check-other', opts:['Sì','No','In parte'] },
+      { id:72, sec:'Percorso Chemioterapico', q:'Quale è la cosa che più ti crea disagio e difficoltà?', type:'check-other', opts:['Avere la testa senza capelli','Non sapere come comportarmi in merito','Il calore ed il prurito che ho sul cuoio capelluto'] },
+      { id:73, sec:'Percorso Chemioterapico', q:'Oltre alla chemioterapia, che farmaci stai assumendo?', type:'textarea' },
+      { id:74, sec:'Percorso Chemioterapico', q:'Cosa ha accompagnato il tuo percorso?', type:'check-other', opts:['Ho fatto intervento','Devo fare intervento','Radioterapia','Menopausa indotta'] }
+    ];
+
+    const Q_VISIVA = [
+      { id:100, sec:'Fase Visiva e Tattile', q:'Scala di Hamilton-Norwood — calvizie maschile', type:'norwood' },
+      { id:101, sec:'Fase Visiva e Tattile', q:'Scala di Ludwig — diradamento femminile', type:'ludwig' },
+      { id:102, sec:'Fase Visiva e Tattile', q:'Osservazioni con Proscope (ingrandimento 200X)', type:'textarea' },
+      { id:103, sec:'Fase Visiva e Tattile', q:'Gravità in relazione all\'età', type:'matrix-gravity' },
+      { id:104, sec:'Fase Visiva e Tattile', q:'Caduta — tipo e entità', type:'radio', opts:['Assente','Lieve (< 50 capelli/giorno)','Moderata (50–100 capelli/giorno)','Intensa (> 100 capelli/giorno)'] },
+      { id:105, sec:'Fase Visiva e Tattile', q:'Zone colpite', type:'check-other', opts:['Frontale','Tempie','Vertice / Corona','Occipitale','Laterale sinistra','Laterale destra','Diffusa'] },
+      { id:106, sec:'Fase Visiva e Tattile', q:'Cuoio capelluto — aspetto lipidico', type:'radio-grid3', opts:['Secco','Normale','Grasso'] },
+      { id:107, sec:'Fase Visiva e Tattile', q:'Cuoio capelluto — spessore', type:'radio-grid3', opts:['Sottile','Normale','Spesso'] },
+      { id:108, sec:'Fase Visiva e Tattile', q:'Cuoio capelluto — tensione', type:'radio-grid3', opts:['Bassa','Normale','Alta'] },
+      { id:109, sec:'Fase Visiva e Tattile', q:'Cuoio capelluto — colore', type:'radio-grid3', opts:['Rosa (normale)','Arrossato','Pallido'] },
+      { id:110, sec:'Fase Visiva e Tattile', q:'Forfora — tipo', type:'radio', opts:['Assente','Pitiriasi secca','Pitiriasi grassa','Squame aderenti'] },
+      { id:111, sec:'Fase Visiva e Tattile', q:'Prurito — intensità', type:'radio-grid2', opts:['Assente','Lieve','Moderato','Intenso'] },
+      { id:112, sec:'Fase Visiva e Tattile', q:'Odore del cuoio capelluto', type:'radio-grid3', opts:['Assente','Lieve','Intenso'] },
+      { id:113, sec:'Fase Visiva e Tattile', q:'Sudorazione', type:'radio-grid3', opts:['Scarsa','Normale','Eccessiva'] },
+      { id:114, sec:'Fase Visiva e Tattile', q:'Caratteristiche dei capelli', type:'check-other', opts:['Secchi','Grassi','Fragili','Spenti','Privi di volume','Con doppie punte','Trattati chimicamente'] },
+      { id:115, sec:'Fase Visiva e Tattile', q:'Tipo di incidenza', type:'incidenze-visive' },
+      { id:116, sec:'Fase Visiva e Tattile', q:'Patologie riscontrate', type:'patologie-check' },
+      { id:117, sec:'Fase Visiva e Tattile', q:'Tipo di incidenze — dettaglio', type:'incidenze-tabella' },
+      { id:118, sec:'Fase Visiva e Tattile', q:'Note finali', type:'textarea' }
+    ];
+
+    // Stato del questionario
+    let S = {
+      step: 'conoscitiva',
+      qIdx: 0,
+      casoTipo: null,
+      answers: {},
+      checkAns: {},
+      otherTxt: {},
+      gravity: {},
+      incidenze: new Set(),
+      incidenzeTab: new Set(),
+    };
+
+    function getActiveQuestions() {
+      switch(S.step) {
+        case 'conoscitiva': return Q_CONOSCITIVA;
+        case 'indagine': return Q_INDAGINE;
+        case 'caso':
+          if (S.casoTipo === 'uomo') return Q_UOMO;
+          if (S.casoTipo === 'donna') return Q_DONNA;
+          if (S.casoTipo === 'mamma') return Q_MAMMA;
+          if (S.casoTipo === 'menopausa') return Q_MENOPAUSA;
+          if (S.casoTipo === 'uomomezza') return Q_UOMOMEZZA;
+          if (S.casoTipo === 'chemio') return Q_CHEMIO;
+          return [];
+        case 'visiva':
+          if (S.casoTipo === 'uomo' || S.casoTipo === 'uomomezza') return Q_VISIVA.filter(q => q.id !== 101);
+          if (S.casoTipo === 'chemio') return Q_VISIVA.filter(q => q.id !== 101 && q.id !== 100);
+          if (S.casoTipo === 'donna' || S.casoTipo === 'mamma' || S.casoTipo === 'menopausa') return Q_VISIVA.filter(q => q.id !== 100);
+          return Q_VISIVA;
+        default: return [];
+      }
+    }
+
+    function cur() {
+      const qs = getActiveQuestions();
+      return qs[S.qIdx] || null;
+    }
+
+    function getCasoLength() {
+      if (S.casoTipo === 'uomo') return Q_UOMO.length;
+      if (S.casoTipo === 'donna') return Q_DONNA.length;
+      if (S.casoTipo === 'mamma') return Q_MAMMA.length;
+      if (S.casoTipo === 'menopausa') return Q_MENOPAUSA.length;
+      if (S.casoTipo === 'uomomezza') return Q_UOMOMEZZA.length;
+      if (S.casoTipo === 'chemio') return Q_CHEMIO.length;
+      return 6;
+    }
+
+    function getVisivaLength() {
+      if (S.casoTipo === 'uomo' || S.casoTipo === 'uomomezza') return Q_VISIVA.length - 1;
+      if (S.casoTipo === 'chemio') return Q_VISIVA.length - 2;
+      if (S.casoTipo === 'donna' || S.casoTipo === 'mamma' || S.casoTipo === 'menopausa') return Q_VISIVA.length - 1;
+      return Q_VISIVA.length;
+    }
+
+    function globalProgress() {
+      let done = 0;
+      let casoLen = S.casoTipo ? getCasoLength() : 6;
+      let visivaLen = getVisivaLength();
+      
+      if (S.step === 'conoscitiva') done = S.qIdx;
+      else if (S.step === 'indagine') done = Q_CONOSCITIVA.length + S.qIdx;
+      else if (S.step === 'selector') done = Q_CONOSCITIVA.length + Q_INDAGINE.length;
+      else if (S.step === 'caso') done = Q_CONOSCITIVA.length + Q_INDAGINE.length + 1 + S.qIdx;
+      else if (S.step === 'visiva') done = Q_CONOSCITIVA.length + Q_INDAGINE.length + 1 + casoLen + S.qIdx;
+      else if (S.step === 'done') return 'Completato';
+      
+      const total = Q_CONOSCITIVA.length + Q_INDAGINE.length + 1 + casoLen + visivaLen;
+      return (done + 1) + ' / ' + total;
+    }
+
+    function renderTimeline() {
+      const tl = document.getElementById('si-timeline');
+      if (!tl) return;
+      
+      let casoLabel = 'Caso';
+      let casoIcon = '3';
+      if (S.casoTipo === 'uomo') { casoLabel = 'Uomo'; casoIcon = '👨'; }
+      else if (S.casoTipo === 'donna') { casoLabel = 'Donna'; casoIcon = '👩'; }
+      else if (S.casoTipo === 'mamma') { casoLabel = 'Mamma'; casoIcon = '🤱'; }
+      else if (S.casoTipo === 'menopausa') { casoLabel = 'Menopausa'; casoIcon = '👩‍🦳'; }
+      else if (S.casoTipo === 'uomomezza') { casoLabel = 'Uomo Mezza'; casoIcon = '🧔'; }
+      else if (S.casoTipo === 'chemio') { casoLabel = 'Chemio'; casoIcon = '🎗️'; }
+      
+      const phases = [
+        { label: 'Conoscitiva', icon: '1', active: S.step === 'conoscitiva' },
+        { label: 'Indagine', icon: '2', active: S.step === 'indagine' },
+        { label: casoLabel, icon: casoIcon, active: S.step === 'selector' || S.step === 'caso' },
+        { label: 'Visiva', icon: '4', active: S.step === 'visiva' },
+        { label: 'Fine', icon: '✓', active: S.step === 'done' },
+      ];
+      
+      let currentIdx = phases.findIndex(p => p.active);
+      let done = 0;
+      let casoLen = S.casoTipo ? getCasoLength() : 6;
+      let visivaLen = getVisivaLength();
+      
+      if (S.step === 'conoscitiva') done = S.qIdx;
+      else if (S.step === 'indagine') done = Q_CONOSCITIVA.length + S.qIdx;
+      else if (S.step === 'selector') done = Q_CONOSCITIVA.length + Q_INDAGINE.length;
+      else if (S.step === 'caso') done = Q_CONOSCITIVA.length + Q_INDAGINE.length + 1 + S.qIdx;
+      else if (S.step === 'visiva') done = Q_CONOSCITIVA.length + Q_INDAGINE.length + 1 + casoLen + S.qIdx;
+      else if (S.step === 'done') done = Q_CONOSCITIVA.length + Q_INDAGINE.length + 1 + casoLen + visivaLen;
+      
+      const total = Q_CONOSCITIVA.length + Q_INDAGINE.length + 1 + casoLen + visivaLen;
+      const progressPercent = Math.min(100, Math.max(0, (done / total) * 100));
+      
+      let html = `<div class="tl-progress-bg"><div class="tl-progress-fill" style="width: ${progressPercent}%"></div></div>`;
+      html += `<div class="tl-steps">`;
+      phases.forEach((p, i) => {
+        let cls = 'tl-item';
+        if (i < currentIdx) cls += ' done';
+        if (i === currentIdx) cls += ' active';
+        
+        let iconContent = p.icon;
+        if (i < currentIdx && p.icon !== '✓' && !['👨','👩','🤱','👩‍🦳','🧔','🎗️'].includes(p.icon)) {
+          iconContent = '✓';
+        }
+        
+        html += `<div class="${cls}"><div class="tl-dot">${iconContent}</div><div class="tl-lbl">${p.label}</div></div>`;
+      });
+      html += `</div>`;
+      tl.innerHTML = html;
+    }
+
+    function initQuestionnaire() {
+      renderQuestionnaire();
+    }
+
+    function renderQuestionnaire() {
+      renderTimeline();
+      
+      const main = document.getElementById('si-question-container');
+      const btnBack = document.getElementById('si-btn-back');
+      const btnNext = document.getElementById('si-btn-next');
+      const stepProgress = document.getElementById('si-step-progress');
+      
+      if (!main) return;
+      
+      stepProgress.textContent = globalProgress();
+      btnBack.disabled = (S.step === 'conoscitiva' && S.qIdx === 0);
+      
+      if (S.step === 'done') {
+        btnNext.style.display = 'none';
+        renderDone(main);
+        return;
+      }
+      
+      btnNext.style.display = '';
+      
+      if (S.step === 'selector') {
+        btnNext.style.display = 'none';
+        renderSelector(main);
+        return;
+      }
+      
+      const q = cur();
+      if (!q) return;
+      
+      let html = `<div class="sec-badge" style="margin-bottom: 12px; margin-top: 10px;">${q.sec}</div>
+      <div class="q-card">
+        <div class="q-num">Domanda ${q.id}</div>
+        <div class="q-text" style="font-size: 17px; font-weight: 700; color: var(--dark); margin-bottom: 16px;">${q.q}</div>`;
+      html += renderInput(q);
+      html += `</div>`;
+      main.innerHTML = html;
+    }
+
+    function renderSelector(main) {
+      main.innerHTML = `
+      <div class="sec-badge" style="margin-bottom: 12px; margin-top: 10px;">Seleziona Caso Specifico</div>
+      <div class="q-card">
+        <div class="q-text" style="font-size: 16px; font-weight: 700; margin-bottom: 20px;">Seleziona il caso specifico per questo cliente:</div>
+        <div class="caso-selector">
+          <button type="button" class="caso-btn uomo" onclick="siSelectCaso('uomo')">
+            <div class="caso-icon">👨</div>
+            <div class="caso-label">Uomo Giovane</div>
+          </button>
+          <button type="button" class="caso-btn donna" onclick="siSelectCaso('donna')">
+            <div class="caso-icon">👩</div>
+            <div class="caso-label">Donna Giovane</div>
+          </button>
+          <button type="button" class="caso-btn mamma" onclick="siSelectCaso('mamma')">
+            <div class="caso-icon">🤱</div>
+            <div class="caso-label">Neo Mamma</div>
+          </button>
+          <button type="button" class="caso-btn menopausa" onclick="siSelectCaso('menopausa')">
+            <div class="caso-icon">👩‍🦳</div>
+            <div class="caso-label">Donna Mezza Età</div>
+          </button>
+          <button type="button" class="caso-btn uomomezza" onclick="siSelectCaso('uomomezza')">
+            <div class="caso-icon">🧔</div>
+            <div class="caso-label">Uomo di Mezza Età</div>
+          </button>
+          <button type="button" class="caso-btn chemio" onclick="siSelectCaso('chemio')">
+            <div class="caso-icon">🎗️</div>
+            <div class="caso-label">Percorso Chemioterapico</div>
+          </button>
+        </div>
+      </div>`;
+    }
+
+    function renderInput(q) {
+      switch (q.type) {
+        case 'name':            return rName(q);
+        case 'radio':           return rRadioList(q);
+        case 'radio-grid2':     return rRadioGrid(q, 2);
+        case 'radio-grid3':     return rRadioGrid(q, 3);
+        case 'check-other':     return rCheckOther(q);
+        case 'scale':           return rScale(q);
+        case 'textarea':        return rTextarea(q);
+        case 'matrix-gravity':  return rMatrixGravity();
+        case 'matrix-incidenze':return rMatrixIncidenze();
+        case 'incidenze-visive':return rIncidenze();
+        case 'patologie-check': return rPatologie();
+        case 'incidenze-tabella':return rIncidenzeTabella();
+        case 'norwood':         return rNorwood(q);
+        case 'ludwig':          return rLudwig(q);
+        default: return '';
+      }
+    }
+
+    function rName(q) {
+      const first = S.answers[q.id + '_first'] || '';
+      const last  = S.answers[q.id + '_last']  || '';
+      return `<div class="name-row">
+        <div class="inp-group"><label>Nome</label><input type="text" value="${first}" placeholder="Nome" oninput="S.answers['${q.id}_first']=this.value"></div>
+        <div class="inp-group"><label>Cognome</label><input type="text" value="${last}" placeholder="Cognome" oninput="S.answers['${q.id}_last']=this.value"></div>
+      </div>`;
+    }
+
+    function rRadioList(q) {
+      return '<div class="opts">' + q.opts.map(o => {
+        const sel = S.answers[q.id] === o ? ' sel' : '';
+        const col = optColorClass(o);
+        return `<button type="button" class="opt${sel}${col}" onclick="siPickR(${q.id},'${escQ(o)}')"><span class="opt-radio"></span>${o}</button>`;
+      }).join('') + '</div>';
+    }
+
+    function rRadioGrid(q, cols) {
+      const cls = cols === 3 ? 'opts-grid3' : 'opts-grid2';
+      return '<div class="' + cls + '">' + q.opts.map(o => {
+        const sel = S.answers[q.id] === o ? ' sel' : '';
+        const col = optColorClass(o);
+        return `<button type="button" class="opt${sel}${col}" onclick="siPickR(${q.id},'${escQ(o)}')"><span class="opt-radio"></span>${o}</button>`;
+      }).join('') + '</div>';
+    }
+
+    function rCheckOther(q) {
+      const set   = S.checkAns[q.id] || new Set();
+      const other = S.otherTxt[q.id] || '';
+      let html = '<div class="opts">';
+      q.opts.forEach(o => {
+        const sel = set.has(o) ? ' sel' : '';
+        const col = optColorClass(o);
+        html += `<button type="button" class="opt${sel}${col}" onclick="siToggleC(${q.id},'${escQ(o)}')"><span class="opt-check"></span>${o}</button>`;
+      });
+      html += '</div>';
+      html += `<div class="other-row"><span class="other-lbl">Altro:</span><input class="other-inp" type="text" value="${other}" placeholder="Specifica…" oninput="S.otherTxt['${q.id}']=this.value"></div>`;
+      return html;
+    }
+
+    function rScale(q) {
+      const val = S.answers[q.id];
+      let btns = '';
+      for (let i = 1; i <= 10; i++) {
+        const sel = val == i ? ' sel' : '';
+        btns += `<button type="button" class="scale-btn${sel}" onclick="siPickS(${q.id},${i})">${i}</button>`;
+      }
+      return `<div class="scale-wrap">
+        <div class="scale-ends"><span>Pessima</span><span>Ottima</span></div>
+        <div class="scale-btns">${btns}</div>
+      </div>`;
+    }
+
+    function rTextarea(q) {
+      const val = S.answers[q.id] || '';
+      return `<textarea placeholder="Scrivi qui…" oninput="S.answers['${q.id}']=this.value">${val}</textarea>`;
+    }
+
+    function rMatrixGravity() {
+      const zones = ['Attaccatura frontale','Tempie','Vertice / Corona','Zona occipitale','Laterale sinistra','Laterale destra'];
+      const cols  = ['1','2','3','4','5'];
+      let html = '<div class="mx-scroll"><table class="mx-table"><thead><tr><th>Zona</th>';
+      cols.forEach(c => html += `<th>${c}</th>`);
+      html += '</tr></thead><tbody>';
+      zones.forEach(z => {
+        html += `<tr><td>${z}</td>`;
+        cols.forEach((c, ci) => {
+          const sel = S.gravity[z] === ci ? ' sel' : '';
+          html += `<td><div class="mx-dot${sel}" onclick="siPickGrav('${escQ(z)}',${ci})"></div></td>`;
+        });
+        html += '</tr>';
+      });
+      html += '</tbody></table></div>';
+      return html;
+    }
+
+    const INCIDENZE_TIPI = [
+      { tipo:'Digestiva',    img:'img/incidenza-digestiva.png' },
+      { tipo:'Nervosa',      img:'img/incidenza-nervosa.png' },
+      { tipo:'Fisica',       img:'img/incidenza-fisica.png' },
+      { tipo:'Psicofisica',  img:'img/incidenza-psicofisica.png' },
+    ];
+
+    function rIncidenze() {
+      let html = '<div class="clinical-grid incidenze-grid">';
+      INCIDENZE_TIPI.forEach(i => {
+        const sel = S.answers['incid_tipo'] === i.tipo ? ' sel' : '';
+        html += `<div class="clinical-item${sel}" onclick="siPickIncidTipo('${escQ(i.tipo)}')">
+          <img src="${i.img}" alt="${i.tipo}" style="width: 100%; height: auto; border-radius: 4px; display: block;" referrerPolicy="no-referrer" />
+          <div class="ci-stage">${i.tipo}</div>
+        </div>`;
+      });
+      html += '</div>';
+      return html;
+    }
+
+    function rPatologie() {
+      const types = [
+        'Alopecia androgenetica','Alopecia areata','Alopecia da trazione',
+        'Telogen effluvium','Anagen effluvium','Dermatite seborroica',
+        'Pitiriasi','Psoriasi del cuoio capelluto','Tricotillomania'
+      ];
+      let html = '<div class="opts">';
+      types.forEach(t => {
+        const sel = S.incidenze.has(t) ? ' sel' : '';
+        html += `<button type="button" class="opt${sel}" onclick="siToggleI('${escQ(t)}')"><span class="opt-check"></span>${t}</button>`;
+      });
+      html += '</div>';
+      const other = S.otherTxt['incid'] || '';
+      html += `<div class="other-row"><span class="other-lbl">Altro:</span><input class="other-inp" type="text" value="${other}" placeholder="Specifica…" oninput="S.otherTxt['incid']=this.value"></div>`;
+      return html;
+    }
+
+    function rMatrixIncidenze() {
+      return rIncidenze() + rPatologie();
+    }
+
+    const INCIDENZE_DETTAGLIO = [
+      { label: 'Vertice posteriore', col: 'rosso' },
+      { label: 'Generalmente diffuso', col: 'blu' },
+      { label: 'Cuoio capelluto iperlipidico', col: 'rosso' },
+      { label: 'Cuoio capelluto sottile', col: 'blu' },
+      { label: 'Cuoio capelluto spesso', col: 'rosso' },
+      { label: 'Cuoio capelluto grigiastro', col: 'blu' },
+      { label: 'Cuoio capelluto mobile', col: 'rosso' },
+      { label: 'Localizzazione del prurito zona superiore', col: 'blu' },
+      { label: 'Cuoio capelluto rosato', col: 'rosso' },
+      { label: 'Odore cuoio capelluto ammoniacale', col: 'blu' },
+      { label: 'Forfora grassa', col: 'rosso' },
+      { label: 'Sudorazione intensa', col: 'blu' },
+      { label: 'Odore cuoio capelluto rancido', col: 'rosso' },
+      { label: 'Capelli fini', col: 'blu' },
+      { label: 'Capelli grossi', col: 'rosso' },
+    ];
+
+    function rIncidenzeTabella() {
+      if (!S.incidenzeTab) S.incidenzeTab = new Set();
+      
+      let html = '<div class="incidenze-tab-grid">';
+      
+      // Colonna BLU
+      html += '<div class="incidenze-col incidenze-col-blu">';
+      html += '<div class="incidenze-col-header blu">Incidenza Blu</div>';
+      INCIDENZE_DETTAGLIO.filter(i => i.col === 'blu').forEach(i => {
+        const sel = S.incidenzeTab.has(i.label) ? ' sel' : '';
+        html += `<button type="button" class="incidenze-item blu${sel}" onclick="siToggleIncidTab('${escQ(i.label)}')">
+          <span class="incidenze-dot"></span>${i.label}
+        </button>`;
+      });
+      html += '</div>';
+      
+      // Colonna ROSSA
+      html += '<div class="incidenze-col incidenze-col-rosso">';
+      html += '<div class="incidenze-col-header rosso">Incidenza Rossa</div>';
+      INCIDENZE_DETTAGLIO.filter(i => i.col === 'rosso').forEach(i => {
+        const sel = S.incidenzeTab.has(i.label) ? ' sel' : '';
+        html += `<button type="button" class="incidenze-item rosso${sel}" onclick="siToggleIncidTab('${escQ(i.label)}')">
+          <span class="incidenze-dot"></span>${i.label}
+        </button>`;
+      });
+      html += '</div>';
+      
+      html += '</div>';
+      return html;
+    }
+
+    const NORWOOD_STAGES = [
+      { stage:'I',    img:'img/norwood-1.png' },
+      { stage:'II',   img:'img/norwood-2.png' },
+      { stage:'III',  img:'img/norwood-3.png' },
+      { stage:'IIIv', img:'img/norwood-3v.png' },
+      { stage:'IV',   img:'img/norwood-4.png' },
+      { stage:'IVa',  img:'img/norwood-4a.png' },
+      { stage:'V',    img:'img/norwood-5.png' },
+      { stage:'Va',   img:'img/norwood-5a.png' },
+      { stage:'VI',   img:'img/norwood-6.png' },
+      { stage:'VII',  img:'img/norwood-7.png' },
+      { stage:'VIIa', img:'img/norwood-7a.png' },
+    ];
+
+    function rNorwood(q) {
+      let html = '<div class="clinical-grid">';
+      NORWOOD_STAGES.forEach(s => {
+        const sel = S.answers[q.id] === s.stage ? ' sel' : '';
+        html += `<div class="clinical-item${sel}" onclick="siPickR(${q.id},'${escQ(s.stage)}')">
+          <img src="${s.img}" alt="Stadio ${s.stage}" style="width: 100%; height: auto; border-radius: 4px; display: block;" referrerPolicy="no-referrer" />
+        </div>`;
+      });
+      html += '</div>';
+      return html;
+    }
+
+    const LUDWIG_STAGES = [
+      { stage:'I',   label:'Grado I',   img:'img/ludwig-1.png' },
+      { stage:'II',  label:'Grado II',  img:'img/ludwig-2.png' },
+      { stage:'III', label:'Grado III', img:'img/ludwig-3.png' },
+    ];
+
+    function rLudwig(q) {
+      let html = '<div class="clinical-grid ludwig-grid">';
+      LUDWIG_STAGES.forEach(s => {
+        const sel = S.answers[q.id] === s.stage ? ' sel' : '';
+        html += `<div class="clinical-item${sel}" onclick="siPickR(${q.id},'${escQ(s.stage)}')">
+          <img src="${s.img}" alt="${s.label}" style="width: 100%; height: auto; border-radius: 4px; display: block;" referrerPolicy="no-referrer" />
+          <div class="ci-stage">${s.label}</div>
+        </div>`;
+      });
+      html += '</div>';
+      return html;
+    }
+
+    function renderDone(main) {
+      const name = (S.answers['1_first'] || '') + ' ' + (S.answers['1_last'] || '');
+      const display = name.trim() ? name.trim() : null;
+      main.innerHTML = `
+      <div class="done-card">
+        <div class="done-icon">✓</div>
+        <h2>Scheda completata!</h2>
+        <p>${display ? 'Grazie <strong>' + display + '</strong>.<br>' : ''}La scheda tricologica è stata compilata con successo ed è in fase di caricamento.</p>
+      </div>`;
+    }
+
+    // Actions & Event handlers
+    function siGoBack() {
+      if (S.step === 'conoscitiva' && S.qIdx > 0) {
+        S.qIdx--;
+      } else if (S.step === 'indagine' && S.qIdx > 0) {
+        S.qIdx--;
+      } else if (S.step === 'indagine' && S.qIdx === 0) {
+        S.step = 'conoscitiva';
+        S.qIdx = Q_CONOSCITIVA.length - 1;
+      } else if (S.step === 'selector') {
+        S.step = 'indagine';
+        S.qIdx = Q_INDAGINE.length - 1;
+      } else if (S.step === 'caso' && S.qIdx > 0) {
+        S.qIdx--;
+      } else if (S.step === 'caso' && S.qIdx === 0) {
+        S.step = 'selector';
+        S.casoTipo = null;
+      } else if (S.step === 'visiva' && S.qIdx > 0) {
+        S.qIdx--;
+      } else if (S.step === 'visiva' && S.qIdx === 0) {
+        S.step = 'caso';
+        S.qIdx = getActiveQuestions().length - 1;
+      }
+      renderQuestionnaire();
+    }
+
+    function siGoNext() {
+      const qs = getActiveQuestions();
+      
+      if (S.step === 'conoscitiva') {
+        if (S.qIdx === 0) {
+          const first = S.answers['1_first'] || '';
+          const last  = S.answers['1_last']  || '';
+          if (!first.trim() || !last.trim()) {
+            alert('Inserisci sia il nome che il cognome per continuare.');
+            return;
+          }
+        }
+        
+        if (S.qIdx < qs.length - 1) {
+          S.qIdx++;
+        } else {
+          S.step = 'indagine';
+          S.qIdx = 0;
+        }
+      } else if (S.step === 'indagine') {
+        if (S.qIdx < qs.length - 1) {
+          S.qIdx++;
+        } else {
+          S.step = 'selector';
+        }
+      } else if (S.step === 'caso') {
+        if (S.qIdx < qs.length - 1) {
+          S.qIdx++;
+        } else {
+          S.step = 'visiva';
+          S.qIdx = 0;
+        }
+      } else if (S.step === 'visiva') {
+        if (S.qIdx < qs.length - 1) {
+          S.qIdx++;
+        } else {
+          siSaveAndUpload();
+          S.step = 'done';
+        }
+      }
+      renderQuestionnaire();
+    }
+
+    function siSelectCaso(tipo) {
+      S.casoTipo = tipo;
+      S.step = 'caso';
+      S.qIdx = 0;
+      renderQuestionnaire();
+    }
+
+    function siPickR(id, val) {
+      S.answers[id] = val;
+      renderQuestionnaire();
+    }
+    function siPickS(id, val) {
+      S.answers[id] = val;
+      renderQuestionnaire();
+    }
+    function siToggleC(id, val) {
+      if (!S.checkAns[id]) S.checkAns[id] = new Set();
+      if (S.checkAns[id].has(val)) S.checkAns[id].delete(val);
+      else S.checkAns[id].add(val);
+      renderQuestionnaire();
+    }
+    function siPickGrav(zone, col) {
+      if (S.gravity[zone] === col) delete S.gravity[zone];
+      else S.gravity[zone] = col;
+      renderQuestionnaire();
+    }
+    function siToggleI(val) {
+      if (S.incidenze.has(val)) S.incidenze.delete(val);
+      else S.incidenze.add(val);
+      renderQuestionnaire();
+    }
+    function siPickIncidTipo(val) {
+      if (S.answers['incid_tipo'] === val) delete S.answers['incid_tipo'];
+      else S.answers['incid_tipo'] = val;
+      renderQuestionnaire();
+    }
+    function siToggleIncidTab(val) {
+      if (S.incidenzeTab.has(val)) S.incidenzeTab.delete(val);
+      else S.incidenzeTab.add(val);
+      renderQuestionnaire();
+    }
+
+    function siResetForm() {
+      S = { step:'conoscitiva', qIdx:0, casoTipo:null, answers:{}, checkAns:{}, otherTxt:{}, gravity:{}, incidenze:new Set(), incidenzeTab:new Set() };
+      renderQuestionnaire();
+    }
+
+    window.siSelectCaso = siSelectCaso;
+    window.siGoBack = siGoBack;
+    window.siGoNext = siGoNext;
+    window.siPickR = siPickR;
+    window.siPickS = siPickS;
+    window.siToggleC = siToggleC;
+    window.siPickGrav = siPickGrav;
+    window.siToggleI = siToggleI;
+    window.siPickIncidTipo = siPickIncidTipo;
+    window.siToggleIncidTab = siToggleIncidTab;
+    window.siResetForm = siResetForm;
+
+    function generaHTMLPdf() {
+      const nome = S.answers['1_first'] || '';
+      const cognome = S.answers['1_last'] || '';
+      const timestamp = new Date().toLocaleString('it-IT');
+      const casoTipo = S.casoTipo || '';
+      const incidenzaTipo = S.answers['incid_tipo'] || 'Non specificato';
+      
+      const tutteDomande = [...Q_CONOSCITIVA, ...Q_INDAGINE, ...Q_UOMO, ...Q_DONNA, ...Q_MAMMA, ...Q_MENOPAUSA, ...Q_UOMOMEZZA, ...Q_CHEMIO, ...Q_VISIVA];
+      let risposteHTML = '';
+      let checkboxHTML = '';
+      
+      tutteDomande.forEach(q => {
+        if (S.answers[q.id] !== undefined) {
+          risposteHTML += '<div style="margin-bottom:8px;padding:8px 12px;background:#fafafa;border-radius:4px;"><strong>' + q.q + ':</strong> ' + S.answers[q.id] + '</div>';
+        }
+        if (S.checkAns[q.id] && S.checkAns[q.id].size > 0) {
+          checkboxHTML += '<div style="margin-bottom:8px;padding:8px 12px;background:#fafafa;border-radius:4px;"><strong>' + q.q + ':</strong> ' + Array.from(S.checkAns[q.id]).join(', ') + '</div>';
+        }
+      });
+      
+      let gravityHTML = '';
+      Object.entries(S.gravity).forEach(([zona, val]) => {
+        const pct = (val + 1) * 20;
+        gravityHTML += '<div style="display:flex;justify-content:space-between;padding:8px 12px;background:#fafafa;margin-bottom:5px;border-radius:4px;"><span>' + zona + '</span><div style="width:100px;height:8px;background:#e5e5e5;border-radius:4px;overflow:hidden;"><div style="height:100%;width:' + pct + '%;background:#EAB308;"></div></div></div>';
+      });
+      
+      const incidenze = Array.from(S.incidenze);
+      let incidenzeBadges = incidenze.map(i => '<span style="display:inline-block;background:#EAB308;color:#fff;padding:3px 10px;border-radius:12px;font-size:12px;margin:3px;">' + i + '</span>').join('');
+      if (!incidenzeBadges) incidenzeBadges = '<span style="color:#888;">Nessuna</span>';
+      
+      const incidenzeTab = Array.from(S.incidenzeTab);
+      let incidenzeTabBadges = incidenzeTab.map(i => '<span style="display:inline-block;background:transparent;border:1px solid #EAB308;color:#333;padding:3px 10px;border-radius:12px;font-size:12px;margin:3px;">' + i + '</span>').join('');
+      if (!incidenzeTabBadges) incidenzeTabBadges = '<span style="color:#888;">Nessuna</span>';
+     
+      return '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Segoe UI,Arial,sans-serif;padding:40px;color:#1a1a1a;font-size:14px}h1{color:#EAB308;border-bottom:2px solid #EAB308;padding-bottom:10px;margin-bottom:30px;font-size:24px}.header-subtitle{color:#666;font-size:12px;margin-top:-25px;margin-bottom:30px}.info-box{background:#f8f7f4;padding:20px;border-radius:8px;margin-bottom:30px;border-left:4px solid #EAB308}h2{color:#333;font-size:16px;margin-top:30px;margin-bottom:15px;padding-bottom:5px;border-bottom:1px solid #ddd}.footer{margin-top:40px;padding-top:20px;border-top:1px solid #ddd;font-size:11px;color:#888;text-align:center}</style></head><body><h1>Scheda Tricologica</h1><p class="header-subtitle">Beautri S.R.L. — Centro Tricologico</p><div class="info-box"><p><strong>Cliente:</strong> ' + cognome + ' ' + nome + '</p><p><strong>Caso:</strong> ' + casoTipo + '</p><p><strong>Data compilazione:</strong> ' + timestamp + '</p></div><h2>Risposte Questionario</h2>' + (risposteHTML || '<p style="color:#888;">Nessuna risposta</p>') + '<h2>Selezioni Multiple</h2>' + (checkboxHTML || '<p style="color:#888;">Nessuna selezione</p>') + '<h2>Tipo di Incidenza</h2><p><span style="display:inline-block;background:#EAB308;color:#fff;padding:3px 10px;border-radius:12px;font-size:12px;">' + incidenzaTipo + '</span></p><h2>Patologie Riscontrate</h2><div>' + incidenzeBadges + '</div><h2>Dettaglio Incidenze</h2><div>' + incidenzeTabBadges + '</div><h2>Gravità per Zona</h2>' + (gravityHTML || '<p style="color:#888;">Nessuna gravità specificata</p>') + '<div class="footer">Documento generato automaticamente — ' + timestamp + '</div></body></html>';
+    }
+
+    function showSiToast(title, desc, type) {
+      showToast(title, desc, type);
+    }
+
+    async function fetchWithTimeout(url, options, timeoutMs = 30000) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const response = await fetch(url, { ...options, signal: controller.signal });
+        clearTimeout(timeoutId);
+        return response;
+      } catch (err) {
+        clearTimeout(timeoutId);
+        throw err;
+      }
+    }
+
+    async function generaPdfBase64(htmlContent, retries = 3) {
+      for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+          const pdfResponse = await fetchWithTimeout('https://api.html2pdf.app/v1/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              apiKey: HTML2PDF_API_KEY,
+              html: htmlContent,
+              format: 'A4',
+              marginTop: 20,
+              marginBottom: 20,
+              marginLeft: 20,
+              marginRight: 20
+            })
+          }, 30000);
+          
+          if (!pdfResponse.ok) {
+            throw new Error('HTTP ' + pdfResponse.status);
+          }
+          
+          const pdfBlob = await pdfResponse.blob();
+          
+          if (!pdfBlob || pdfBlob.size < 1000) {
+            throw new Error('PDF vuoto o corrotto (' + (pdfBlob?.size || 0) + ' bytes)');
+          }
+          
+          const pdfBase64 = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              const result = reader.result;
+              if (result && result.includes(',')) {
+                resolve(result.split(',')[1]);
+              } else {
+                reject(new Error('Conversione base64 fallita'));
+              }
+            };
+            reader.onerror = () => reject(new Error('FileReader error'));
+            reader.readAsDataURL(pdfBlob);
+          });
+          
+          if (!pdfBase64 || pdfBase64.length < 100) {
+            throw new Error('Base64 non valido');
+          }
+          
+          return pdfBase64;
+          
+        } catch (err) {
+          console.warn('Tentativo ' + attempt + '/' + retries + ' fallito:', err.message);
+          if (attempt === retries) throw err;
+          await new Promise(r => setTimeout(r, 1000 * attempt));
+        }
+      }
+    }
+
+    async function inviaAGoogleDrive(filename, pdfBase64, retries = 2) {
+      for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+          await fetch(GOOGLE_APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              filename: filename,
+              pdfBase64: pdfBase64
+            })
+          });
+          return true;
+        } catch (err) {
+          console.warn('Upload tentativo ' + attempt + '/' + retries + ' fallito:', err.message);
+          if (attempt === retries) throw err;
+          await new Promise(r => setTimeout(r, 1000 * attempt));
+        }
+      }
+    }
+
+    function base64ToBlob(base64, type = 'application/pdf') {
+      const byteCharacters = atob(base64);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      return new Blob([byteArray], {type: type});
+    }
+
+    async function siSaveAndUpload() {
+      const nome = S.answers['1_first'] || '';
+      const cognome = S.answers['1_last'] || '';
+      const clientFullName = (cognome + ' ' + nome).trim() || 'Cliente Senza Nome';
+      const filenameClean = clientFullName + ' - Scheda Interna.pdf';
+      const clientId = 'si_' + Date.now() + Math.random().toString(36).substring(2, 7);
+
+      showSiToast("Salvataggio in corso", "Generazione del report PDF in corso...", "loading");
+
+      try {
+        const htmlContent = generaHTMLPdf();
+        if (!htmlContent || htmlContent.length < 500) {
+          throw new Error('HTML non generato correttamente');
+        }
+
+        showSiToast("Salvataggio in corso", "Conversione del report in PDF...", "loading");
+        const pdfBase64 = await generaPdfBase64(htmlContent);
+
+        inviaAGoogleDrive(filenameClean, pdfBase64).catch(err => {
+          console.warn("Upload Google Drive fallito, ma continuiamo su Firebase:", err);
+        });
+
+        showSiToast("Salvataggio in corso", "Caricamento del PDF su Firebase...", "loading");
+        
+        if (firebaseActive && !auth.currentUser) {
+          await auth.signInAnonymously();
+        }
+
+        let pdfUrl = "";
+        if (firebaseActive) {
+          const pdfBlob = base64ToBlob(pdfBase64);
+          const storageRef = storage.ref().child(`schede_interne/${clientId}_scheda.pdf`);
+          const uploadTask = await storageRef.put(pdfBlob);
+          pdfUrl = await uploadTask.ref.getDownloadURL();
+        } else {
+          pdfUrl = "offline_mode_no_storage_url";
+        }
+
+        showSiToast("Salvataggio in corso", "Salvataggio del record nel database...", "loading");
+
+        const docData = {
+          id: clientId,
+          name: clientFullName,
+          pdfUrl: pdfUrl,
+          recordType: 'scheda_interna',
+          casoTipo: S.casoTipo || 'generico',
+          createdAt: firebaseActive ? firebase.firestore.FieldValue.serverTimestamp() : Date.now()
+        };
+
+        if (firebaseActive) {
+          await db.collection('tricologia_consultations').doc(clientId).set(docData);
+        } else {
+          const offlineList = JSON.parse(localStorage.getItem('beautri_offline_consultations') || '[]');
+          offlineList.push(docData);
+          localStorage.setItem('beautri_offline_consultations', JSON.stringify(offlineList));
+        }
+
+        showSiToast("Scheda Salvata!", "La scheda clinica è stata salvata con successo.", "success");
+        setTimeout(hideToast, 2000);
+
+        siResetForm();
+        const tabBtnStorico = document.getElementById('btn-tab-storico');
+        if (tabBtnStorico) {
+          tabBtnStorico.click();
+        }
+
+      } catch (err) {
+        console.error('Errore durante il salvataggio:', err);
+        showSiToast("Errore di Salvataggio", err.message || "Impossibile salvare la scheda. Riprova.", "error");
+      }
+    }
+
+    function optColorClass(val) {
+      const v = (val || '').trim();
+      if (v === 'Sì') return ' opt-si';
+      if (v === 'No') return ' opt-no';
+      if (v === 'Maschio') return ' opt-maschio';
+      if (v === 'Femmina') return ' opt-femmina';
+      return '';
+    }
+
+    function escQ(s) {
+      return (s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
     }
 
     // Helper Toast
