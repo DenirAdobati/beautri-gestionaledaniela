@@ -2316,6 +2316,7 @@ window.addEventListener('unhandledrejection', function(e) {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('admin') === 'true' && btnBackToAdmin) {
       btnBackToAdmin.style.display = 'flex';
+      btnBackToAdmin.setAttribute('href', 'index.html?admin=true&tab=history');
     }
 
     const displayTreatmentsList = document.getElementById('display-treatments-list');
