@@ -414,7 +414,7 @@
   <!-- Firebase SDK Compat -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-  <script src="firebase-config-v2.js?v=50"></script>
+  <script src="firebase-config-v2.js?v=51"></script>
 
   <script>
     // Mappa delle etichette descrittive per il layout admin
@@ -507,16 +507,26 @@
       }
       document.getElementById('client-date').textContent = dateStr;
 
-      // Aggiorna Badge se modificata
+      // Aggiorna Badge e pulsante modifica se modificata o originale
       const docBadge = document.getElementById('doc-badge');
-      if (docData.status === 'modificato') {
+      const btnEdit = document.getElementById('btn-edit');
+
+      if (docData.status === 'originale') {
+        docBadge.textContent = "Pre-Consulenza (Originale)";
+        docBadge.style.background = "rgba(107, 114, 128, 0.12)";
+        docBadge.style.color = "#4b5563";
+        if (btnEdit) btnEdit.style.display = 'none';
+      } else if (docData.status === 'modificato') {
         docBadge.textContent = "Pre-Consulenza (Modificato)";
         docBadge.style.background = "rgba(16, 185, 129, 0.12)";
         docBadge.style.color = "#047857";
+        if (btnEdit && !isEditing) btnEdit.style.display = 'inline-flex';
       } else {
-        docBadge.textContent = "Pre-Consulenza";
-        docBadge.style.background = "rgba(59, 130, 246, 0.12)";
-        docBadge.style.color = "#1d4ed8";
+        // modificabile o predefinito
+        docBadge.textContent = "Pre-Consulenza (Da Modificare)";
+        docBadge.style.background = "rgba(245, 158, 11, 0.12)";
+        docBadge.style.color = "#d97706";
+        if (btnEdit && !isEditing) btnEdit.style.display = 'inline-flex';
       }
 
       // Renderizza risposte nella griglia

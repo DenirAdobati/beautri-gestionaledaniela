@@ -724,7 +724,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
-  <script src="firebase-config-v2.js?v=50"></script>
+  <script src="firebase-config-v2.js?v=51"></script>
 
   <script>
     // Configurazione domande
@@ -1096,7 +1096,8 @@
 
         document.getElementById("loader-text").textContent = "Salvataggio risposte...";
 
-        const clientId = 'pre_' + Date.now() + Math.random().toString(36).substring(2, 7);
+        const timestamp = Date.now();
+        const baseId = 'pre_' + timestamp + Math.random().toString(36).substring(2, 7);
         const name = (answers["1_last"] + " " + answers["1_first"]).trim();
 
         // Converti i set in array per serializzarli in JSON
@@ -1105,23 +1106,38 @@
           checkAnsSerialized[k] = Array.from(set || []);
         });
 
-        const docData = {
-          id: clientId,
+        // 1. Versione Originale (non modificabile da Daniela)
+        const docDataOrig = {
+          id: baseId + '_orig',
           name: name,
           recordType: 'questionario_pre',
-          status: 'originale', // 'originale' all'inizio, poi può essere modificata da Daniela
-          createdAt: firebaseActive ? firebase.firestore.FieldValue.serverTimestamp() : Date.now(),
-          answers: answers,
-          checkAns: checkAnsSerialized,
+          status: 'originale',
+          createdAt: firebaseActive ? firebase.firestore.FieldValue.serverTimestamp() : timestamp,
+          answers: JSON.parse(JSON.stringify(answers)),
+          checkAns: JSON.parse(JSON.stringify(checkAnsSerialized)),
+          productImageUrl: imageUrl
+        };
+
+        // 2. Versione Da Modificare (integrabile da Daniela)
+        const docDataMod = {
+          id: baseId + '_mod',
+          name: name,
+          recordType: 'questionario_pre',
+          status: 'modificabile',
+          createdAt: firebaseActive ? firebase.firestore.FieldValue.serverTimestamp() : timestamp,
+          answers: JSON.parse(JSON.stringify(answers)),
+          checkAns: JSON.parse(JSON.stringify(checkAnsSerialized)),
           productImageUrl: imageUrl
         };
 
         if (firebaseActive) {
-          await db.collection('tricologia_consultations').doc(clientId).set(docData);
+          await db.collection('tricologia_consultations').doc(docDataOrig.id).set(docDataOrig);
+          await db.collection('tricologia_consultations').doc(docDataMod.id).set(docDataMod);
         } else {
           // Salva in locale come fallback offline
           const offlineList = JSON.parse(localStorage.getItem('beautri_offline_consultations') || '[]');
-          offlineList.push(docData);
+          offlineList.push(docDataOrig);
+          offlineList.push(docDataMod);
           localStorage.setItem('beautri_offline_consultations', JSON.stringify(offlineList));
         }
 

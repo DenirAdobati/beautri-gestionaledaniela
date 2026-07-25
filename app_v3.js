@@ -1042,9 +1042,14 @@ window.addEventListener('unhandledrejection', function(e) {
 
       // 2. Converti in un array di cartelle e ordinale per data dell'attività più recente
       const folders = Object.values(groups).map(g => {
-        // Ordina i documenti della cartella: il più recente prima
-        g.documents.sort((a, b) => getTimestamp(b) - getTimestamp(a));
-        // L'attività più recente determina l'ordine della cartella
+        g.documents.sort((a, b) => {
+          const diff = getTimestamp(b) - getTimestamp(a);
+          if (diff !== 0) return diff;
+          // Se hanno lo stesso timestamp (creazione simultanea), mostra prima quella modificabile/modificata
+          if (a.status === 'originale' && b.status !== 'originale') return 1;
+          if (a.status !== 'originale' && b.status === 'originale') return -1;
+          return 0;
+        });
         g.latestActivity = getTimestamp(g.documents[0]);
         return g;
       });
@@ -1143,8 +1148,20 @@ window.addEventListener('unhandledrejection', function(e) {
           if (isScheda) {
             subText = `<span style="background: rgba(234, 179, 8, 0.15); color: var(--gold); padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; margin-right: 6px;">SCHEDA INTERNA</span> Caso: ${(client.casoTipo || 'generico').toUpperCase()}`;
           } else if (isPreConsulenza) {
-            const modText = client.status === 'modificato' ? ' (MODIFICATO)' : '';
-            subText = `<span style="background: rgba(59, 130, 246, 0.15); color: #1d4ed8; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; margin-right: 6px;">PRE-CONSULENZA${modText}</span>`;
+            let label = "PRE-CONSULENZA (DA MODIFICARE)";
+            let badgeBg = "rgba(245, 158, 11, 0.15)";
+            let badgeColor = "#d97706";
+            
+            if (client.status === 'originale') {
+              label = "PRE-CONSULENZA (ORIGINALE)";
+              badgeBg = "rgba(107, 114, 128, 0.15)";
+              badgeColor = "#4b5563";
+            } else if (client.status === 'modificato') {
+              label = "PRE-CONSULENZA (MODIFICATO)";
+              badgeBg = "rgba(16, 185, 129, 0.15)";
+              badgeColor = "#047857";
+            }
+            subText = `<span style="background: ${badgeBg}; color: ${badgeColor}; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; margin-right: 6px;">${label}</span>`;
           } else {
             subText = `${client.treatment} (${client.sessions} sedute - €${(client.price || 0).toFixed(2)})`;
           }
