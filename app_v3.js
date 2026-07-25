@@ -1,11 +1,11 @@
 // app.js - Logica applicativa del gestionale Beautri Tricologia
 
-// Cattura errori di runtime globali per renderli visibili a schermo durante i test
+// Cattura errori di runtime globali per i log di debug in console (evitando alert pop-up all'utente)
 window.addEventListener('error', function(e) {
-  alert("Errore di Sistema:\n" + (e.error ? e.error.stack || e.error.message : e.message));
+  console.error("Errore di Sistema:", e.error || e.message);
 });
 window.addEventListener('unhandledrejection', function(e) {
-  alert("Errore di Promise non gestito (Rejection):\n" + (e.reason ? e.reason.stack || e.reason.message || e.reason : e));
+  console.error("Errore di Promise non gestito (Rejection):", e.reason || e);
 });
 
 (function() {
@@ -2678,21 +2678,28 @@ window.addEventListener('unhandledrejection', function(e) {
     }
 
     function initCountdown(expiryDateStr) {
-      const expiryTime = new Date(expiryDateStr + 'T23:59:59').getTime();
+      // Sostituiamo i trattini con gli slash per la massima compatibilità Safari iOS
+      const cleanDateStr = expiryDateStr.replace(/-/g, "/");
+      const expiryTime = new Date(cleanDateStr + ' 23:59:59').getTime();
+      let timerInterval = null;
       
       const updateTimer = () => {
         const now = new Date().getTime();
         const diff = expiryTime - now;
 
-        if (diff <= 0) {
-          // Offerta scaduta
-          clearInterval(timerInterval);
+        if (isNaN(diff) || diff <= 0) {
+          // Offerta scaduta o data non valida
+          if (timerInterval) clearInterval(timerInterval);
           countdownTimer.style.display = "none";
           countdownTitleText.style.display = "none";
           
-          const expDate = new Date(expiryTime);
-          const formattedExp = expDate.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' });
-          offerExpiredText.textContent = `Proposta di trattamento scaduta il ${formattedExp}`;
+          if (!isNaN(expiryTime)) {
+            const expDate = new Date(expiryTime);
+            const formattedExp = expDate.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            offerExpiredText.textContent = `Proposta di trattamento scaduta il ${formattedExp}`;
+          } else {
+            offerExpiredText.textContent = `Proposta di trattamento scaduta`;
+          }
           offerExpiredText.style.display = "block";
           countdownContainer.style.background = "var(--red-light)";
           countdownContainer.style.borderColor = "var(--red)";
@@ -2714,7 +2721,7 @@ window.addEventListener('unhandledrejection', function(e) {
       // Mostra container countdown
       countdownContainer.style.display = "block";
       updateTimer();
-      const timerInterval = setInterval(updateTimer, 1000);
+      timerInterval = setInterval(updateTimer, 1000);
     }
 
     function showErrorState(message) {
