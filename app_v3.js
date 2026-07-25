@@ -2418,10 +2418,19 @@ window.addEventListener('unhandledrejection', function(e) {
       // PDF Report Link - Anteprima Modale Integrata
       btnViewPdf.onclick = function() {
         if (data.pdfUrl) {
-          if (pdfModal && pdfModalIframe) {
-            pdfModalIframe.src = data.pdfUrl;
-            pdfModal.style.display = "flex";
-            document.body.style.overflow = "hidden"; // Blocca lo scroll di sfondo
+          // Rileva se l'utente è su dispositivo mobile (smartphone o tablet)
+          const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+          
+          if (isMobile) {
+            // Su mobile apre il PDF in una nuova scheda per utilizzare il visualizzatore nativo (scorrimento e zoom perfetti)
+            window.open(data.pdfUrl, '_blank');
+          } else {
+            // Su desktop mantiene la comoda modale integrata
+            if (pdfModal && pdfModalIframe) {
+              pdfModalIframe.src = data.pdfUrl;
+              pdfModal.style.display = "flex";
+              document.body.style.overflow = "hidden"; // Blocca lo scroll di sfondo
+            }
           }
         } else {
           alert("Report PDF non caricato correttamente.");
