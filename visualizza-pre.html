@@ -414,7 +414,7 @@
   <!-- Firebase SDK Compat -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-  <script src="firebase-config-v2.js?v=51"></script>
+  <script src="firebase-config-v2.js?v=54"></script>
 
   <script>
     // Mappa delle etichette descrittive per il layout admin
@@ -537,17 +537,17 @@
       addAnswerCard(container, "2", "Data di nascita");
       addAnswerCard(container, "5", "Email");
       addAnswerCard(container, "6", "Telefono");
-      addAnswerCard(container, "4_addr", "Indirizzo residenza", true);
+      addAnswerCard(container, "4_addr", "Indirizzo residenza", true, false, true);
 
       // Domande a crocette/testo
       addAnswerCard(container, "7", "Motivo della consulenza", true, true);
       addAnswerCard(container, "8", "Cosa vorrebbe per i suoi capelli", true, true);
-      addAnswerCard(container, "9", "Tempo desiderato per i cambiamenti");
+      addAnswerCard(container, "9", "Tempo desiderato per i cambiamenti", false, false, true);
       addAnswerCard(container, "10", "Rapporto attuale con i capelli", true, false, true);
       addAnswerCard(container, "11", "Situazioni in cui si trova attualmente", true, true);
-      addAnswerCard(container, "12", "Quanto influisce il rapporto con i capelli");
+      addAnswerCard(container, "12", "Quanto influisce il rapporto con i capelli", false, false, true);
       addAnswerCard(container, "13", "Cosa ha già provato in passato", true, true);
-      addAnswerCard(container, "15", "Efficacia dei trattamenti passati");
+      addAnswerCard(container, "15", "Efficacia dei trattamenti passati", false, false, true);
       addAnswerCard(container, "16", "Cosa vorrebbe fare ancora", true, true);
 
       // Foto prodotti
@@ -582,12 +582,12 @@
           const val = docData.answers?.[qKey] || '';
           html += `<textarea class="edit-textarea" data-qkey="${qKey}">${val}</textarea>`;
         } else if (isCheck) {
-          // Checkbox separate da virgola o testo modificabile
+          // Checkbox separate da nuova riga per massima facilità di lettura ed editing su iPad
           const arr = docData.checkAns?.[qKey] || [];
           const other = docData.answers?.[qKey + "-other"] || '';
-          let val = arr.join(", ");
-          if (other.trim()) val += (val ? ", " : "") + "Altro: " + other;
-          html += `<input type="text" class="edit-input" data-qkey="${qKey}" data-ischeck="true" value="${val}" placeholder="Opzioni separate da virgola…">`;
+          let val = arr.join("\n");
+          if (other.trim()) val += (val ? "\n" : "") + "Altro: " + other;
+          html += `<textarea class="edit-textarea" data-qkey="${qKey}" data-ischeck="true" placeholder="Opzioni (una per riga o separate da virgola)…">${val}</textarea>`;
         } else {
           // Input normale
           const val = docData.answers?.[qKey] || '';
@@ -647,8 +647,8 @@
           const val = el.value.trim();
 
           if (isCheck) {
-            // Separa di nuovo le opzioni per virgola
-            const parts = val.split(",").map(p => p.trim()).filter(p => p.length > 0);
+            // Separa di nuovo le opzioni per virgola o per a capo (nuova riga)
+            const parts = val.split(/,|\n/).map(p => p.trim()).filter(p => p.length > 0);
             
             // Trova se c'è un campo "Altro:"
             const regularChoices = [];
