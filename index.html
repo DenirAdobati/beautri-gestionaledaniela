@@ -143,6 +143,20 @@
     <!-- TAB: NUOVA CONSULENZA -->
     <section id="tab-nuova" class="tab-content">
       
+      <!-- Banner Modalità Modifica (visibile solo quando si modifica una consulenza esistente) -->
+      <div id="edit-consultation-banner" style="display: none; background: rgba(234, 179, 8, 0.12); border: 1.5px solid var(--gold); border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 20px; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <i data-lucide="pencil" style="color: var(--gold); width: 20px; height: 20px; flex-shrink: 0;"></i>
+          <div>
+            <div style="font-weight: 700; color: var(--dark); font-size: 15px;">Modalità Modifica Consulenza</div>
+            <div style="font-size: 13px; color: var(--gray);">Stai modificando la consulenza di: <strong id="edit-banner-client-name" style="color: var(--black);">-</strong></div>
+          </div>
+        </div>
+        <button type="button" id="btn-cancel-edit-consultation" class="btn-dark" style="padding: 6px 14px; font-size: 13px; background: #fff; border: 1.5px solid var(--border); color: var(--dark); cursor: pointer; border-radius: var(--radius-sm); font-weight: 600;">
+          Annulla Modifica
+        </button>
+      </div>
+
       <!-- FORM CREAZIONE -->
       <form id="consultation-form">
         
@@ -326,7 +340,7 @@
 
         <!-- Action Buttons -->
         <div style="margin-top: 30px; display: flex; gap: 12px; flex-wrap: wrap;">
-          <button type="submit" class="btn-gold" style="flex: 2; font-size: 16px; min-width: 200px;">
+          <button type="submit" class="btn-gold" id="btn-submit-consultation" style="flex: 2; font-size: 16px; min-width: 200px;">
             <i data-lucide="link" style="width: 18px; height: 18px;"></i>
             Genera Link e Salva
           </button>
@@ -487,10 +501,10 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 
   <!-- Local Config -->
-  <script src="firebase-config-v2.js?v=54">
+  <script src="firebase-config-v2.js?v=56">
   </script>
   <!-- Application Logic -->
-  <script src="app_v3.js?v=54"></script>
+  <script src="app_v3.js?v=56"></script>
 
   <script>
     // Initialize lucide icons

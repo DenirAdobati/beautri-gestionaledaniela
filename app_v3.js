@@ -58,8 +58,10 @@ window.addEventListener('unhandledrejection', function(e) {
   // Prodotti caricati in memoria (Daniela)
   let recommendedProducts = [];
 
-  // File PDF selezionato per il caricamento
+  // File PDF selezionato per il caricamento & stato modifica
   let selectedPdfFile = null;
+  let existingPdfUrl = null;
+  let editingConsultationId = null;
 
   // Inizializzazione Firebase
   function initFirebase() {
@@ -171,6 +173,10 @@ window.addEventListener('unhandledrejection', function(e) {
     const btnWhatsappShare = document.getElementById('btn-whatsapp-share');
     const btnResetForm = document.getElementById('btn-reset-form');
     const btnResetFormMain = document.getElementById('btn-reset-form-main');
+    const editConsultationBanner = document.getElementById('edit-consultation-banner');
+    const editBannerClientName = document.getElementById('edit-banner-client-name');
+    const btnCancelEditConsultation = document.getElementById('btn-cancel-edit-consultation');
+    const btnSubmitConsultation = document.getElementById('btn-submit-consultation');
 
     const searchInput = document.getElementById('search-input');
     const clientsList = document.getElementById('clients-list');
@@ -410,6 +416,7 @@ window.addEventListener('unhandledrejection', function(e) {
 
     fileRemove.addEventListener('click', function() {
       selectedPdfFile = null;
+      existingPdfUrl = null;
       pdfInput.value = "";
       fileInfo.classList.remove('show');
       pdfDropzone.style.display = "flex";
@@ -425,8 +432,8 @@ window.addEventListener('unhandledrejection', function(e) {
     }
 
     // 5. Gestione Prodotti Consigliati Dinamici
-    addProductBtn.addEventListener('click', function() {
-      const prodId = 'prod_' + Date.now();
+    function addProductRow(data = {}) {
+      const prodId = 'prod_' + Date.now() + Math.random().toString(36).substring(2, 5);
       const productRow = document.createElement('div');
       productRow.className = 'product-row';
       productRow.id = prodId;
@@ -435,7 +442,7 @@ window.addEventListener('unhandledrejection', function(e) {
         <div class="form-group">
           <label>Prodotto consigliato</label>
           <select class="prod-select" required>
-            <option value="" disabled selected>Seleziona prodotto...</option>
+            <option value="" disabled ${!data.name ? 'selected' : ''}>Seleziona prodotto...</option>
             <option value="Lozione SOFT">Lozione SOFT</option>
             <option value="Lozione ACTIVE">Lozione ACTIVE</option>
             <option value="Lozione PRO">Lozione PRO</option>
@@ -458,7 +465,7 @@ window.addEventListener('unhandledrejection', function(e) {
         </div>
         <div class="form-group">
           <label>Quantità</label>
-          <input type="number" min="1" value="1" required class="prod-qty-input">
+          <input type="number" min="1" value="${data.qty || 1}" required class="prod-qty-input">
         </div>
         <div class="form-group">
           <label>Prezzo Totale</label>
@@ -475,6 +482,23 @@ window.addEventListener('unhandledrejection', function(e) {
       const qtyInput = productRow.querySelector('.prod-qty-input');
       const priceDisplay = productRow.querySelector('.prod-price-display');
       const customPriceInput = productRow.querySelector('.custom-prod-price-input');
+
+      // Se ci sono dati pre-caricati
+      if (data.name) {
+        const optionExists = Array.from(select.options).some(opt => opt.value === data.name);
+        if (optionExists) {
+          select.value = data.name;
+        } else {
+          select.value = "Altro / Personalizzato";
+          customInput.value = data.name;
+          customInput.style.display = "block";
+          customInput.setAttribute('required', 'required');
+          if (data.price) {
+            const unitPrice = data.price / (data.qty || 1);
+            customPriceInput.value = unitPrice.toFixed(2);
+          }
+        }
+      }
 
       // Gestione rimozione prodotto
       productRow.querySelector('.remove-prod-btn').addEventListener('click', function() {
@@ -514,6 +538,8 @@ window.addEventListener('unhandledrejection', function(e) {
       qtyInput.addEventListener('input', updateRowPrice);
       customPriceInput.addEventListener('input', updateRowPrice);
 
+      updateRowPrice();
+
       productsContainer.appendChild(productRow);
       recommendedProducts.push({ id: prodId });
       
@@ -523,7 +549,9 @@ window.addEventListener('unhandledrejection', function(e) {
           class: 'lucide'
         }
       });
-    });
+    }
+
+    addProductBtn.addEventListener('click', () => addProductRow());
 
     // Autocompilazione valori di default per il Mantenimento
     function updateMaintenanceDefaults() {
@@ -687,16 +715,18 @@ window.addEventListener('unhandledrejection', function(e) {
         mainTreatmentName = `Mantenimento ${maintenanceLevelVal.toUpperCase()} (${maintenanceGenderVal.toUpperCase()})`;
       }
 
-      if (!selectedPdfFile) {
+      if (!selectedPdfFile && !existingPdfUrl) {
         showToast("File mancante", "Carica il report PDF della cute per generare la scheda.", "error", 3000);
         return;
       }
 
-      showToast("Salvataggio in corso", "Caricamento del report PDF ed inserimento nel database...", "loading");
+      const isEditing = !!editingConsultationId;
+      const loadingMsg = isEditing ? "Salvataggio delle modifiche nel database..." : "Caricamento del report PDF ed inserimento nel database...";
+      showToast(isEditing ? "Aggiornamento in corso" : "Salvataggio in corso", loadingMsg, "loading");
 
       try {
-        const clientId = 'c_' + Date.now() + Math.random().toString(36).substring(2, 7);
-        let pdfUrl = "";
+        const clientId = isEditing ? editingConsultationId : ('c_' + Date.now() + Math.random().toString(36).substring(2, 7));
+        let pdfUrl = existingPdfUrl || "";
 
         // Raccogli i prodotti inseriti
         const finalProducts = [];
@@ -731,12 +761,14 @@ window.addEventListener('unhandledrejection', function(e) {
             await auth.signInAnonymously();
           }
 
-          // 2. Carica PDF su Firebase Storage
-          console.log("Avvio upload PDF...");
-          const storageRef = storage.ref().child(`consulenze_tricologia/${clientId}_${selectedPdfFile.name}`);
-          const uploadTask = await storageRef.put(selectedPdfFile);
-          pdfUrl = await uploadTask.ref.getDownloadURL();
-          console.log("Upload completato con successo. URL:", pdfUrl);
+          // 2. Carica PDF su Firebase Storage se è stato fornito un nuovo file
+          if (selectedPdfFile) {
+            console.log("Avvio upload PDF...");
+            const storageRef = storage.ref().child(`consulenze_tricologia/${clientId}_${selectedPdfFile.name}`);
+            const uploadTask = await storageRef.put(selectedPdfFile);
+            pdfUrl = await uploadTask.ref.getDownloadURL();
+            console.log("Upload completato con successo. URL:", pdfUrl);
+          }
 
           // 3. Salva scheda cliente su Firestore
           const docData = {
@@ -758,17 +790,22 @@ window.addEventListener('unhandledrejection', function(e) {
             maintenancePriceUnica: maintenancePriceUnicaVal,
             maintenancePriceSeduta: maintenancePriceSedutaVal,
             maintenanceSavings: maintenanceSavingsVal,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
           };
 
-          await db.collection('tricologia_consultations').doc(clientId).set(docData);
-        } else {
-          // Modalità Offline: Converti file in Base64 (se piccolo)
-          if (selectedPdfFile.size > 2 * 1024 * 1024) {
-            throw new Error("Il file PDF è troppo grande per la modalità Offline (max 2MB). Configura Firebase.");
+          if (!isEditing) {
+            docData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
           }
 
-          pdfUrl = await convertFileToBase64(selectedPdfFile);
+          await db.collection('tricologia_consultations').doc(clientId).set(docData, { merge: true });
+        } else {
+          // Modalità Offline
+          if (selectedPdfFile) {
+            if (selectedPdfFile.size > 2 * 1024 * 1024) {
+              throw new Error("Il file PDF è troppo grande per la modalità Offline (max 2MB). Configura Firebase.");
+            }
+            pdfUrl = await convertFileToBase64(selectedPdfFile);
+          }
 
           const docData = {
             id: clientId,
@@ -789,12 +826,25 @@ window.addEventListener('unhandledrejection', function(e) {
             maintenancePriceUnica: maintenancePriceUnicaVal,
             maintenancePriceSeduta: maintenancePriceSedutaVal,
             maintenanceSavings: maintenanceSavingsVal,
-            createdAt: new Date().toISOString()
+            updatedAt: new Date().toISOString()
           };
 
+          if (!isEditing) {
+            docData.createdAt = new Date().toISOString();
+          }
+
           // Salva in localStorage
-          const localData = JSON.parse(localStorage.getItem('beautri_local_consultations') || '[]');
-          localData.push(docData);
+          let localData = JSON.parse(localStorage.getItem('beautri_local_consultations') || '[]');
+          if (isEditing) {
+            const idx = localData.findIndex(item => item.id === clientId);
+            if (idx !== -1) {
+              localData[idx] = { ...localData[idx], ...docData };
+            } else {
+              localData.push(docData);
+            }
+          } else {
+            localData.push(docData);
+          }
           localStorage.setItem('beautri_local_consultations', JSON.stringify(localData));
         }
 
@@ -802,25 +852,32 @@ window.addEventListener('unhandledrejection', function(e) {
         const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
         const landingUrl = `${baseUrl}consultazione.html?id=${clientId}`;
 
-        // Copia automaticamente negli appunti
-        let copied = false;
-        try {
-          await navigator.clipboard.writeText(landingUrl);
-          copied = true;
-        } catch(err) {
-          console.warn("Copia negli appunti non riuscita automaticamente:", err);
-        }
-
-        // Mostra toast di successo e notifica di copia
-        if (copied) {
-          showToast("Link Copiato!", "La scheda è stata salvata ed il link è stato copiato negli appunti.", "success", 4000);
+        if (isEditing) {
+          showToast("Consulenza Aggiornata!", "Le modifiche sono state salvate con successo. Il link del cliente mostrerà i nuovi dati.", "success", 4000);
+          resetFormUI();
+          const btnTabStorico = document.getElementById('btn-tab-storico');
+          if (btnTabStorico) btnTabStorico.click();
         } else {
-          // Fallback se il browser blocca la scrittura degli appunti
-          showToast("Scheda Salvata!", `Link: ${landingUrl}`, "success", 6000);
-        }
+          // Copia automaticamente negli appunti
+          let copied = false;
+          try {
+            await navigator.clipboard.writeText(landingUrl);
+            copied = true;
+          } catch(err) {
+            console.warn("Copia negli appunti non riuscita automaticamente:", err);
+          }
 
-        // Reset del form immediato per prepararlo a una nuova inserzione
-        resetFormUI();
+          // Mostra toast di successo e notifica di copia
+          if (copied) {
+            showToast("Link Copiato!", "La scheda è stata salvata ed il link è stato copiato negli appunti.", "success", 4000);
+          } else {
+            // Fallback se il browser blocca la scrittura degli appunti
+            showToast("Scheda Salvata!", `Link: ${landingUrl}`, "success", 6000);
+          }
+
+          // Reset del form immediato per prepararlo a una nuova inserzione
+          resetFormUI();
+        }
 
       } catch (err) {
         console.error(err);
@@ -828,8 +885,129 @@ window.addEventListener('unhandledrejection', function(e) {
       }
     });
 
+    // Funzioni di gestione della modalità Modifica Consulenza
+    function showEditBanner(name) {
+      if (editConsultationBanner) {
+        editConsultationBanner.style.display = 'flex';
+      }
+      if (editBannerClientName) {
+        editBannerClientName.textContent = name || 'Cliente';
+      }
+      if (btnSubmitConsultation) {
+        btnSubmitConsultation.innerHTML = '<i data-lucide="save" style="width: 18px; height: 18px;"></i> Salva Modifiche Consulenza';
+      }
+      lucide.createIcons();
+    }
+
+    function hideEditBanner() {
+      if (editConsultationBanner) {
+        editConsultationBanner.style.display = 'none';
+      }
+      if (btnSubmitConsultation) {
+        btnSubmitConsultation.innerHTML = '<i data-lucide="link" style="width: 18px; height: 18px;"></i> Genera Link e Salva';
+      }
+      lucide.createIcons();
+    }
+
+    if (btnCancelEditConsultation) {
+      btnCancelEditConsultation.addEventListener('click', function() {
+        resetFormUI();
+        const btnTabStorico = document.getElementById('btn-tab-storico');
+        if (btnTabStorico) btnTabStorico.click();
+      });
+    }
+
+    function startEditConsultation(client) {
+      editingConsultationId = client.id;
+      existingPdfUrl = client.pdfUrl || "";
+
+      // 1. Attiva la tab Nuova Consulenza
+      const btnTabNuova = document.querySelector('.tab-btn[data-tab="tab-nuova"]');
+      if (btnTabNuova) btnTabNuova.click();
+
+      // 2. Pre-popola il nome cliente
+      const clientNameInput = document.getElementById('client-name');
+      if (clientNameInput) clientNameInput.value = client.name || "";
+
+      // 3. Pre-popola la relazione
+      const clientRelazioneInput = document.getElementById('client-relazione');
+      if (clientRelazioneInput) clientRelazioneInput.value = client.relation || "";
+
+      // 4. Tipo di consulenza
+      const type = client.type || 'iniziale';
+      selectConsultationType(type);
+
+      // 5. PDF
+      if (existingPdfUrl) {
+        selectedPdfFile = null;
+        pdfInput.value = "";
+        pdfInput.removeAttribute('required');
+        fileNameLabel.textContent = `PDF allegato esistente (clicca ✕ per sostituire)`;
+        fileInfo.classList.add('show');
+        pdfDropzone.style.display = "none";
+      } else {
+        selectedPdfFile = null;
+        pdfInput.value = "";
+        fileInfo.classList.remove('show');
+        pdfDropzone.style.display = "flex";
+        pdfInput.setAttribute('required', 'required');
+      }
+
+      // 6. Trattamenti / Sedute
+      treatmentsContainer.innerHTML = "";
+      if (type === 'iniziale') {
+        if (client.treatments && client.treatments.length > 0) {
+          client.treatments.forEach(t => addTreatmentRow(t));
+        } else if (client.treatment) {
+          addTreatmentRow({
+            name: client.treatment,
+            sessionsCount: client.sessions || 1,
+            pricePerSession: client.sessions ? (client.price / client.sessions) : client.price
+          });
+        } else {
+          addTreatmentRow();
+        }
+
+        if (expiryDate) {
+          expiryDate.value = client.expiryDate || "";
+        }
+      } else {
+        addTreatmentRow();
+      }
+
+      // 7. Mantenimento
+      if (type === 'mantenimento') {
+        if (maintLevelSelect && client.maintenanceLevel) maintLevelSelect.value = client.maintenanceLevel;
+        if (maintGenderSelect && client.maintenanceGender) maintGenderSelect.value = client.maintenanceGender;
+        if (maintPriceUnicaInput) maintPriceUnicaInput.value = client.maintenancePriceUnica || "";
+        if (maintPriceSedutaInput) maintPriceSedutaInput.value = client.maintenancePriceSeduta || "";
+        if (maintSavingsInput) maintSavingsInput.value = client.maintenanceSavings || "";
+        if (expiryDate) expiryDate.value = client.expiryDate || "";
+      }
+
+      // 8. Prodotti
+      productsContainer.innerHTML = "";
+      recommendedProducts = [];
+      if (client.products && client.products.length > 0) {
+        client.products.forEach(p => addProductRow(p));
+      }
+
+      // 9. Informazioni Default (Menu e Orari)
+      if (menuLink && client.menuLink) menuLink.value = client.menuLink;
+      if (salonHours && client.salonHours) salonHours.value = client.salonHours;
+
+      // 10. Mostra banner informativo di modifica
+      showEditBanner(client.name);
+
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     // Funzione per il reset completo del form e dell'interfaccia
     function resetFormUI() {
+      editingConsultationId = null;
+      existingPdfUrl = null;
+      hideEditBanner();
       form.reset();
       selectedPdfFile = null;
       pdfInput.value = "";
@@ -1175,6 +1353,9 @@ window.addEventListener('unhandledrejection', function(e) {
               <button type="button" class="btn-icon-only btn-view" title="${(isScheda || isPreConsulenza) ? 'Visualizza Scheda' : 'Visualizza Landing Page'}">
                 <i data-lucide="${(isScheda || isPreConsulenza) ? 'file-text' : 'eye'}" style="width: 16px; height: 16px;"></i>
               </button>
+              <button type="button" class="btn-icon-only btn-edit" title="Modifica Consulenza" style="${(isScheda || isPreConsulenza) ? 'display: none;' : ''}">
+                <i data-lucide="pencil" style="width: 16px; height: 16px;"></i>
+              </button>
               <button type="button" class="btn-icon-only btn-copy" title="Copia Link" style="${hideCopyBtn ? 'display: none;' : ''}">
                 <i data-lucide="copy" style="width: 16px; height: 16px;"></i>
               </button>
@@ -1201,6 +1382,15 @@ window.addEventListener('unhandledrejection', function(e) {
               window.location.href = clientLandingUrl + "&admin=true";
             }
           };
+
+          if (!isScheda && !isPreConsulenza) {
+            const btnEdit = card.querySelector('.btn-edit');
+            if (btnEdit) {
+              btnEdit.onclick = () => {
+                startEditConsultation(client);
+              };
+            }
+          }
 
           if (!hideCopyBtn) {
             card.querySelector('.btn-copy').onclick = async () => {
