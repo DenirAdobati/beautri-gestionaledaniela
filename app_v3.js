@@ -2670,7 +2670,13 @@ window.addEventListener('unhandledrejection', function(e) {
             btnPdfFullscreen.href = data.pdfUrl;
           }
           if (pdfModalIframe) {
-            pdfModalIframe.src = data.pdfUrl;
+            // Su mobile e iOS Safari i file PDF grezzi in un iframe vengono tagliati alla sola prima pagina.
+            // Il viewer incorporato converte tutte le pagine in un flusso scrollabile completo su iPhone, iPad, Android e PC.
+            let viewerUrl = data.pdfUrl;
+            if (data.pdfUrl.startsWith('http://') || data.pdfUrl.startsWith('https://')) {
+              viewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(data.pdfUrl)}&embedded=true`;
+            }
+            pdfModalIframe.src = viewerUrl;
           }
           if (pdfModal) {
             pdfModal.style.display = 'flex';
