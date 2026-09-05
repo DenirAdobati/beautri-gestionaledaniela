@@ -8,11 +8,9 @@
   <link rel="apple-touch-icon" href="apple-touch-icon.png?v=55">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=49">
+  <link rel="stylesheet" href="style.css?v=50">
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- PDF.js CDN for In-Page Multi-page PDF Rendering -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body class="client-body">
 
@@ -246,31 +244,32 @@
     </div>
   </main>
 
-  <!-- PDF PREVIEW MODAL (IN-PAGE MULTIPAGE VIEWER) -->
-  <div id="pdf-modal" class="pdf-modal-backdrop">
-    <div class="pdf-modal-window">
-      <!-- Top Bar with title, page counter, fullscreen action and Close 'X' -->
-      <div class="pdf-modal-header">
-        <div class="pdf-modal-title-area">
-          <i data-lucide="file-text" style="color: var(--gold); width: 18px; height: 18px; flex-shrink: 0;"></i>
-          <span class="pdf-modal-title">Report Cute e Capelli</span>
-          <span id="pdf-page-count-badge" class="pdf-page-badge" style="display: none;">0 pagine</span>
+  <!-- PDF PREVIEW MODAL (IN-PAGE VIEWER) -->
+  <div id="pdf-modal" style="display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 99999; align-items: center; justify-content: center; padding: 12px; box-sizing: border-box;">
+    <div style="width: 100%; max-width: 1000px; height: 92vh; max-height: 94vh; background: #1e293b; border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); display: flex; flex-direction: column; position: relative; border: 1.5px solid rgba(255, 255, 255, 0.15);">
+      
+      <!-- Top Bar -->
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; background: #0f172a; border-bottom: 1px solid rgba(255, 255, 255, 0.15); color: #fff; flex-shrink: 0; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+          <i data-lucide="file-text" style="color: var(--gold); width: 20px; height: 20px; flex-shrink: 0;"></i>
+          <span style="font-size: 15px; font-weight: 700; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Report Cute e Capelli</span>
         </div>
-        <div class="pdf-modal-actions">
-          <a id="btn-pdf-fullscreen" href="#" target="_blank" class="btn-pdf-action" title="Apri a schermo intero in una nuova scheda">
+        <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+          <a id="btn-pdf-fullscreen" href="#" target="_blank" style="background: rgba(255, 255, 255, 0.12); color: #f1f5f9; border: 1px solid rgba(255, 255, 255, 0.25); padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
             <i data-lucide="external-link" style="width: 14px; height: 14px;"></i>
             <span class="hide-mobile">Schermo intero</span>
           </a>
-          <button id="pdf-modal-close" type="button" class="btn-pdf-close" aria-label="Chiudi e torna alla consulenza" title="Chiudi (Esc)">
-            <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+          <button id="pdf-modal-close" type="button" style="width: 38px; height: 38px; border-radius: 50%; background: #ef4444; border: none; color: #ffffff; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: transform 0.15s ease;" onmouseover="this.style.transform='scale(1.08)';" onmouseout="this.style.transform='scale(1)';" aria-label="Chiudi e torna alla consulenza" title="Chiudi (Esc)">
+            <i data-lucide="x" style="width: 22px; height: 22px; stroke-width: 2.5;"></i>
           </button>
         </div>
       </div>
       
-      <!-- Scrollable PDF Pages Container -->
-      <div id="pdf-pages-container" class="pdf-modal-body">
-        <!-- Pagine renderizzate con PDF.js in alta risoluzione -->
+      <!-- PDF Frame -->
+      <div style="flex: 1; width: 100%; height: 100%; background: #fff; position: relative;">
+        <iframe id="pdf-modal-iframe" src="" style="width: 100%; height: 100%; border: none; display: block;"></iframe>
       </div>
+
     </div>
   </div>
 
@@ -281,8 +280,8 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 
   <!-- Local Config & App Logic -->
-  <script src="firebase-config-v2.js?v=60"></script>
-  <script src="app_v3.js?v=60"></script>
+  <script src="firebase-config-v2.js?v=61"></script>
+  <script src="app_v3.js?v=61"></script>
 
   <script>
     // Initialize lucide icons
