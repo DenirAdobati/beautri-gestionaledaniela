@@ -2543,7 +2543,9 @@ window.addEventListener('unhandledrejection', function(e) {
     const displayDate = document.getElementById('display-date');
     const btnViewPdf = document.getElementById('btn-view-pdf');
     const pdfModal = document.getElementById('pdf-modal');
-    const pdfModalIframe = document.getElementById('pdf-modal-iframe');
+    const pdfPagesContainer = document.getElementById('pdf-pages-container');
+    const pdfPageCountBadge = document.getElementById('pdf-page-count-badge');
+    const btnPdfFullscreen = document.getElementById('btn-pdf-fullscreen');
     const pdfModalClose = document.getElementById('pdf-modal-close');
     const btnBackToAdmin = document.getElementById('btn-back-to-admin');
     
@@ -2579,6 +2581,159 @@ window.addEventListener('unhandledrejection', function(e) {
       showErrorState();
       return;
     }
+
+    // ── GESTIONE MODALE PDF IN-PAGE MULTIPAGINA CON PDF.JS ──
+    let currentRenderTaskId = 0;
+
+    function closePdfModal() {
+      currentRenderTaskId++; // Annulla eventuali render di pagine in corso
+      if (pdfModal) {
+        pdfModal.style.display = "none";
+      }
+      if (pdfPagesContainer) {
+        pdfPagesContainer.innerHTML = "";
+      }
+      document.body.style.overflow = ""; // Ripristina lo scroll della pagina cliente
+    }
+
+    async function openAndRenderPdfModal(pdfUrl) {
+      if (!pdfUrl) {
+        alert("Il report fotografico è in fase di elaborazione da parte del salone.");
+        return;
+      }
+
+      if (btnPdfFullscreen) {
+        btnPdfFullscreen.href = pdfUrl;
+      }
+
+      if (pdfModal) {
+        pdfModal.style.display = "flex";
+        document.body.style.overflow = "hidden"; // Blocca lo scroll dello sfondo
+      }
+
+      if (pdfPageCountBadge) {
+        pdfPageCountBadge.style.display = "none";
+      }
+
+      if (!pdfPagesContainer) return;
+
+      // Mostra lo stato di caricamento con icona animata
+      pdfPagesContainer.innerHTML = `
+        <div class="pdf-loading-state">
+          <i data-lucide="loader-2" class="pdf-loading-spinner"></i>
+          <p style="font-size: 14px; font-weight: 600; margin-top: 8px;">Caricamento report completo...</p>
+        </div>
+      `;
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+
+      const taskId = ++currentRenderTaskId;
+
+      try {
+        if (!window.pdfjsLib) {
+          throw new Error("Libreria PDF.js non caricata.");
+        }
+
+        // Configura il worker di PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        const loadingTask = pdfjsLib.getDocument(pdfUrl);
+        const pdfDoc = await loadingTask.promise;
+
+        // Se l'utente ha chiuso la modale mentre scaricava, interrompi
+        if (taskId !== currentRenderTaskId) return;
+
+        pdfPagesContainer.innerHTML = "";
+
+        if (pdfPageCountBadge) {
+          pdfPageCountBadge.textContent = `${pdfDoc.numPages} ${pdfDoc.numPages === 1 ? 'pagina' : 'pagine'}`;
+          pdfPageCountBadge.style.display = "inline-block";
+        }
+
+        // Calcola la larghezza ottimale in base al contenitore / schermo
+        const containerWidth = Math.min(pdfPagesContainer.clientWidth || (window.innerWidth - 32), 880);
+        const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+
+        // Renderizza tutte le pagine in sequenza verticale
+        for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
+          if (taskId !== currentRenderTaskId) return;
+
+          const page = await pdfDoc.getPage(pageNum);
+          const unscaledViewport = page.getViewport({ scale: 1 });
+          const scale = (containerWidth / unscaledViewport.width);
+          const viewport = page.getViewport({ scale: scale * pixelRatio });
+
+          const pageWrapper = document.createElement('div');
+          pageWrapper.className = 'pdf-page-wrapper';
+          pageWrapper.style.width = `${Math.round(viewport.width / pixelRatio)}px`;
+
+          const canvas = document.createElement('canvas');
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          canvas.style.width = `${Math.round(viewport.width / pixelRatio)}px`;
+          canvas.style.height = `${Math.round(viewport.height / pixelRatio)}px`;
+
+          const context = canvas.getContext('2d');
+          pageWrapper.appendChild(canvas);
+          pdfPagesContainer.appendChild(pageWrapper);
+
+          const renderContext = {
+            canvasContext: context,
+            viewport: viewport
+          };
+
+          await page.render(renderContext).promise;
+        }
+
+        if (window.lucide) {
+          lucide.createIcons();
+        }
+
+      } catch (err) {
+        console.error("Errore rendering PDF in-page con PDF.js:", err);
+        if (taskId !== currentRenderTaskId) return;
+
+        // Fallback elegante all'interno della modale se PDF.js incontra limitazioni CORS o di rete
+        pdfPagesContainer.innerHTML = `
+          <div style="background: #1e293b; border-radius: 14px; padding: 28px 20px; text-align: center; max-width: 480px; margin: 40px auto; color: #f8fafc; border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+            <div style="width: 54px; height: 54px; border-radius: 50%; background: rgba(234, 179, 8, 0.15); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto;">
+              <i data-lucide="file-text" style="width: 28px; height: 28px; color: var(--gold);"></i>
+            </div>
+            <h3 style="font-size: 17px; font-weight: 700; margin-bottom: 8px;">Report Cute e Capelli</h3>
+            <p style="font-size: 13px; color: #94a3b8; margin-bottom: 22px; line-height: 1.5;">
+              Visualizza il report completo ad alta risoluzione cliccando il pulsante sottostante:
+            </p>
+            <a href="${pdfUrl}" target="_blank" class="btn-gold" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; text-decoration: none; padding: 13px; font-size: 14px; font-weight: 700; border-radius: 10px;">
+              <i data-lucide="external-link" style="width: 18px; height: 18px;"></i>
+              Apri Report PDF
+            </a>
+          </div>
+        `;
+        if (window.lucide) {
+          lucide.createIcons();
+        }
+      }
+    }
+
+    // Gestori eventi chiusura modale PDF
+    if (pdfModalClose) {
+      pdfModalClose.onclick = closePdfModal;
+    }
+    
+    if (pdfModal) {
+      pdfModal.onclick = function(e) {
+        if (e.target === pdfModal) {
+          closePdfModal();
+        }
+      };
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && pdfModal && pdfModal.style.display === 'flex') {
+        closePdfModal();
+      }
+    });
 
     // 2. Carica i dati
     loadClientData(clientId);
@@ -2633,60 +2788,10 @@ window.addEventListener('unhandledrejection', function(e) {
       }
       displayDate.textContent = `Consulenza effettuata il ${formattedDate}`;
 
-      // PDF Report Link - Anteprima Modale Integrata & Visualizzatore Nativo
-      const btnPdfFullscreen = document.getElementById('btn-pdf-fullscreen');
-
+      // PDF Report Button -> Apre la modale multipagina in-page
       btnViewPdf.onclick = function() {
-        if (data.pdfUrl) {
-          if (btnPdfFullscreen) {
-            btnPdfFullscreen.href = data.pdfUrl;
-          }
-
-          // Rileva se il dispositivo è touch/mobile/tablet (inclusi iPad con iPadOS e in-app browser)
-          const isTouchOrMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-            || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
-            || ('ontouchstart' in window)
-            || (navigator.maxTouchPoints > 0)
-            || (window.innerWidth <= 1024);
-          
-          if (isTouchOrMobile) {
-            // Su mobile e iPad apre direttamente il PDF nel visualizzatore nativo per scorrere tutte le pagine e fare zoom
-            window.open(data.pdfUrl, '_blank');
-          } else {
-            // Su desktop con mouse apre la modale con possibilità di aprire a schermo intero
-            if (pdfModal && pdfModalIframe) {
-              pdfModalIframe.src = data.pdfUrl;
-              pdfModal.style.display = "flex";
-              document.body.style.overflow = "hidden"; // Blocca lo scroll di sfondo
-              lucide.createIcons();
-            }
-          }
-        } else {
-          alert("Il report fotografico è in fase di elaborazione da parte del salone.");
-        }
+        openAndRenderPdfModal(data.pdfUrl);
       };
-
-      // Gestore chiusura modale PDF
-      if (pdfModalClose) {
-        pdfModalClose.onclick = function() {
-          if (pdfModal && pdfModalIframe) {
-            pdfModalIframe.src = "";
-            pdfModal.style.display = "none";
-            document.body.style.overflow = ""; // Ripristina lo scroll di sfondo
-          }
-        };
-      }
-      
-      // Chiudi cliccando anche sullo sfondo nero
-      if (pdfModal) {
-        pdfModal.onclick = function(e) {
-          if (e.target === pdfModal) {
-            pdfModalIframe.src = "";
-            pdfModal.style.display = "none";
-            document.body.style.overflow = "";
-          }
-        };
-      }
 
       // Relazione della Consulenza
       const cardRelationSection = document.getElementById('card-relation-section');
