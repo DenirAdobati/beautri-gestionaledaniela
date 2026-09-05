@@ -2633,25 +2633,36 @@ window.addEventListener('unhandledrejection', function(e) {
       }
       displayDate.textContent = `Consulenza effettuata il ${formattedDate}`;
 
-      // PDF Report Link - Anteprima Modale Integrata
+      // PDF Report Link - Anteprima Modale Integrata & Visualizzatore Nativo
+      const btnPdfFullscreen = document.getElementById('btn-pdf-fullscreen');
+
       btnViewPdf.onclick = function() {
         if (data.pdfUrl) {
-          // Rileva se l'utente è su dispositivo mobile (smartphone o tablet)
-          const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+          if (btnPdfFullscreen) {
+            btnPdfFullscreen.href = data.pdfUrl;
+          }
+
+          // Rileva se il dispositivo è touch/mobile/tablet (inclusi iPad con iPadOS e in-app browser)
+          const isTouchOrMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+            || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+            || ('ontouchstart' in window)
+            || (navigator.maxTouchPoints > 0)
+            || (window.innerWidth <= 1024);
           
-          if (isMobile) {
-            // Su mobile apre il PDF in una nuova scheda per utilizzare il visualizzatore nativo (scorrimento e zoom perfetti)
+          if (isTouchOrMobile) {
+            // Su mobile e iPad apre direttamente il PDF nel visualizzatore nativo per scorrere tutte le pagine e fare zoom
             window.open(data.pdfUrl, '_blank');
           } else {
-            // Su desktop mantiene la comoda modale integrata
+            // Su desktop con mouse apre la modale con possibilità di aprire a schermo intero
             if (pdfModal && pdfModalIframe) {
               pdfModalIframe.src = data.pdfUrl;
               pdfModal.style.display = "flex";
               document.body.style.overflow = "hidden"; // Blocca lo scroll di sfondo
+              lucide.createIcons();
             }
           }
         } else {
-          alert("Report PDF non caricato correttamente.");
+          alert("Il report fotografico è in fase di elaborazione da parte del salone.");
         }
       };
 
