@@ -292,7 +292,7 @@ window.addEventListener('unhandledrejection', function(e) {
       row.innerHTML = `
         <div class="form-group">
           <label>Tipo di Seduta</label>
-          <select class="treat-type-select" required>
+          <select class="treat-type-select">
             <option value="" disabled ${!data.name ? 'selected' : ''}>Seleziona...</option>
             <option value="IGENIZZARE/PURIFICARE">IGENIZZARE/PURIFICARE</option>
             <option value="LENIRE">LENIRE</option>
@@ -305,11 +305,11 @@ window.addEventListener('unhandledrejection', function(e) {
         </div>
         <div class="form-group">
           <label>N. Sedute</label>
-          <input type="number" min="1" value="${data.sessionsCount || 1}" required class="treat-qty-input">
+          <input type="number" min="1" value="${data.sessionsCount || 1}" class="treat-qty-input">
         </div>
         <div class="form-group">
           <label>Costo Cad. (€)</label>
-          <input type="number" min="0" step="0.01" value="${data.pricePerSession !== undefined ? data.pricePerSession : ''}" placeholder="Costo cad." required class="treat-price-input">
+          <input type="number" min="0" step="0.01" value="${data.pricePerSession !== undefined ? data.pricePerSession : ''}" placeholder="Costo cad." class="treat-price-input">
         </div>
         <button type="button" class="remove-prod-btn remove-treat-btn" title="Rimuovi seduta">&times;</button>
       `;
@@ -329,7 +329,6 @@ window.addEventListener('unhandledrejection', function(e) {
           select.value = "Altro / Personalizzato";
           customInput.value = data.name;
           customInput.style.display = "block";
-          customInput.setAttribute('required', 'required');
         }
       }
 
@@ -337,10 +336,8 @@ window.addEventListener('unhandledrejection', function(e) {
       select.addEventListener('change', function() {
         if (this.value === 'Altro / Personalizzato') {
           customInput.style.display = 'block';
-          customInput.setAttribute('required', 'required');
         } else {
           customInput.style.display = 'none';
-          customInput.removeAttribute('required');
         }
         recalculateEstimatedTotal();
       });
@@ -351,11 +348,6 @@ window.addEventListener('unhandledrejection', function(e) {
 
       // Rimozione riga
       removeBtn.addEventListener('click', function() {
-        // Impedisci di rimuovere se è l'unica riga
-        if (treatmentsContainer.querySelectorAll('.treatment-row').length <= 1) {
-          showToast("Azione non consentita", "Devi inserire almeno un tipo di seduta per la proposta.", "error", 2000);
-          return;
-        }
         row.remove();
         recalculateEstimatedTotal();
       });
@@ -420,7 +412,6 @@ window.addEventListener('unhandledrejection', function(e) {
       pdfInput.value = "";
       fileInfo.classList.remove('show');
       pdfDropzone.style.display = "flex";
-      pdfInput.setAttribute('required', 'required');
     });
 
     function handlePdfSelection(file) {
@@ -428,7 +419,6 @@ window.addEventListener('unhandledrejection', function(e) {
       fileNameLabel.textContent = file.name + ` (${(file.size / (1024 * 1024)).toFixed(2)} MB)`;
       fileInfo.classList.add('show');
       pdfDropzone.style.display = "none";
-      pdfInput.removeAttribute('required');
     }
 
     // 5. Gestione Prodotti Consigliati Dinamici
@@ -441,7 +431,7 @@ window.addEventListener('unhandledrejection', function(e) {
       productRow.innerHTML = `
         <div class="form-group">
           <label>Prodotto consigliato</label>
-          <select class="prod-select" required>
+          <select class="prod-select">
             <option value="" disabled ${!data.name ? 'selected' : ''}>Seleziona prodotto...</option>
             <option value="Lozione SOFT">Lozione SOFT</option>
             <option value="Lozione ACTIVE">Lozione ACTIVE</option>
@@ -465,7 +455,7 @@ window.addEventListener('unhandledrejection', function(e) {
         </div>
         <div class="form-group">
           <label>Quantità</label>
-          <input type="number" min="1" value="${data.qty || 1}" required class="prod-qty-input">
+          <input type="number" min="1" value="${data.qty || 1}" class="prod-qty-input">
         </div>
         <div class="form-group">
           <label>Prezzo Totale</label>
@@ -492,7 +482,6 @@ window.addEventListener('unhandledrejection', function(e) {
           select.value = "Altro / Personalizzato";
           customInput.value = data.name;
           customInput.style.display = "block";
-          customInput.setAttribute('required', 'required');
           if (data.price) {
             const unitPrice = data.price / (data.qty || 1);
             customPriceInput.value = unitPrice.toFixed(2);
@@ -513,11 +502,9 @@ window.addEventListener('unhandledrejection', function(e) {
         if (prodVal === 'Altro / Personalizzato') {
           customPriceInput.style.display = 'block';
           priceDisplay.style.display = 'none';
-          customPriceInput.setAttribute('required', 'required');
         } else {
           customPriceInput.style.display = 'none';
           priceDisplay.style.display = 'flex';
-          customPriceInput.removeAttribute('required');
           const unitPrice = PRODUCT_PRICES[prodVal] || 0;
           priceDisplay.textContent = `€ ${(unitPrice * qtyVal).toFixed(2)}`;
         }
@@ -527,10 +514,8 @@ window.addEventListener('unhandledrejection', function(e) {
       select.addEventListener('change', function() {
         if (this.value === 'Altro / Personalizzato') {
           customInput.style.display = 'block';
-          customInput.setAttribute('required', 'required');
         } else {
           customInput.style.display = 'none';
-          customInput.removeAttribute('required');
         }
         updateRowPrice();
       });
@@ -596,7 +581,6 @@ window.addEventListener('unhandledrejection', function(e) {
         if (expiryDateContainer) expiryDateContainer.style.display = 'none';
         if (expiryDate) {
           expiryDate.disabled = true;
-          expiryDate.removeAttribute('required');
         }
       } else if (type === 'mantenimento') {
         if (conditionalSectionsWrapper) {
@@ -615,7 +599,6 @@ window.addEventListener('unhandledrejection', function(e) {
         if (expiryDateContainer) expiryDateContainer.style.display = 'block';
         if (expiryDate) {
           expiryDate.disabled = false;
-          expiryDate.setAttribute('required', 'required');
         }
       } else {
         // Iniziale
@@ -634,7 +617,6 @@ window.addEventListener('unhandledrejection', function(e) {
         if (expiryDateContainer) expiryDateContainer.style.display = 'block';
         if (expiryDate) {
           expiryDate.disabled = false;
-          expiryDate.setAttribute('required', 'required');
         }
       }
     }
@@ -653,10 +635,10 @@ window.addEventListener('unhandledrejection', function(e) {
     form.addEventListener('submit', async function(e) {
       e.preventDefault();
 
-      const clientNameVal = document.getElementById('client-name').value.trim();
+      const clientNameVal = document.getElementById('client-name').value.trim() || 'Cliente Senza Nome';
       const relationVal = document.getElementById('client-relazione').value.trim();
-      const menuLinkVal = menuLink.value.trim();
-      const salonHoursVal = salonHours.value.trim();
+      const menuLinkVal = menuLink.value.trim() || DEFAULT_MENU;
+      const salonHoursVal = salonHours.value.trim() || DEFAULT_HOURS;
       const typeVal = consultationType ? consultationType.value : 'iniziale';
 
       // Raccogli trattamenti/sedute
@@ -672,19 +654,19 @@ window.addEventListener('unhandledrejection', function(e) {
       let maintenanceSavingsVal = "";
       
       if (typeVal === 'iniziale') {
-        expiryDateVal = expiryDate.value;
+        expiryDateVal = expiryDate ? expiryDate.value : "";
         document.querySelectorAll('.treatment-row').forEach(row => {
           const select = row.querySelector('.treat-type-select');
           const customInput = row.querySelector('.custom-treat-input');
-          const qty = parseInt(row.querySelector('.treat-qty-input').value) || 0;
+          const qty = parseInt(row.querySelector('.treat-qty-input').value) || 1;
           const priceCad = parseFloat(row.querySelector('.treat-price-input').value) || 0;
           
-          let name = select.value;
+          let name = select ? select.value : "";
           if (name === "Altro / Personalizzato") {
-            name = customInput.value.trim() || "Trattamento Personalizzato";
+            name = customInput ? customInput.value.trim() : "";
           }
           
-          if (name) {
+          if (name && name !== "Seleziona...") {
             finalTreatments.push({
               name,
               sessionsCount: qty,
@@ -694,17 +676,18 @@ window.addEventListener('unhandledrejection', function(e) {
             totalPrice += qty * priceCad;
           }
         });
-
-        if (finalTreatments.length === 0) {
-          showToast("Trattamento mancante", "Inserisci almeno un tipo di seduta per la proposta.", "error", 3000);
-          return;
-        }
       }
 
       // Genera un nome cumulativo per la visualizzazione nello storico
-      let mainTreatmentName = "Solo Relazione/Controllo";
-      if (typeVal === 'iniziale' && finalTreatments.length > 0) {
-        mainTreatmentName = finalTreatments.map(t => `${t.sessionsCount}x ${t.name}`).join(", ");
+      let mainTreatmentName = "Consulenza Personalizzata";
+      if (typeVal === 'iniziale') {
+        if (finalTreatments.length > 0) {
+          mainTreatmentName = finalTreatments.map(t => `${t.sessionsCount}x ${t.name}`).join(", ");
+        } else {
+          mainTreatmentName = "Consulenza Iniziale";
+        }
+      } else if (typeVal === 'controllo') {
+        mainTreatmentName = "Consulenza di Controllo";
       } else if (typeVal === 'mantenimento') {
         maintenanceLevelVal = maintLevelSelect ? maintLevelSelect.value : "base";
         maintenanceGenderVal = maintGenderSelect ? maintGenderSelect.value : "lei";
@@ -712,16 +695,11 @@ window.addEventListener('unhandledrejection', function(e) {
         maintenancePriceSedutaVal = maintPriceSedutaInput ? maintPriceSedutaInput.value.trim() : "";
         maintenanceSavingsVal = maintSavingsInput ? maintSavingsInput.value.trim() : "";
         
-        mainTreatmentName = `Mantenimento ${maintenanceLevelVal.toUpperCase()} (${maintenanceGenderVal.toUpperCase()})`;
-      }
-
-      if (!selectedPdfFile && !existingPdfUrl) {
-        showToast("File mancante", "Carica il report PDF della cute per generare la scheda.", "error", 3000);
-        return;
+        mainTreatmentName = `Mantenimento ${(maintenanceLevelVal || 'base').toUpperCase()} (${(maintenanceGenderVal || 'lei').toUpperCase()})`;
       }
 
       const isEditing = !!editingConsultationId;
-      const loadingMsg = isEditing ? "Salvataggio delle modifiche nel database..." : "Caricamento del report PDF ed inserimento nel database...";
+      const loadingMsg = isEditing ? "Salvataggio delle modifiche nel database..." : (selectedPdfFile ? "Caricamento del report PDF ed inserimento nel database..." : "Salvataggio nel database...");
       showToast(isEditing ? "Aggiornamento in corso" : "Salvataggio in corso", loadingMsg, "loading");
 
       try {
@@ -941,7 +919,6 @@ window.addEventListener('unhandledrejection', function(e) {
       if (existingPdfUrl) {
         selectedPdfFile = null;
         pdfInput.value = "";
-        pdfInput.removeAttribute('required');
         fileNameLabel.textContent = `PDF allegato esistente (clicca ✕ per sostituire)`;
         fileInfo.classList.add('show');
         pdfDropzone.style.display = "none";
@@ -950,7 +927,6 @@ window.addEventListener('unhandledrejection', function(e) {
         pdfInput.value = "";
         fileInfo.classList.remove('show');
         pdfDropzone.style.display = "flex";
-        pdfInput.setAttribute('required', 'required');
       }
 
       // 6. Trattamenti / Sedute
@@ -1013,7 +989,6 @@ window.addEventListener('unhandledrejection', function(e) {
       pdfInput.value = "";
       fileInfo.classList.remove('show');
       pdfDropzone.style.display = "flex";
-      pdfInput.setAttribute('required', 'required');
       productsContainer.innerHTML = "";
       recommendedProducts = [];
       
@@ -1043,7 +1018,6 @@ window.addEventListener('unhandledrejection', function(e) {
         if (expiryDateContainer) expiryDateContainer.style.display = 'block';
         if (expiryDate) {
           expiryDate.disabled = false;
-          expiryDate.setAttribute('required', 'required');
         }
       }
 

@@ -177,7 +177,7 @@
               <i data-lucide="file-text" class="dropzone-icon"></i>
               <div class="dropzone-text">Trascina qui il PDF o clicca per sfogliare</div>
               <div class="dropzone-subtext">Verranno accettati esclusivamente file PDF (.pdf)</div>
-              <input type="file" id="pdf-input" accept="application/pdf" required>
+              <input type="file" id="pdf-input" accept="application/pdf">
             </div>
             <div class="file-info-box" id="file-info">
               <span class="file-info-name" id="file-name-label">nomefile.pdf</span>
@@ -312,7 +312,7 @@
           </h3>
           <div class="form-group" style="max-width: 300px; margin: 0;">
             <label for="expiry-date">Offerta Valida Fino Al</label>
-            <input type="date" id="expiry-date" required>
+            <input type="date" id="expiry-date">
           </div>
         </div>
 
@@ -329,11 +329,11 @@
           <div style="border-top: 1.5px solid var(--border); padding-top: 16px; margin-top: 16px; cursor: default;" onclick="event.stopPropagation();">
             <div class="form-group">
               <label for="menu-link">Link Menù Trattamenti</label>
-              <input type="url" id="menu-link" placeholder="https://..." required autocomplete="off">
+              <input type="url" id="menu-link" placeholder="https://..." autocomplete="off">
             </div>
             <div class="form-group" style="margin-bottom: 0;">
               <label for="salon-hours">Orari di Apertura</label>
-              <textarea id="salon-hours" rows="6" placeholder="Inserisci gli orari..." required></textarea>
+              <textarea id="salon-hours" rows="6" placeholder="Inserisci gli orari..."></textarea>
             </div>
           </div>
         </details>
@@ -501,10 +501,10 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 
   <!-- Local Config -->
-  <script src="firebase-config-v2.js?v=57">
+  <script src="firebase-config-v2.js?v=58">
   </script>
   <!-- Application Logic -->
-  <script src="app_v3.js?v=57"></script>
+  <script src="app_v3.js?v=58"></script>
 
   <script>
     // Initialize lucide icons
