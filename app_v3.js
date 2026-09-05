@@ -1067,6 +1067,35 @@ window.addEventListener('unhandledrejection', function(e) {
       });
     }
 
+    // Helper per ottenere una chiave canonica indipendente dall'ordine delle parole (es: "Mario Rossi" === "Rossi Mario")
+    function getCanonicalNameKey(name) {
+      if (!name || typeof name !== 'string') return 'cliente senza nome';
+      
+      const cleanStr = name
+        .toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Rimuove accenti
+        .replace(/[^a-z0-9\s]/g, ' ') // Rimuove punteggiatura, virgole, trattini
+        .trim();
+
+      const tokens = cleanStr.split(/\s+/).filter(t => t.length > 0);
+      if (tokens.length === 0) return 'cliente senza nome';
+
+      tokens.sort();
+      return tokens.join(' ');
+    }
+
+    // Helper per formattare con eleganza le iniziali maiuscole (es. Mario Rossi)
+    function formatNameTitleCase(str) {
+      if (!str) return '';
+      return str.trim().split(/\s+/).map(word => {
+        if (!word) return '';
+        if (word.includes("'")) {
+          return word.split("'").map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()).join("'");
+        }
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      }).join(' ');
+    }
+
     // 7. Storico Clienti (Caricamento e Filtro)
     async function loadClientsHistory() {
       clientsList.innerHTML = '<div class="no-clients">Caricamento dello storico...</div>';
@@ -1091,10 +1120,28 @@ window.addEventListener('unhandledrejection', function(e) {
 
         renderClientsList(items);
 
-        // Associa ricerca in tempo reale
+        // Associa ricerca in tempo reale (supporta qualsiasi ordine delle parole)
         searchInput.oninput = function() {
           const query = this.value.toLowerCase().trim();
-          const filtered = items.filter(item => item.name.toLowerCase().includes(query));
+          if (!query) {
+            renderClientsList(items);
+            return;
+          }
+
+          const queryTokens = query
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-z0-9\s]/g, ' ')
+            .split(/\s+/)
+            .filter(t => t.length > 0);
+
+          const filtered = items.filter(item => {
+            const rawText = `${item.name || ''} ${item.treatment || ''} ${item.relation || ''}`
+              .toLowerCase()
+              .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+            return queryTokens.every(token => rawText.includes(token));
+          });
+
           renderClientsList(filtered);
         };
 
@@ -1198,18 +1245,18 @@ window.addEventListener('unhandledrejection', function(e) {
 
       clientsList.innerHTML = "";
 
-      // 1. Raggruppa i documenti per nome cliente normalizzato
+      // 1. Raggruppa i documenti per chiave canonica del nome (indipendentemente dall'ordine Nome/Cognome)
       const groups = {};
       items.forEach(client => {
         const rawName = client.name || 'Cliente Senza Nome';
-        const normName = rawName.trim().toLowerCase().replace(/\s+/g, ' ');
-        if (!groups[normName]) {
-          groups[normName] = {
-            displayName: rawName, // Preserviamo la grafia originaria
+        const canonicalKey = getCanonicalNameKey(rawName);
+        if (!groups[canonicalKey]) {
+          groups[canonicalKey] = {
+            displayName: rawName.trim(),
             documents: []
           };
         }
-        groups[normName].documents.push(client);
+        groups[canonicalKey].documents.push(client);
       });
 
       // Helper per ricavare una data valida (timestamp o millisecondi)
@@ -1229,6 +1276,13 @@ window.addEventListener('unhandledrejection', function(e) {
           return 0;
         });
         g.latestActivity = getTimestamp(g.documents[0]);
+
+        // Scegli il miglior nome visivo della cartella: preferisci una cartella esplicita, una consulenza o il documento più recente
+        const preferredDoc = g.documents.find(d => d.recordType === 'folder_placeholder' || d.recordType === 'scheda_interna' || (!d.recordType && d.treatment)) || g.documents[0];
+        if (preferredDoc && preferredDoc.name) {
+          g.displayName = formatNameTitleCase(preferredDoc.name);
+        }
+
         return g;
       });
 
