@@ -1290,7 +1290,7 @@ window.addEventListener('unhandledrejection', function(e) {
         // --- DRAG & DROP ON FOLDER ---
         summary.ondragover = (e) => {
           e.preventDefault();
-          summary.style.background = 'rgba(234, 179, 8, 0.1)';
+          summary.style.background = 'rgba(245, 194, 0, 0.1)';
           summary.style.border = '2px dashed var(--gold)';
           summary.style.borderRadius = '8px';
         };
@@ -1352,7 +1352,7 @@ window.addEventListener('unhandledrejection', function(e) {
           
           let subText = "";
           if (isScheda) {
-            subText = `<span style="background: rgba(234, 179, 8, 0.15); color: var(--gold); padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; margin-right: 6px;">SCHEDA INTERNA</span> Caso: ${(client.casoTipo || 'generico').toUpperCase()}`;
+            subText = `<span style="background: rgba(245, 194, 0, 0.15); color: var(--gold); padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; margin-right: 6px;">SCHEDA INTERNA</span> Caso: ${(client.casoTipo || 'generico').toUpperCase()}`;
           } else if (isPreConsulenza) {
             let label = "PRE-CONSULENZA (DA MODIFICARE)";
             let badgeBg = "rgba(245, 158, 11, 0.15)";
@@ -2310,18 +2310,18 @@ window.addEventListener('unhandledrejection', function(e) {
       let gravityHTML = '';
       Object.entries(S.gravity).forEach(([zona, val]) => {
         const pct = (val + 1) * 20;
-        gravityHTML += '<div style="display:flex;justify-content:space-between;padding:8px 12px;background:#fafafa;margin-bottom:5px;border-radius:4px;"><span>' + zona + '</span><div style="width:100px;height:8px;background:#e5e5e5;border-radius:4px;overflow:hidden;"><div style="height:100%;width:' + pct + '%;background:#EAB308;"></div></div></div>';
+        gravityHTML += '<div style="display:flex;justify-content:space-between;padding:8px 12px;background:#fafafa;margin-bottom:5px;border-radius:4px;"><span>' + zona + '</span><div style="width:100px;height:8px;background:#e5e5e5;border-radius:4px;overflow:hidden;"><div style="height:100%;width:' + pct + '%;background:#F5C200;"></div></div></div>';
       });
       
       const incidenze = Array.from(S.incidenze);
-      let incidenzeBadges = incidenze.map(i => '<span style="display:inline-block;background:#EAB308;color:#fff;padding:3px 10px;border-radius:12px;font-size:12px;margin:3px;">' + i + '</span>').join('');
+      let incidenzeBadges = incidenze.map(i => '<span style="display:inline-block;background:#F5C200;color:#fff;padding:3px 10px;border-radius:12px;font-size:12px;margin:3px;">' + i + '</span>').join('');
       if (!incidenzeBadges) incidenzeBadges = '<span style="color:#888;">Nessuna</span>';
       
       const incidenzeTab = Array.from(S.incidenzeTab);
-      let incidenzeTabBadges = incidenzeTab.map(i => '<span style="display:inline-block;background:transparent;border:1px solid #EAB308;color:#333;padding:3px 10px;border-radius:12px;font-size:12px;margin:3px;">' + i + '</span>').join('');
+      let incidenzeTabBadges = incidenzeTab.map(i => '<span style="display:inline-block;background:transparent;border:1px solid #F5C200;color:#333;padding:3px 10px;border-radius:12px;font-size:12px;margin:3px;">' + i + '</span>').join('');
       if (!incidenzeTabBadges) incidenzeTabBadges = '<span style="color:#888;">Nessuna</span>';
      
-      return '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Segoe UI,Arial,sans-serif;padding:40px;color:#1a1a1a;font-size:14px}h1{color:#EAB308;border-bottom:2px solid #EAB308;padding-bottom:10px;margin-bottom:30px;font-size:24px}.header-subtitle{color:#666;font-size:12px;margin-top:-25px;margin-bottom:30px}.info-box{background:#f8f7f4;padding:20px;border-radius:8px;margin-bottom:30px;border-left:4px solid #EAB308}h2{color:#333;font-size:16px;margin-top:30px;margin-bottom:15px;padding-bottom:5px;border-bottom:1px solid #ddd}.footer{margin-top:40px;padding-top:20px;border-top:1px solid #ddd;font-size:11px;color:#888;text-align:center}</style></head><body><h1>Scheda Tricologica</h1><p class="header-subtitle">Beautri S.R.L. — Centro Tricologico</p><div class="info-box"><p><strong>Cliente:</strong> ' + cognome + ' ' + nome + '</p><p><strong>Caso:</strong> ' + casoTipo + '</p><p><strong>Data compilazione:</strong> ' + timestamp + '</p></div><h2>Risposte Questionario</h2>' + (risposteHTML || '<p style="color:#888;">Nessuna risposta</p>') + '<h2>Selezioni Multiple</h2>' + (checkboxHTML || '<p style="color:#888;">Nessuna selezione</p>') + '<h2>Tipo di Incidenza</h2><p><span style="display:inline-block;background:#EAB308;color:#fff;padding:3px 10px;border-radius:12px;font-size:12px;">' + incidenzaTipo + '</span></p><h2>Patologie Riscontrate</h2><div>' + incidenzeBadges + '</div><h2>Dettaglio Incidenze</h2><div>' + incidenzeTabBadges + '</div><h2>Gravità per Zona</h2>' + (gravityHTML || '<p style="color:#888;">Nessuna gravità specificata</p>') + '<div class="footer">Documento generato automaticamente — ' + timestamp + '</div></body></html>';
+      return '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Segoe UI,Arial,sans-serif;padding:40px;color:#1a1a1a;font-size:14px}h1{color:#F5C200;border-bottom:2px solid #F5C200;padding-bottom:10px;margin-bottom:30px;font-size:24px}.header-subtitle{color:#666;font-size:12px;margin-top:-25px;margin-bottom:30px}.info-box{background:#f8f7f4;padding:20px;border-radius:8px;margin-bottom:30px;border-left:4px solid #F5C200}h2{color:#333;font-size:16px;margin-top:30px;margin-bottom:15px;padding-bottom:5px;border-bottom:1px solid #ddd}.footer{margin-top:40px;padding-top:20px;border-top:1px solid #ddd;font-size:11px;color:#888;text-align:center}</style></head><body><h1>Scheda Tricologica</h1><p class="header-subtitle">Beautri S.R.L. — Centro Tricologico</p><div class="info-box"><p><strong>Cliente:</strong> ' + cognome + ' ' + nome + '</p><p><strong>Caso:</strong> ' + casoTipo + '</p><p><strong>Data compilazione:</strong> ' + timestamp + '</p></div><h2>Risposte Questionario</h2>' + (risposteHTML || '<p style="color:#888;">Nessuna risposta</p>') + '<h2>Selezioni Multiple</h2>' + (checkboxHTML || '<p style="color:#888;">Nessuna selezione</p>') + '<h2>Tipo di Incidenza</h2><p><span style="display:inline-block;background:#F5C200;color:#fff;padding:3px 10px;border-radius:12px;font-size:12px;">' + incidenzaTipo + '</span></p><h2>Patologie Riscontrate</h2><div>' + incidenzeBadges + '</div><h2>Dettaglio Incidenze</h2><div>' + incidenzeTabBadges + '</div><h2>Gravità per Zona</h2>' + (gravityHTML || '<p style="color:#888;">Nessuna gravità specificata</p>') + '<div class="footer">Documento generato automaticamente — ' + timestamp + '</div></body></html>';
     }
 
     function showSiToast(title, desc, type) {

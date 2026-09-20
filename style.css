@@ -3,15 +3,15 @@
 :root {
   --bg: #F3F0EA;
   --card: #FFFFFF;
-  --gold: #EAB308;
-  --gold-hover: #CA8A04;
-  --gold-light: #FEF9C3;
+  --gold: #F5C200;
+  --gold-hover: #D9A700;
+  --gold-light: #FEF9D9;
   --black: #111827;
   --dark: #1F2937;
   --gray: #6B7280;
   --gray-light: #F3F4F6;
   --border: #E2DBC8;
-  --border-focus: #EAB308;
+  --border-focus: #F5C200;
   --radius: 20px;
   --radius-sm: 13px;
   --shadow: 0 4px 20px rgba(0,0,0,.05);
@@ -138,7 +138,7 @@ body {
   height: 3px;
   background: var(--gold);
   border-radius: 3px 3px 0 0;
-  box-shadow: 0 0 10px rgba(234, 179, 8, 0.5);
+  box-shadow: 0 0 10px rgba(245, 194, 0, 0.5);
 }
 
 /* ── MAIN CONTAINER ── */
@@ -278,7 +278,7 @@ input[type=password]:focus,
 textarea:focus,
 select:focus {
   border-color: var(--gold);
-  box-shadow: 0 0 0 4px rgba(234, 179, 8, 0.1);
+  box-shadow: 0 0 0 4px rgba(245, 194, 0, 0.1);
 }
 
 /* Grid Layouts for Inputs */
@@ -490,7 +490,7 @@ select:focus {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  box-shadow: 0 4px 12px rgba(234, 179, 8, 0.2);
+  box-shadow: 0 4px 12px rgba(245, 194, 0, 0.2);
 }
 
 .btn-gold:hover {
@@ -669,7 +669,7 @@ select:focus {
   justify-content: center;
   margin: 0 auto 22px;
   font-size: 32px;
-  box-shadow: 0 6px 16px rgba(234, 179, 8, 0.3);
+  box-shadow: 0 6px 16px rgba(245, 194, 0, 0.3);
 }
 
 .done-card h2 {
@@ -786,7 +786,7 @@ select:focus {
 
 @keyframes pulse {
   0% { transform: scale(1); }
-  50% { transform: scale(1.08); box-shadow: 0 0 14px rgba(234,179,8,.2); }
+  50% { transform: scale(1.08); box-shadow: 0 0 14px rgba(245,194,0,.2); }
   100% { transform: scale(1); }
 }
 
@@ -855,7 +855,7 @@ select:focus {
   content: '';
   position: absolute;
   top: -50%; left: -50%; width: 200%; height: 200%;
-  background: radial-gradient(circle, rgba(234,179,8,0.1) 0%, transparent 60%);
+  background: radial-gradient(circle, rgba(245,194,0,0.1) 0%, transparent 60%);
   pointer-events: none;
 }
 
@@ -1191,7 +1191,7 @@ select:focus {
 }
 
 .folder-count {
-  background: rgba(234, 179, 8, 0.15);
+  background: rgba(245, 194, 0, 0.15);
   color: var(--gold);
   padding: 2px 8px;
   border-radius: 12px;
@@ -1288,9 +1288,9 @@ select:focus {
 }
 
 .pdf-page-badge {
-  background: rgba(234, 179, 8, 0.2);
+  background: rgba(245, 194, 0, 0.2);
   color: var(--gold);
-  border: 1px solid rgba(234, 179, 8, 0.4);
+  border: 1px solid rgba(245, 194, 0, 0.4);
   padding: 2px 8px;
   border-radius: 20px;
   font-size: 11px;
@@ -1418,23 +1418,23 @@ select:focus {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: var(--gold-light, #FEF9C3);
+  background: var(--gold-light, #FEF9D9);
   color: #854d0e;
-  border: 1.5px solid var(--gold, #EAB308);
+  border: 1.5px solid var(--gold, #F5C200);
   padding: 13px 18px;
   border-radius: 12px;
   font-weight: 700;
   font-size: 14px;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(234, 179, 8, 0.15);
+  box-shadow: 0 2px 8px rgba(245, 194, 0, 0.15);
 }
 
 .btn-info-percorso:hover {
   background: #fef08a;
-  border-color: var(--gold-hover, #CA8A04);
+  border-color: var(--gold-hover, #D9A700);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(234, 179, 8, 0.25);
+  box-shadow: 0 4px 12px rgba(245, 194, 0, 0.25);
 }
 
 .btn-info-percorso:active {

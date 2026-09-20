@@ -3,8 +3,8 @@
 :root {
   --si-bg: #F3F0EA;
   --si-card: #FFFFFF;
-  --si-gold: #EAB308;
-  --si-gold-light: #FEF9C3;
+  --si-gold: #F5C200;
+  --si-gold-light: #FEF9D9;
   --si-black: #111827;
   --si-dark: #1F2937;
   --si-gray: #6B7280;
@@ -24,7 +24,7 @@
 #tab-scheda-interna .tl-progress-fill {
   position: absolute; top: 0; left: 0; height: 100%;
   background: var(--si-gold); border-radius: 4px;
-  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 10px rgba(234,179,8,.4);
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 10px rgba(245, 194, 0, .4);
 }
 #tab-scheda-interna .tl-steps { display: flex; align-items: flex-start; justify-content: space-between; position: relative; z-index: 1; }
 #tab-scheda-interna .tl-item { display: flex; flex-direction: column; align-items: center; flex: 1; position: relative; cursor: default; }
@@ -36,7 +36,7 @@
   position: relative; z-index: 1; flex-shrink: 0; transition: all .4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 #tab-scheda-interna .tl-item.done .tl-dot { border-color: var(--si-gold); background: var(--si-gold); color: var(--si-black); }
-#tab-scheda-interna .tl-item.active .tl-dot { border-color: var(--si-gold); background: var(--si-black); color: var(--si-gold); box-shadow: 0 0 0 5px rgba(234,179,8,.15); transform: scale(1.15); }
+#tab-scheda-interna .tl-item.active .tl-dot { border-color: var(--si-gold); background: var(--si-black); color: var(--si-gold); box-shadow: 0 0 0 5px rgba(245, 194, 0, .15); transform: scale(1.15); }
 #tab-scheda-interna .tl-lbl {
   font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em;
   color: var(--si-gray); margin-top: 10px; white-space: nowrap;
