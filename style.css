@@ -1410,3 +1410,35 @@ select:focus {
   }
 }
 
+/* ── PULSANTE E MODALE INFO PERCORSO ── */
+.btn-info-percorso {
+  margin-top: 18px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--gold-light, #FEF9C3);
+  color: #854d0e;
+  border: 1.5px solid var(--gold, #EAB308);
+  padding: 13px 18px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(234, 179, 8, 0.15);
+}
+
+.btn-info-percorso:hover {
+  background: #fef08a;
+  border-color: var(--gold-hover, #CA8A04);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(234, 179, 8, 0.25);
+}
+
+.btn-info-percorso:active {
+  transform: translateY(0);
+}
+
+

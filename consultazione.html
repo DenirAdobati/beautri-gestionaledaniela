@@ -96,6 +96,12 @@
         <div id="display-payment-plan" style="border-top: 1.5px solid var(--border); padding-top: 16px; margin-top: 16px;">
           <!-- Popolato via JS con il piano di pagamento (costo a seduta o rateizzato) -->
         </div>
+
+        <!-- Tasto Altre Informazioni sul Percorso -->
+        <button type="button" class="btn-info-percorso" id="btn-open-info-percorso">
+          <i data-lucide="info" style="width: 18px; height: 18px;"></i>
+          Altre informazioni sul percorso
+        </button>
       </div>
 
       <!-- PERCORSO DI MANTENIMENTO -->
@@ -273,6 +279,190 @@
     </div>
   </div>
 
+  <!-- MODALE ALTRE INFORMAZIONI SUL PERCORSO -->
+  <div id="info-percorso-modal" style="display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 99999; align-items: center; justify-content: center; padding: 12px; box-sizing: border-box;">
+    <div style="width: 100%; max-width: 800px; height: 92vh; max-height: 94vh; background: #ffffff; border-radius: 18px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); display: flex; flex-direction: column; position: relative; border: 1.5px solid var(--border);">
+      
+      <!-- Top Bar -->
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; background: #111827; border-bottom: 1px solid #374151; color: #fff; flex-shrink: 0;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <i data-lucide="sparkles" style="color: var(--gold); width: 20px; height: 20px;"></i>
+          <span style="font-size: 16px; font-weight: 800; color: #f8fafc; letter-spacing: 0.02em;">I NOSTRI PERCORSI</span>
+        </div>
+        <button id="info-percorso-close" type="button" style="width: 38px; height: 38px; border-radius: 50%; background: #ef4444; border: none; color: #ffffff; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: transform 0.15s ease;" onmouseover="this.style.transform='scale(1.08)';" onmouseout="this.style.transform='scale(1)';" aria-label="Chiudi e torna alla consulenza" title="Chiudi (Esc)">
+          <i data-lucide="x" style="width: 22px; height: 22px; stroke-width: 2.5;"></i>
+        </button>
+      </div>
+
+      <!-- Content Scrollable Body -->
+      <div style="flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 24px 20px; background: #fafaf9; display: flex; flex-direction: column; gap: 20px;">
+        
+        <!-- Header Banner -->
+        <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #fff; padding: 20px; border-radius: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-left: 5px solid var(--gold);">
+          <h2 style="font-size: 18px; font-weight: 800; margin-bottom: 10px; color: var(--gold);">I nostri percorsi personalizzati</h2>
+          <p style="font-size: 14px; line-height: 1.6; color: #e2e8f0; margin-bottom: 10px;">
+            Tutti i nostri percorsi sono creati su misura con l’obiettivo di ristabilire l’equilibrio perduto di cute e capelli.
+          </p>
+          <p style="font-size: 14px; line-height: 1.6; color: #e2e8f0; margin-bottom: 10px;">
+            Ogni percorso prevede <strong>sedute a cadenza settimanale</strong>, perché la costanza è un elemento fondamentale per ottenere risultati reali e duraturi.
+          </p>
+          <p style="font-size: 13.5px; line-height: 1.6; color: #cbd5e1; font-style: italic; margin-bottom: 0;">
+            Al termine di ogni percorso, conoscenza, metodo, atteggiamento e innovazione tecnologica si uniscono per trasformare le aspettative iniziali in un’esperienza esclusiva e consapevole, costruita intorno alla persona.
+          </p>
+        </div>
+
+        <!-- 1. Beautrì Check Inclusi -->
+        <div style="background: #ffffff; border: 1.5px solid var(--border); border-radius: 14px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+            <i data-lucide="check-circle-2" style="color: var(--gold-hover); width: 22px; height: 22px;"></i>
+            <h3 style="font-size: 16px; font-weight: 800; color: var(--dark); margin: 0;">Beautrì Check inclusi nel percorso</h3>
+          </div>
+          <p style="font-size: 14px; line-height: 1.5; color: var(--dark); margin-bottom: 16px;">
+            Durante il percorso sono inclusi <strong>2 Beautrì Check</strong> (valore <strong>47 € ciascuno</strong>), fondamentali per monitorare l’evoluzione dei risultati:
+          </p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px;">
+            
+            <!-- 1° Check -->
+            <div style="background: var(--gray-light); border-left: 4px solid var(--gold); border-radius: 10px; padding: 14px;">
+              <div style="font-size: 14px; font-weight: 800; color: var(--black); margin-bottom: 6px;">1° Beautrì Check</div>
+              <div style="font-size: 12.5px; color: var(--gray); margin-bottom: 8px;">Al termine dell’ultima seduta delle fasi di:</div>
+              <ul style="list-style: none; padding-left: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; font-weight: 600; color: var(--dark);">
+                <li style="display: flex; align-items: center; gap: 6px;"><span style="color: var(--gold-hover); font-weight: 900;">•</span> Igienizzazione / Purificazione</li>
+                <li style="display: flex; align-items: center; gap: 6px;"><span style="color: var(--gold-hover); font-weight: 900;">•</span> Lenire</li>
+              </ul>
+            </div>
+
+            <!-- 2° Check -->
+            <div style="background: var(--gray-light); border-left: 4px solid var(--gold); border-radius: 10px; padding: 14px;">
+              <div style="font-size: 14px; font-weight: 800; color: var(--black); margin-bottom: 6px;">2° Beautrì Check</div>
+              <div style="font-size: 12.5px; color: var(--gray); margin-bottom: 8px;">Al termine dell’ultima seduta delle fasi di:</div>
+              <ul style="list-style: none; padding-left: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; font-weight: 600; color: var(--dark);">
+                <li style="display: flex; align-items: center; gap: 6px;"><span style="color: var(--gold-hover); font-weight: 900;">•</span> Detossinare</li>
+                <li style="display: flex; align-items: center; gap: 6px;"><span style="color: var(--gold-hover); font-weight: 900;">•</span> Nutrire</li>
+                <li style="display: flex; align-items: center; gap: 6px;"><span style="color: var(--gold-hover); font-weight: 900;">•</span> Laser</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 2. Modalità di Pagamento -->
+        <div style="background: #ffffff; border: 1.5px solid var(--border); border-radius: 14px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+            <i data-lucide="credit-card" style="color: var(--gold-hover); width: 22px; height: 22px;"></i>
+            <h3 style="font-size: 16px; font-weight: 800; color: var(--dark); margin: 0;">Modalità di pagamento</h3>
+          </div>
+          <ul style="list-style: none; padding-left: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; font-size: 14px; color: var(--dark); line-height: 1.5;">
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: var(--gold-hover); font-size: 18px; line-height: 1; font-weight: 900;">•</span>
+              <span><strong>Il pagamento è a seduta</strong></span>
+            </li>
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: var(--gold-hover); font-size: 18px; line-height: 1; font-weight: 900;">•</span>
+              <span>Alla prima seduta viene richiesto il <strong>pagamento anticipato anche della seduta successiva</strong></span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- 3. Cosa garantiamo durante il percorso -->
+        <div style="background: #ffffff; border: 1.5px solid var(--border); border-radius: 14px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+            <i data-lucide="shield-check" style="color: #10B981; width: 22px; height: 22px;"></i>
+            <h3 style="font-size: 16px; font-weight: 800; color: var(--dark); margin: 0;">Cosa garantiamo durante il percorso</h3>
+          </div>
+          <p style="font-size: 13.5px; color: var(--gray); margin-bottom: 14px;">Durante tutto il percorso Beautrì garantiamo:</p>
+          <ul style="list-style: none; padding-left: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; font-size: 13.5px; color: var(--dark); line-height: 1.45;">
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: #10B981; font-weight: 900; font-size: 15px;">✓</span>
+              <span>Sedute potenziate con tecnologie di ultima generazione</span>
+            </li>
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: #10B981; font-weight: 900; font-size: 15px;">✓</span>
+              <span>Possibilità di svolgere le sedute in modalità One to One in Comfort Room</span>
+            </li>
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: #10B981; font-weight: 900; font-size: 15px;">✓</span>
+              <span>Prodotti personalizzati, codificati in base alle esigenze individuali</span>
+            </li>
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: #10B981; font-weight: 900; font-size: 15px;">✓</span>
+              <span>Supporto WhatsApp e/o telefonico per tutta la durata del percorso</span>
+            </li>
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: #10B981; font-weight: 900; font-size: 15px;">✓</span>
+              <span><strong>2 Beautrì Check in omaggio (valore totale 94 €)</strong> per il monitoraggio dei risultati</span>
+            </li>
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: #10B981; font-weight: 900; font-size: 15px;">✓</span>
+              <span><strong>Prezzi agevolati</strong>, riservati esclusivamente a chi intraprende un percorso</span>
+            </li>
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: #10B981; font-weight: 900; font-size: 15px;">✓</span>
+              <span><strong>Prezzi bloccati</strong>, che non subiranno aumenti durante il percorso</span>
+            </li>
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: #10B981; font-weight: 900; font-size: 15px;">✓</span>
+              <span>Priorità assoluta su tutte le novità e innovazioni Beautrì</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- 4. Cosa chiediamo alla persona -->
+        <div style="background: #ffffff; border: 1.5px solid var(--border); border-radius: 14px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+            <i data-lucide="help-circle" style="color: #6366F1; width: 22px; height: 22px;"></i>
+            <h3 style="font-size: 16px; font-weight: 800; color: var(--dark); margin: 0;">Cosa chiediamo alla persona che intraprende un percorso</h3>
+          </div>
+          <p style="font-size: 13.5px; color: var(--gray); margin-bottom: 14px;">Per garantire risultati concreti e un servizio di alto livello, chiediamo:</p>
+          <ul style="list-style: none; padding-left: 0; margin: 0; display: flex; flex-direction: column; gap: 14px; font-size: 13.5px; color: var(--dark); line-height: 1.5;">
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: #6366F1; font-size: 18px; line-height: 1; font-weight: 900;">•</span>
+              <div>
+                <strong>Rispetto della cadenza settimanale delle sedute</strong><br>
+                <span style="color: var(--gray); font-size: 13px;">In caso di mancato rispetto per motivi futili, tutte le agevolazioni decadono.</span>
+                <div style="background: #FEF3C7; border: 1px solid #FDE68A; color: #92400E; border-radius: 8px; padding: 8px 12px; margin-top: 8px; font-size: 13px; font-weight: 600;">
+                  👉 In caso di imprevisti, parlane con noi: una soluzione si trova sempre, senza dover rinunciare alla seduta.
+                </div>
+              </div>
+            </li>
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: #6366F1; font-size: 18px; line-height: 1; font-weight: 900;">•</span>
+              <span><strong>Collaborazione attiva tramite WhatsApp e/o telefonico</strong>, fondamentale per il monitoraggio e il supporto</span>
+            </li>
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: #6366F1; font-size: 18px; line-height: 1; font-weight: 900;">•</span>
+              <span><strong>Utilizzo corretto dei prodotti</strong>, seguendo la codifica indicata</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- 5. Un impegno reciproco -->
+        <div style="background: #FDF4E3; border: 1.5px solid #FCD34D; border-radius: 14px; padding: 20px; color: #78350F;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+            <i data-lucide="heart-handshake" style="color: #D97706; width: 22px; height: 22px;"></i>
+            <h3 style="font-size: 16px; font-weight: 800; color: #78350F; margin: 0;">Un impegno reciproco</h3>
+          </div>
+          <p style="font-size: 13.5px; line-height: 1.6; margin-bottom: 8px;">
+            Oggi non è possibile seguire tutti indistintamente. Proprio perché teniamo profondamente alla qualità del servizio, diamo grande valore al rispetto reciproco.
+          </p>
+          <p style="font-size: 13.5px; line-height: 1.6; margin-bottom: 8px;">
+            Questo regolamento rappresenta la base del percorso ed è il nostro modo per garantirti sempre il miglior supporto possibile, accompagnandoti passo dopo passo verso i tuoi obiettivi.
+          </p>
+          <p style="font-size: 13.5px; line-height: 1.6; font-weight: 600; margin-bottom: 0;">
+            Siamo certi che comprenderai l’importanza di queste regole: sono ciò che ci permette di ottenere risultati reali e duraturi insieme.
+          </p>
+        </div>
+
+        <!-- Pulsante di Chiusura a fondo modale -->
+        <button type="button" class="btn-dark" onclick="document.getElementById('info-percorso-close').click();" style="width: 100%; padding: 13px; font-weight: 700; margin-top: 4px;">
+          Chiudi e torna alla consulenza
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+
   <!-- Firebase SDK Compat (App, Auth, Firestore, Storage) -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -280,8 +470,8 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 
   <!-- Local Config & App Logic -->
-  <script src="firebase-config-v2.js?v=63"></script>
-  <script src="app_v3.js?v=63"></script>
+  <script src="firebase-config-v2.js?v=64"></script>
+  <script src="app_v3.js?v=64"></script>
 
   <script>
     // Initialize lucide icons

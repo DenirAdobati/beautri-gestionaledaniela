@@ -2604,9 +2604,52 @@ window.addEventListener('unhandledrejection', function(e) {
       };
     }
 
+    // ── GESTIONE MODALE ALTRE INFORMAZIONI SUL PERCORSO ──
+    const btnOpenInfoPercorso = document.getElementById('btn-open-info-percorso');
+    const infoPercorsoModal = document.getElementById('info-percorso-modal');
+    const infoPercorsoClose = document.getElementById('info-percorso-close');
+
+    function closeInfoPercorsoModal() {
+      if (infoPercorsoModal) {
+        infoPercorsoModal.style.display = 'none';
+      }
+      document.body.style.overflow = '';
+    }
+
+    function openInfoPercorsoModal() {
+      if (infoPercorsoModal) {
+        infoPercorsoModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        if (window.lucide) {
+          lucide.createIcons();
+        }
+      }
+    }
+
+    if (btnOpenInfoPercorso) {
+      btnOpenInfoPercorso.onclick = openInfoPercorsoModal;
+    }
+
+    if (infoPercorsoClose) {
+      infoPercorsoClose.onclick = closeInfoPercorsoModal;
+    }
+
+    if (infoPercorsoModal) {
+      infoPercorsoModal.onclick = function(e) {
+        if (e.target === infoPercorsoModal) {
+          closeInfoPercorsoModal();
+        }
+      };
+    }
+
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && pdfModal && pdfModal.style.display === 'flex') {
-        closePdfModal();
+      if (e.key === 'Escape') {
+        if (pdfModal && pdfModal.style.display === 'flex') {
+          closePdfModal();
+        }
+        if (infoPercorsoModal && infoPercorsoModal.style.display === 'flex') {
+          closeInfoPercorsoModal();
+        }
       }
     });
 
