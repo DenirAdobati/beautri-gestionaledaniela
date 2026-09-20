@@ -8,7 +8,7 @@
   <link rel="apple-touch-icon" href="apple-touch-icon.png?v=55">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=66">
+  <link rel="stylesheet" href="style.css?v=67">
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -168,6 +168,12 @@
               </div>
             </div>
           </div>
+
+          <!-- Tasto Altre Informazioni sul Percorso di Mantenimento -->
+          <button type="button" class="btn-info-percorso" id="btn-open-info-mantenimento" style="margin-top: 18px;">
+            <i data-lucide="info" style="width: 18px; height: 18px;"></i>
+            Altre informazioni sul percorso di mantenimento
+          </button>
 
         </div>
       </div>
@@ -463,6 +469,242 @@
     </div>
   </div>
 
+  <!-- MODALE ALTRE INFORMAZIONI SUL PERCORSO DI MANTENIMENTO -->
+  <div id="info-mantenimento-modal" style="display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 99999; align-items: center; justify-content: center; padding: 12px; box-sizing: border-box;">
+    <div style="width: 100%; max-width: 800px; height: 92vh; max-height: 94vh; background: #ffffff; border-radius: 18px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); display: flex; flex-direction: column; position: relative; border: 1.5px solid var(--border);">
+      
+      <!-- Top Bar -->
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; background: #111827; border-bottom: 1px solid #374151; color: #fff; flex-shrink: 0;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <i data-lucide="activity" style="color: var(--gold); width: 20px; height: 20px;"></i>
+          <span style="font-size: 16px; font-weight: 800; color: #f8fafc; letter-spacing: 0.02em;">I NOSTRI PERCORSI DI MANTENIMENTO</span>
+        </div>
+        <button id="info-mantenimento-close" type="button" style="width: 38px; height: 38px; border-radius: 50%; background: #ef4444; border: none; color: #ffffff; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: transform 0.15s ease;" onmouseover="this.style.transform='scale(1.08)';" onmouseout="this.style.transform='scale(1)';" aria-label="Chiudi e torna al report" title="Chiudi (Esc)">
+          <i data-lucide="x" style="width: 22px; height: 22px; stroke-width: 2.5;"></i>
+        </button>
+      </div>
+
+      <!-- Content Scrollable Body -->
+      <div style="flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 24px 20px; background: #fafaf9; display: flex; flex-direction: column; gap: 20px;">
+        
+        <!-- Header Banner -->
+        <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #fff; padding: 20px; border-radius: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-left: 5px solid var(--gold);">
+          <h2 style="font-size: 18px; font-weight: 800; margin-bottom: 10px; color: var(--gold);">La fase più importante: il mantenimento</h2>
+          <p style="font-size: 14px; line-height: 1.6; color: #e2e8f0; margin-bottom: 10px;">
+            Il percorso di mantenimento è la fase più delicata e più importante del lavoro fatto insieme.
+          </p>
+          <p style="font-size: 14px; line-height: 1.6; color: #e2e8f0; margin-bottom: 12px;">
+            È proprio qui che i risultati si stabilizzano, si proteggono e si potenziano nel tempo.
+          </p>
+          <p style="font-size: 14px; line-height: 1.6; color: #cbd5e1; font-weight: 700; margin-bottom: 8px;">
+            Ti consigliamo il mantenimento per tre motivi fondamentali:
+          </p>
+          <ul style="list-style: none; padding-left: 0; margin: 0 0 14px 0; display: flex; flex-direction: column; gap: 8px; font-size: 13.5px; color: #f1f5f9;">
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: var(--gold); font-weight: 900; font-size: 16px;">•</span>
+              <span><strong>Mantenere i risultati raggiunti</strong></span>
+            </li>
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: var(--gold); font-weight: 900; font-size: 16px;">•</span>
+              <span><strong>Potenziare i benefici</strong> ottenuti durante il percorso</span>
+            </li>
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: var(--gold); font-weight: 900; font-size: 16px;">•</span>
+              <span><strong>Essere accompagnato/a per un intero anno da Daniela</strong>, con la possibilità di contattarla direttamente via WhatsApp o telefono per qualsiasi dubbio o necessità</span>
+            </li>
+          </ul>
+          <p style="font-size: 13.5px; line-height: 1.6; color: #cbd5e1; font-style: italic; margin-bottom: 0;">
+            Può sembrarti impegnativo, ma non lo è.<br>
+            Anzi, immagina quando amici, familiari o colleghi ti chiederanno cosa hai fatto per avere capelli così belli… e tu potrai esserne orgoglioso/a.
+          </p>
+        </div>
+
+        <!-- 1. Il Percorso di Mantenimento – Durata 12 mesi -->
+        <div style="background: #ffffff; border: 1.5px solid var(--border); border-radius: 14px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+            <i data-lucide="calendar" style="color: var(--gold-hover); width: 22px; height: 22px;"></i>
+            <h3 style="font-size: 16px; font-weight: 800; color: var(--dark); margin: 0;">Il Percorso di Mantenimento – Durata 12 mesi</h3>
+          </div>
+          <p style="font-size: 14px; line-height: 1.5; color: var(--dark); margin-bottom: 16px;">
+            Il percorso di mantenimento annuale comprende:
+          </p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px;">
+            
+            <!-- 12 Sedute -->
+            <div style="background: var(--gray-light); border-left: 4px solid var(--gold); border-radius: 10px; padding: 14px;">
+              <div style="font-size: 14px; font-weight: 800; color: var(--black); margin-bottom: 6px;">12 sedute a cadenza mensile</div>
+              <div style="font-size: 12.5px; color: var(--gray); margin-bottom: 4px;">(1 seduta al mese)</div>
+              <p style="font-size: 13px; line-height: 1.5; color: var(--dark); margin: 0;">
+                Ogni seduta è studiata per potenziare l’efficacia di argille e peeling naturali, supportati da tecnologie tricologiche avanzate.
+              </p>
+            </div>
+
+            <!-- 2 Check Omaggio -->
+            <div style="background: var(--gray-light); border-left: 4px solid var(--gold); border-radius: 10px; padding: 14px;">
+              <div style="font-size: 14px; font-weight: 800; color: var(--black); margin-bottom: 6px;">2 Beautrì Check in omaggio</div>
+              <div style="font-size: 12.5px; color: var(--gray); margin-bottom: 4px;">(valore 47 € ciascuno)</div>
+              <p style="font-size: 13px; line-height: 1.5; color: var(--dark); margin: 0;">
+                Per monitorare l’andamento dei risultati nel tempo.
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 2. Modalità di Pagamento -->
+        <div style="background: #ffffff; border: 1.5px solid var(--border); border-radius: 14px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+            <i data-lucide="credit-card" style="color: var(--gold-hover); width: 22px; height: 22px;"></i>
+            <h3 style="font-size: 16px; font-weight: 800; color: var(--dark); margin: 0;">Modalità di pagamento</h3>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-top: 10px;">
+            
+            <!-- Pagamento in un'unica quota -->
+            <div style="background: #FEF9D9; border: 1.5px solid var(--gold); border-radius: 12px; padding: 16px;">
+              <div style="font-size: 14.5px; font-weight: 800; color: #854d0e; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                <span>🔹</span> Pagamento in un’unica quota
+              </div>
+              <p style="font-size: 13px; color: #713f12; margin-bottom: 10px;">
+                Scegliendo il pagamento anticipato dell’intero percorso, ricevi:
+              </p>
+              <ul style="list-style: none; padding-left: 0; margin: 0 0 12px 0; display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 700; color: #1f2937;">
+                <li style="display: flex; align-items: center; gap: 6px;"><span style="color: #10B981; font-weight: 900;">✓</span> 1 seduta in omaggio</li>
+                <li style="display: flex; align-items: center; gap: 6px;"><span style="color: #10B981; font-weight: 900;">✓</span> 1 prodotto in omaggio, selezionato in base alle tue esigenze</li>
+                <li style="display: flex; align-items: center; gap: 6px;"><span style="color: #10B981; font-weight: 900;">✓</span> 2 Beautrì Check in omaggio (valore totale 94 €)</li>
+              </ul>
+              <div style="background: rgba(255,255,255,0.85); border-radius: 8px; padding: 8px 10px; font-size: 12px; font-weight: 600; color: #854d0e;">
+                👉 È la formula più completa e vantaggiosa, pensata per chi desidera massimizzare i benefici e risparmiare.
+              </div>
+            </div>
+
+            <!-- Pagamento a seduta -->
+            <div style="background: var(--gray-light); border: 1.5px solid var(--border); border-radius: 12px; padding: 16px;">
+              <div style="font-size: 14.5px; font-weight: 800; color: var(--dark); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                <span>🔹</span> Pagamento a seduta
+              </div>
+              <ul style="list-style: none; padding-left: 0; margin: 0 0 12px 0; display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--dark);">
+                <li style="display: flex; align-items: flex-start; gap: 6px;">
+                  <span style="color: var(--gold-hover); font-weight: 900;">•</span>
+                  <span>Pagamento a seduta</span>
+                </li>
+                <li style="display: flex; align-items: flex-start; gap: 6px;">
+                  <span style="color: var(--gold-hover); font-weight: 900;">•</span>
+                  <span>Alla prima seduta viene richiesto il <strong>pagamento anticipato anche della seduta successiva</strong></span>
+                </li>
+                <li style="display: flex; align-items: flex-start; gap: 6px; font-weight: 700;">
+                  <span style="color: #10B981; font-weight: 900;">✓</span>
+                  <span>2 Beautrì Check in omaggio durante l’anno (valore totale 94 €)</span>
+                </li>
+              </ul>
+              <div style="background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 12px; color: var(--gray); line-height: 1.4;">
+                👉 <strong>In questa formula non sono inclusi:</strong> la seduta omaggio e il prodotto omaggio.<br>
+                <span style="font-size: 11.5px;">Questi 2 benefit sono riservati esclusivamente al pagamento in un’unica quota.</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 3. Cosa garantiamo durante il mantenimento -->
+        <div style="background: #ffffff; border: 1.5px solid var(--border); border-radius: 14px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+            <i data-lucide="shield-check" style="color: #10B981; width: 22px; height: 22px;"></i>
+            <h3 style="font-size: 16px; font-weight: 800; color: var(--dark); margin: 0;">Cosa garantiamo durante il mantenimento</h3>
+          </div>
+          <p style="font-size: 13.5px; color: var(--gray); margin-bottom: 14px;">Durante tutto il percorso di mantenimento Beautrì garantiamo:</p>
+          <ul style="list-style: none; padding-left: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; font-size: 13.5px; color: var(--dark); line-height: 1.45;">
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: #10B981; font-weight: 900; font-size: 15px;">✓</span>
+              <span>Sedute potenziate con tecnologie di ultima generazione</span>
+            </li>
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: #10B981; font-weight: 900; font-size: 15px;">✓</span>
+              <span>Possibilità di svolgere le sedute in modalità One to One in Comfort Room</span>
+            </li>
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: #10B981; font-weight: 900; font-size: 15px;">✓</span>
+              <span>Prodotti personalizzati, codificati sulle tue esigenze</span>
+            </li>
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: #10B981; font-weight: 900; font-size: 15px;">✓</span>
+              <span>Supporto WhatsApp e/o telefonico continuo per tutta la durata del percorso</span>
+            </li>
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: #10B981; font-weight: 900; font-size: 15px;">✓</span>
+              <span><strong>2 Beautrì Check in omaggio</strong> per il monitoraggio dei risultati</span>
+            </li>
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: #10B981; font-weight: 900; font-size: 15px;">✓</span>
+              <span><strong>Prezzi agevolati</strong>, riservati a chi sceglie un percorso</span>
+            </li>
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: #10B981; font-weight: 900; font-size: 15px;">✓</span>
+              <span><strong>Prezzi bloccati</strong>, che non subiranno aumenti</span>
+            </li>
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: #10B981; font-weight: 900; font-size: 15px;">✓</span>
+              <span>Priorità assoluta su tutte le novità Beautrì</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- 4. Cosa chiediamo a chi sceglie il mantenimento -->
+        <div style="background: #ffffff; border: 1.5px solid var(--border); border-radius: 14px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+            <i data-lucide="help-circle" style="color: #6366F1; width: 22px; height: 22px;"></i>
+            <h3 style="font-size: 16px; font-weight: 800; color: var(--dark); margin: 0;">Cosa chiediamo a chi sceglie il mantenimento</h3>
+          </div>
+          <p style="font-size: 13.5px; color: var(--gray); margin-bottom: 14px;">Per garantire continuità, risultati e qualità del servizio, chiediamo:</p>
+          <ul style="list-style: none; padding-left: 0; margin: 0; display: flex; flex-direction: column; gap: 14px; font-size: 13.5px; color: var(--dark); line-height: 1.5;">
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: #6366F1; font-size: 18px; line-height: 1; font-weight: 900;">•</span>
+              <div>
+                <strong>Cadenza mensile delle sedute</strong><br>
+                <span style="color: var(--gray); font-size: 13px;">Ogni seduta deve essere effettuata entro 35 giorni. Il mancato rispetto delle tempistiche per motivi futili comporta la decadenza di tutte le agevolazioni.</span>
+                <div style="background: #FEF3C7; border: 1px solid #FDE68A; color: #92400E; border-radius: 8px; padding: 8px 12px; margin-top: 8px; font-size: 13px; font-weight: 600;">
+                  👉 In caso di imprevisti, parlane con noi: una soluzione si trova sempre.
+                </div>
+              </div>
+            </li>
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: #6366F1; font-size: 18px; line-height: 1; font-weight: 900;">•</span>
+              <span><strong>Collaborazione attiva tramite WhatsApp e/o telefonico</strong>, fondamentale per il monitoraggio e il supporto</span>
+            </li>
+            <li style="display: flex; align-items: flex-start; gap: 8px;">
+              <span style="color: #6366F1; font-size: 18px; line-height: 1; font-weight: 900;">•</span>
+              <span><strong>Utilizzo corretto dei prodotti</strong>, seguendo la codifica indicata</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- 5. Un impegno reciproco -->
+        <div style="background: #FDF4E3; border: 1.5px solid #FCD34D; border-radius: 14px; padding: 20px; color: #78350F;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+            <i data-lucide="heart-handshake" style="color: #D97706; width: 22px; height: 22px;"></i>
+            <h3 style="font-size: 16px; font-weight: 800; color: #78350F; margin: 0;">Un impegno reciproco</h3>
+          </div>
+          <p style="font-size: 13.5px; line-height: 1.6; margin-bottom: 8px;">
+            Oggi non è possibile seguire tutti indistintamente. Proprio perché teniamo profondamente alla qualità del servizio, diamo grande valore al rispetto reciproco.
+          </p>
+          <p style="font-size: 13.5px; line-height: 1.6; margin-bottom: 8px;">
+            Questo regolamento rappresenta la base del percorso di mantenimento ed è ciò che ci permette di accompagnarti con attenzione, continuità e professionalità durante tutto l’anno.
+          </p>
+          <p style="font-size: 13.5px; line-height: 1.6; font-weight: 600; margin-bottom: 0;">
+            Siamo certi che comprenderai: è così che i risultati si mantengono, si proteggono e diventano duraturi.
+          </p>
+        </div>
+
+        <!-- Pulsante di Chiusura a fondo modale -->
+        <button type="button" class="btn-dark" onclick="document.getElementById('info-mantenimento-close').click();" style="width: 100%; padding: 13px; font-weight: 700; margin-top: 4px;">
+          Chiudi e torna al report
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+
   <!-- Firebase SDK Compat (App, Auth, Firestore, Storage) -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -471,7 +713,7 @@
 
   <!-- Local Config & App Logic -->
   <script src="firebase-config-v2.js?v=65"></script>
-  <script src="app_v3.js?v=66"></script>
+  <script src="app_v3.js?v=67"></script>
 
   <script>
     // Initialize lucide icons

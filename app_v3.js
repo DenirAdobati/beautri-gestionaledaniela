@@ -2642,6 +2642,44 @@ window.addEventListener('unhandledrejection', function(e) {
       };
     }
 
+    // ── GESTIONE MODALE ALTRE INFORMAZIONI SUL PERCORSO DI MANTENIMENTO ──
+    const btnOpenInfoMantenimento = document.getElementById('btn-open-info-mantenimento');
+    const infoMantenimentoModal = document.getElementById('info-mantenimento-modal');
+    const infoMantenimentoClose = document.getElementById('info-mantenimento-close');
+
+    function closeInfoMantenimentoModal() {
+      if (infoMantenimentoModal) {
+        infoMantenimentoModal.style.display = 'none';
+      }
+      document.body.style.overflow = '';
+    }
+
+    function openInfoMantenimentoModal() {
+      if (infoMantenimentoModal) {
+        infoMantenimentoModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        if (window.lucide) {
+          lucide.createIcons();
+        }
+      }
+    }
+
+    if (btnOpenInfoMantenimento) {
+      btnOpenInfoMantenimento.onclick = openInfoMantenimentoModal;
+    }
+
+    if (infoMantenimentoClose) {
+      infoMantenimentoClose.onclick = closeInfoMantenimentoModal;
+    }
+
+    if (infoMantenimentoModal) {
+      infoMantenimentoModal.onclick = function(e) {
+        if (e.target === infoMantenimentoModal) {
+          closeInfoMantenimentoModal();
+        }
+      };
+    }
+
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
         if (pdfModal && pdfModal.style.display === 'flex') {
@@ -2649,6 +2687,9 @@ window.addEventListener('unhandledrejection', function(e) {
         }
         if (infoPercorsoModal && infoPercorsoModal.style.display === 'flex') {
           closeInfoPercorsoModal();
+        }
+        if (infoMantenimentoModal && infoMantenimentoModal.style.display === 'flex') {
+          closeInfoMantenimentoModal();
         }
       }
     });
