@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Beautri Tricologia — Scheda Pre-Consulenza Cliente</title>
-  <link rel="icon" type="image/png" href="favicon.png?v=55">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=55">
+  <link rel="icon" type="image/png" href="favicon.png?v=68">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=68">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
@@ -435,12 +435,25 @@
       "8": "Obiettivi / Risultati desiderati per i capelli",
       "9": "Tempo entro cui vorrebbe vedere dei cambiamenti",
       "10": "Rapporto attuale con i propri capelli",
+      "scale_satisfaction": "Soddisfazione cute e capelli (1-10)",
+      "scale_control": "Livello di controllo del problema (1-10)",
+      "scale_social": "Sentirsi a proprio agio in mezzo agli altri (1-10)",
       "11": "Situazione di disagio / percezione attuale",
       "12": "Quanto il rapporto con i capelli influenzi la vita",
       "13": "Trattamenti / Cure che ha già provato in passato",
       "15": "Livello di efficacia / risultati ottenuti in passato",
       "16": "Trattamenti o rimedi che le piacerebbe provare in futuro"
     };
+
+    function getScoreEmoji(val) {
+      const n = parseInt(val, 10);
+      if (isNaN(n)) return '🤔';
+      if (n <= 2) return '😞';
+      if (n <= 4) return '🙁';
+      if (n <= 6) return '😐';
+      if (n <= 8) return '🙂';
+      return '🤩';
+    }
 
     let docData = null;
     let firebaseActive = false;
@@ -533,17 +546,23 @@
       const container = document.getElementById('grid-container');
       container.innerHTML = "";
 
-      // Domande personali
+      // Domande personali (retrocompatibilità per vecchi questionari)
       addAnswerCard(container, "2", "Data di nascita");
-      addAnswerCard(container, "5", "Email");
-      addAnswerCard(container, "6", "Telefono");
-      addAnswerCard(container, "4_addr", "Indirizzo residenza", true, false, true);
+      if (docData.answers?.['5']) addAnswerCard(container, "5", "Email");
+      if (docData.answers?.['6']) addAnswerCard(container, "6", "Telefono");
+      if (docData.answers?.['4_addr']) addAnswerCard(container, "4_addr", "Indirizzo residenza", true, false, true);
 
       // Domande a crocette/testo
       addAnswerCard(container, "7", "Motivo della consulenza", true, true);
       addAnswerCard(container, "8", "Cosa vorrebbe per i suoi capelli", true, true);
       addAnswerCard(container, "9", "Tempo desiderato per i cambiamenti", false, false, true);
       addAnswerCard(container, "10", "Rapporto attuale con i capelli", true, false, true);
+
+      // 3 Metriche di Valutazione Iniziale (Scala 1 - 10)
+      if (docData.answers?.['scale_satisfaction'] !== undefined || docData.answers?.['scale_control'] !== undefined || docData.answers?.['scale_social'] !== undefined || isEditing) {
+        addScaleMetricsCard(container);
+      }
+
       addAnswerCard(container, "11", "Situazioni in cui si trova attualmente", true, true);
       addAnswerCard(container, "12", "Quanto influisce il rapporto con i capelli", false, false, true);
       addAnswerCard(container, "13", "Cosa ha già provato in passato", true, true);
@@ -568,6 +587,70 @@
       // Mostra layout
       document.getElementById('loader').style.display = 'none';
       document.getElementById('content').style.display = 'block';
+    }
+
+    function addScaleMetricsCard(container) {
+      const card = document.createElement("div");
+      card.className = "answer-card full-width";
+      card.style.background = "#FEF9D9";
+      card.style.border = "1.5px solid var(--gold)";
+
+      const v1 = docData.answers?.['scale_satisfaction'] || '';
+      const v2 = docData.answers?.['scale_control'] || '';
+      const v3 = docData.answers?.['scale_social'] || '';
+
+      let html = `<span class="answer-q" style="color: #854d0e; font-weight: 800; font-size: 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">🎯 Punteggi Iniziali Cliente (Scala 1 - 10)</span>`;
+
+      if (isEditing) {
+        html += `
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+            <div style="background: #fff; border-radius: 8px; padding: 12px; border: 1px solid var(--border);">
+              <label style="font-size: 12px; font-weight: 700; color: var(--dark); display: block; margin-bottom: 6px;">Soddisfazione cute e capelli (1-10)</label>
+              <input type="number" min="1" max="10" class="edit-input" data-qkey="scale_satisfaction" value="${v1}" placeholder="1-10" style="font-size: 18px; font-weight: 800;">
+            </div>
+            <div style="background: #fff; border-radius: 8px; padding: 12px; border: 1px solid var(--border);">
+              <label style="font-size: 12px; font-weight: 700; color: var(--dark); display: block; margin-bottom: 6px;">Problema sotto controllo (1-10)</label>
+              <input type="number" min="1" max="10" class="edit-input" data-qkey="scale_control" value="${v2}" placeholder="1-10" style="font-size: 18px; font-weight: 800;">
+            </div>
+            <div style="background: #fff; border-radius: 8px; padding: 12px; border: 1px solid var(--border);">
+              <label style="font-size: 12px; font-weight: 700; color: var(--dark); display: block; margin-bottom: 6px;">A proprio agio in pubblico (1-10)</label>
+              <input type="number" min="1" max="10" class="edit-input" data-qkey="scale_social" value="${v3}" placeholder="1-10" style="font-size: 18px; font-weight: 800;">
+            </div>
+          </div>
+        `;
+      } else {
+        html += `
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+            <div style="background: #fff; border-radius: 8px; padding: 14px; border: 1px solid var(--border); box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+              <div style="font-size: 12px; color: var(--gray); font-weight: 700; margin-bottom: 6px;">Soddisfazione Cute e Capelli</div>
+              <div style="font-size: 22px; font-weight: 900; color: #111827; display: flex; align-items: center; gap: 8px;">
+                <span>${getScoreEmoji(v1)}</span>
+                <span style="color: #D9A700;">${v1 || '-'}</span>
+                <span style="font-size: 13px; color: var(--gray); font-weight: 600;">/ 10</span>
+              </div>
+            </div>
+            <div style="background: #fff; border-radius: 8px; padding: 14px; border: 1px solid var(--border); box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+              <div style="font-size: 12px; color: var(--gray); font-weight: 700; margin-bottom: 6px;">Problema Sotto Controllo</div>
+              <div style="font-size: 22px; font-weight: 900; color: #111827; display: flex; align-items: center; gap: 8px;">
+                <span>${getScoreEmoji(v2)}</span>
+                <span style="color: #D9A700;">${v2 || '-'}</span>
+                <span style="font-size: 13px; color: var(--gray); font-weight: 600;">/ 10</span>
+              </div>
+            </div>
+            <div style="background: #fff; border-radius: 8px; padding: 14px; border: 1px solid var(--border); box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+              <div style="font-size: 12px; color: var(--gray); font-weight: 700; margin-bottom: 6px;">A Tuo Agio in Pubblico</div>
+              <div style="font-size: 22px; font-weight: 900; color: #111827; display: flex; align-items: center; gap: 8px;">
+                <span>${getScoreEmoji(v3)}</span>
+                <span style="color: #D9A700;">${v3 || '-'}</span>
+                <span style="font-size: 13px; color: var(--gray); font-weight: 600;">/ 10</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      card.innerHTML = html;
+      container.appendChild(card);
     }
 
     function addAnswerCard(container, qKey, label, isFullWidth = false, isCheck = false, isTextarea = false) {

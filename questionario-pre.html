@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Scheda Beautrìco — Questionario Pre-Consulenza</title>
-  <link rel="icon" type="image/png" href="favicon.png?v=55">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=55">
+  <link rel="icon" type="image/png" href="favicon.png?v=68">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=68">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
@@ -420,14 +420,133 @@
       margin-top: 15px;
     }
 
-    .video-container iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+    /* Scale 1-10 Component */
+    .scale-intro-banner {
+      background: rgba(245, 194, 0, 0.12);
+      border: 1.5px solid var(--gold);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      margin-bottom: 8px;
+      text-align: center;
     }
 
+    .scale-card-box {
+      background: #FFFFFF;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 18px;
+      margin-top: 10px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+    }
+
+    .scale-display {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 52px;
+    }
+
+    .scale-number-badge {
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--dark);
+      background: var(--gray-light);
+      border: 2px solid var(--gold);
+      padding: 6px 16px;
+      border-radius: 30px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      animation: scalePop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes scalePop {
+      0% { transform: scale(0.85); opacity: 0.7; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .scale-emoji {
+      font-size: 32px;
+      line-height: 1;
+    }
+
+    .scale-total {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gray);
+    }
+
+    .scale-placeholder-badge {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #92400E;
+      background: #FEF3C7;
+      border: 1px solid #FDE68A;
+      padding: 8px 14px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .scale-pills {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 6px;
+      width: 100%;
+    }
+
+    @media (max-width: 480px) {
+      .scale-pills {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+      }
+    }
+
+    .scale-pill-btn {
+      height: 44px;
+      background: #FFFFFF;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--dark);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .scale-pill-btn:hover {
+      border-color: var(--gold);
+      background: rgba(245, 194, 0, 0.1);
+    }
+
+    .scale-pill-btn.active {
+      background: var(--gold);
+      border-color: var(--gold-dark);
+      color: #111827;
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(245, 194, 0, 0.4);
+    }
+
+    .scale-labels {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      font-size: 12px;
+      color: var(--gray);
+      font-weight: 700;
+      margin-top: 4px;
+    }
   </style>
 </head>
 <body>
@@ -498,64 +617,8 @@
         </div>
       </div>
 
-      <!-- STEP 4: Address -->
+      <!-- STEP 4: Why did you decide to do the consultation? (Checkbox) -->
       <div class="step-card" id="step-4">
-        <h2>Dove <em>abiti?</em></h2>
-        <div class="address-grid">
-          <div class="inp-group full-w">
-            <label>Indirizzo</label>
-            <input type="text" class="input-text" id="ans-4-addr" placeholder="Via / Piazza e N. Civico" required>
-          </div>
-          <div class="inp-group full-w">
-            <label>Indirizzo Linea 2 (Opzionale)</label>
-            <input type="text" class="input-text" id="ans-4-addr2" placeholder="Scala, Interno…">
-          </div>
-          <div class="inp-group">
-            <label>Città</label>
-            <input type="text" class="input-text" id="ans-4-city" placeholder="Città" required>
-          </div>
-          <div class="inp-group">
-            <label>Provincia / Regione</label>
-            <input type="text" class="input-text" id="ans-4-prov" placeholder="Provincia" required>
-          </div>
-          <div class="inp-group">
-            <label>CAP</label>
-            <input type="text" class="input-text" id="ans-4-zip" placeholder="CAP" required>
-          </div>
-          <div class="inp-group">
-            <label>Nazione</label>
-            <input type="text" class="input-text" id="ans-4-country" placeholder="Italia" value="Italia" required>
-          </div>
-        </div>
-        <div class="nav-buttons">
-          <button type="button" class="btn-back" onclick="goBack()">← Indietro</button>
-          <button type="button" class="btn-submit" onclick="goNext()">Avanti →</button>
-        </div>
-      </div>
-
-      <!-- STEP 5: Email -->
-      <div class="step-card" id="step-5">
-        <h2>La tua <em>email</em></h2>
-        <input type="email" class="input-text" id="ans-5" placeholder="nome@esempio.it" required>
-        <div class="nav-buttons">
-          <button type="button" class="btn-back" onclick="goBack()">← Indietro</button>
-          <button type="button" class="btn-submit" onclick="goNext()">Avanti →</button>
-        </div>
-      </div>
-
-      <!-- STEP 6: Phone Number -->
-      <div class="step-card" id="step-6">
-        <h2>Il tuo <em>numero di telefono</em></h2>
-        <p class="description">Per ricevere il report della consulenza direttamente sul tuo smartphone</p>
-        <input type="tel" class="input-text" id="ans-6" placeholder="+39 333 1234567" required>
-        <div class="nav-buttons">
-          <button type="button" class="btn-back" onclick="goBack()">← Indietro</button>
-          <button type="button" class="btn-submit" onclick="goNext()">Avanti →</button>
-        </div>
-      </div>
-
-      <!-- STEP 7: Why did you decide to do the consultation? (Checkbox) -->
-      <div class="step-card" id="step-7">
         <h2>Perché hai deciso di voler fare la nostra consulenza <em>"Beautrico"?</em></h2>
         <p class="description">Scegli tutto ciò che senti vero per te, anche più di una risposta.</p>
         <div class="options-list" id="opts-7">
@@ -571,8 +634,8 @@
         </div>
       </div>
 
-      <!-- STEP 8: Capelli desiderati (Checkbox) -->
-      <div class="step-card" id="step-8">
+      <!-- STEP 5: Capelli desiderati (Checkbox) -->
+      <div class="step-card" id="step-5">
         <h2>Se potessi scegliere, <em>cosa vorresti</em> per i tuoi capelli?</h2>
         <p class="description">Puoi selezionare più risposte.</p>
         <div class="options-list" id="opts-8">
@@ -588,8 +651,8 @@
         </div>
       </div>
 
-      <!-- STEP 9: Tempo cambiamenti (Radio) -->
-      <div class="step-card" id="step-9">
+      <!-- STEP 6: Tempo cambiamenti (Radio) -->
+      <div class="step-card" id="step-6">
         <h2>In quanto tempo ti piacerebbe iniziare a <em>vedere dei cambiamenti?</em></h2>
         <div class="options-list" id="opts-9">
           <!-- Dinamico -->
@@ -600,11 +663,90 @@
         </div>
       </div>
 
-      <!-- STEP 10: Rapporto capelli (Textarea) -->
-      <div class="step-card" id="step-10">
+      <!-- STEP 7: Rapporto capelli (Textarea) -->
+      <div class="step-card" id="step-7">
         <h2>Raccontaci il tuo <em>rapporto con i tuoi capelli</em>, oggi</h2>
         <p class="description">Non c'è una risposta giusta: scrivi liberamente sensazioni, emozioni, abitudini...</p>
         <textarea id="ans-10" placeholder="Scrivi qui liberamente…" required></textarea>
+        <div class="nav-buttons">
+          <button type="button" class="btn-back" onclick="goBack()">← Indietro</button>
+          <button type="button" class="btn-submit" onclick="goNext()">Avanti →</button>
+        </div>
+      </div>
+
+      <!-- STEP 8: Soddisfazione Cute e Capelli (Scala 1-10) -->
+      <div class="step-card" id="step-8">
+        <div class="scale-intro-banner">
+          <p style="font-size: 14.5px; line-height: 1.5; color: #854d0e; font-weight: 700; margin: 0;">
+            🎯 Ora ti chiediamo 3 numeri.<br>
+            <span style="font-size: 13.5px; font-weight: 500; color: var(--dark);">Rispondi di getto, senza pensarci troppo: sono il tuo punto di partenza e ci serviranno per misurare insieme i tuoi progressi.</span>
+          </p>
+        </div>
+
+        <h2>Quanto sei soddisfatta/o della <em>situazione dei tuoi capelli e della tua cute</em> oggi?</h2>
+        <p class="description">1 = per niente · 10 = del tutto</p>
+
+        <div class="scale-card-box">
+          <div class="scale-display" id="disp-scale_satisfaction">
+            <div class="scale-placeholder-badge">
+              👉 Tocca un numero da 1 a 10 per dare il tuo voto
+            </div>
+          </div>
+          <div class="scale-pills" id="pills-scale_satisfaction"></div>
+          <div class="scale-labels">
+            <span>1 · Per niente</span>
+            <span>10 · Del tutto</span>
+          </div>
+        </div>
+
+        <div class="nav-buttons">
+          <button type="button" class="btn-back" onclick="goBack()">← Indietro</button>
+          <button type="button" class="btn-submit" onclick="goNext()">Avanti →</button>
+        </div>
+      </div>
+
+      <!-- STEP 9: Livello Controllo Problema (Scala 1-10) -->
+      <div class="step-card" id="step-9">
+        <h2>Quanto senti che il tuo <em>problema è sotto controllo</em> oggi?</h2>
+        <p class="description">1 = per niente, peggiora e non so cosa fare · 10 = completamente sotto controllo</p>
+
+        <div class="scale-card-box">
+          <div class="scale-display" id="disp-scale_control">
+            <div class="scale-placeholder-badge">
+              👉 Tocca un numero da 1 a 10 per dare il tuo voto
+            </div>
+          </div>
+          <div class="scale-pills" id="pills-scale_control"></div>
+          <div class="scale-labels">
+            <span>1 · Per niente, peggiora</span>
+            <span>10 · Sotto controllo</span>
+          </div>
+        </div>
+
+        <div class="nav-buttons">
+          <button type="button" class="btn-back" onclick="goBack()">← Indietro</button>
+          <button type="button" class="btn-submit" onclick="goNext()">Avanti →</button>
+        </div>
+      </div>
+
+      <!-- STEP 10: Sentirsi a proprio agio (Scala 1-10) -->
+      <div class="step-card" id="step-10">
+        <h2>Quanto ti senti a tuo agio con i tuoi capelli <em>quando sei in mezzo agli altri?</em></h2>
+        <p class="description">1 = per niente · 10 = completamente</p>
+
+        <div class="scale-card-box">
+          <div class="scale-display" id="disp-scale_social">
+            <div class="scale-placeholder-badge">
+              👉 Tocca un numero da 1 a 10 per dare il tuo voto
+            </div>
+          </div>
+          <div class="scale-pills" id="pills-scale_social"></div>
+          <div class="scale-labels">
+            <span>1 · Per niente</span>
+            <span>10 · Completamente</span>
+          </div>
+        </div>
+
         <div class="nav-buttons">
           <button type="button" class="btn-back" onclick="goBack()">← Indietro</button>
           <button type="button" class="btn-submit" onclick="goNext()">Avanti →</button>
@@ -911,6 +1053,112 @@
       answers[qKey] = opt;
     }
 
+    // Configurazione Scale 1-10
+    const SCALE_CONFIGS = {
+      'scale_satisfaction': {
+        minLabel: '1 · Per niente',
+        maxLabel: '10 · Del tutto',
+        descriptions: {
+          1: 'Per niente',
+          2: 'Molto poco',
+          3: 'Poco',
+          4: 'Insufficiente',
+          5: 'Così così',
+          6: 'Discreto',
+          7: 'Abbastanza',
+          8: 'Buono',
+          9: 'Molto',
+          10: 'Del tutto'
+        }
+      },
+      'scale_control': {
+        minLabel: '1 · Per niente, peggiora',
+        maxLabel: '10 · Sotto controllo',
+        descriptions: {
+          1: 'Per niente, peggiora e non so cosa fare',
+          2: 'Pochissimo controllo',
+          3: 'Scarso controllo',
+          4: 'Spesso fuori controllo',
+          5: 'Controllo parziale',
+          6: 'Accettabile',
+          7: 'Discreto controllo',
+          8: 'Buon controllo',
+          9: 'Ottimo controllo',
+          10: 'Completamente sotto controllo'
+        }
+      },
+      'scale_social': {
+        minLabel: '1 · Per niente',
+        maxLabel: '10 · Completamente',
+        descriptions: {
+          1: 'Per niente a mio agio',
+          2: 'Forte disagio',
+          3: 'Spesso a disagio',
+          4: 'Insicura/o',
+          5: 'A volte a disagio',
+          6: 'Abbastanza serena/o',
+          7: 'A mio agio',
+          8: 'Sicura/o di me',
+          9: 'Molto a mio agio',
+          10: 'Completamente a mio agio'
+        }
+      }
+    };
+
+    function getScoreEmoji(val) {
+      const n = parseInt(val, 10);
+      if (isNaN(n)) return '🤔';
+      if (n <= 2) return '😞';
+      if (n <= 4) return '🙁';
+      if (n <= 6) return '😐';
+      if (n <= 8) return '🙂';
+      return '🤩';
+    }
+
+    function initScales() {
+      ['scale_satisfaction', 'scale_control', 'scale_social'].forEach(qKey => {
+        const container = document.getElementById('pills-' + qKey);
+        if (!container) return;
+        container.innerHTML = '';
+        for (let i = 1; i <= 10; i++) {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'scale-pill-btn';
+          btn.textContent = i;
+          btn.onclick = () => selectScaleValue(qKey, i);
+          container.appendChild(btn);
+        }
+      });
+    }
+
+    function selectScaleValue(qKey, val) {
+      answers[qKey] = val;
+      const container = document.getElementById('pills-' + qKey);
+      if (container) {
+        container.querySelectorAll('.scale-pill-btn').forEach((btn, idx) => {
+          if (idx + 1 === val) {
+            btn.classList.add('active');
+          } else {
+            btn.classList.remove('active');
+          }
+        });
+      }
+
+      const disp = document.getElementById('disp-' + qKey);
+      if (disp) {
+        const emoji = getScoreEmoji(val);
+        const desc = SCALE_CONFIGS[qKey]?.descriptions?.[val] || '';
+        disp.innerHTML = `
+          <div class="scale-number-badge">
+            <span class="scale-emoji">${emoji}</span>
+            <span style="color: var(--gold-dark);">${val}</span>
+            <span class="scale-total">/ 10</span>
+          </div>
+          ${desc ? `<div style="font-size: 13px; font-weight: 700; color: var(--dark); margin-top: 4px;">«${desc}»</div>` : ''}
+        `;
+      }
+    }
+
     // Navigazione
     function updateProgress() {
       const pct = (currentStep / totalSteps) * 100;
@@ -969,66 +1217,26 @@
         answers["3"] = job;
       }
 
-      // Step 4: Indirizzo
+      // Step 4: Perché hai deciso di fare la consulenza
       if (currentStep === 4) {
-        const addr = document.getElementById("ans-4-addr").value.trim();
-        const city = document.getElementById("ans-4-city").value.trim();
-        const prov = document.getElementById("ans-4-prov").value.trim();
-        const zip = document.getElementById("ans-4-zip").value.trim();
-        const country = document.getElementById("ans-4-country").value.trim();
-        if (!addr || !city || !prov || !zip || !country) {
-          alert("Compila tutti i campi obbligatori dell'indirizzo.");
-          return false;
-        }
-        answers["4_addr"] = addr;
-        answers["4_addr2"] = document.getElementById("ans-4-addr2").value.trim();
-        answers["4_city"] = city;
-        answers["4_prov"] = prov;
-        answers["4_zip"] = zip;
-        answers["4_country"] = country;
-      }
-
-      // Step 5: Email
-      if (currentStep === 5) {
-        const email = document.getElementById("ans-5").value.trim();
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!email || !emailRegex.test(email)) {
-          alert("Inserisci un indirizzo email valido.");
-          return false;
-        }
-        answers["5"] = email;
-      }
-
-      // Step 6: Telefono
-      if (currentStep === 6) {
-        const tel = document.getElementById("ans-6").value.trim();
-        if (!tel) {
-          alert("Inserisci un numero di telefono valido.");
-          return false;
-        }
-        answers["6"] = tel;
-      }
-
-      // Step 7: Perché
-      if (currentStep === 7) {
         answers["7-other"] = document.getElementById("ans-7-other").value.trim();
       }
 
-      // Step 8: Capelli
-      if (currentStep === 8) {
+      // Step 5: Capelli desiderati
+      if (currentStep === 5) {
         answers["8-other"] = document.getElementById("ans-8-other").value.trim();
       }
 
-      // Step 9: Tempo
-      if (currentStep === 9) {
+      // Step 6: Tempo cambiamenti
+      if (currentStep === 6) {
         if (!answers["9"]) {
           alert("Seleziona un'opzione per continuare.");
           return false;
         }
       }
 
-      // Step 10: Rapporto
-      if (currentStep === 10) {
+      // Step 7: Rapporto capelli (Aperta)
+      if (currentStep === 7) {
         const text = document.getElementById("ans-10").value.trim();
         if (!text) {
           alert("Raccontaci qualcosa sul tuo rapporto con i capelli per continuare.");
@@ -1037,7 +1245,31 @@
         answers["10"] = text;
       }
 
-      // Step 11: Situazione
+      // Step 8: Soddisfazione cute e capelli (Scala 1-10)
+      if (currentStep === 8) {
+        if (!answers["scale_satisfaction"]) {
+          alert("Per favore, tocca un numero da 1 a 10 per dare il tuo voto prima di proseguire.");
+          return false;
+        }
+      }
+
+      // Step 9: Controllo problema (Scala 1-10)
+      if (currentStep === 9) {
+        if (!answers["scale_control"]) {
+          alert("Per favore, tocca un numero da 1 a 10 per dare il tuo voto prima di proseguire.");
+          return false;
+        }
+      }
+
+      // Step 10: Sentirsi a proprio agio (Scala 1-10)
+      if (currentStep === 10) {
+        if (!answers["scale_social"]) {
+          alert("Per favore, tocca un numero da 1 a 10 per dare il tuo voto prima di proseguire.");
+          return false;
+        }
+      }
+
+      // Step 11: Situazione attuale
       if (currentStep === 11) {
         // Nessun controllo bloccante
       }
@@ -1055,7 +1287,7 @@
         answers["13-other"] = document.getElementById("ans-13-other").value.trim();
       }
 
-      // Step 15: Risultati
+      // Step 15: Risultati trattamenti
       if (currentStep === 15) {
         if (!answers["15"]) {
           alert("Seleziona un'opzione per continuare.");
@@ -1155,6 +1387,7 @@
     // Avvio al caricamento della pagina
     window.onload = () => {
       initOptions();
+      initScales();
       updateProgress();
     };
   </script>
