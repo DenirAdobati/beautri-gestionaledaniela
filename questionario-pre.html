@@ -418,6 +418,17 @@
       border-radius: var(--radius);
       border: 1px solid var(--border);
       margin-top: 15px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      background: #000;
+    }
+
+    .video-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
     }
 
     /* Scale 1-10 Component */
@@ -674,15 +685,25 @@
         </div>
       </div>
 
-      <!-- STEP 8: Soddisfazione Cute e Capelli (Scala 1-10) -->
-      <div class="step-card" id="step-8">
-        <div class="scale-intro-banner">
-          <p style="font-size: 14.5px; line-height: 1.5; color: #854d0e; font-weight: 700; margin: 0;">
-            🎯 Ora ti chiediamo 3 numeri.<br>
-            <span style="font-size: 13.5px; font-weight: 500; color: var(--dark);">Rispondi di getto, senza pensarci troppo: sono il tuo punto di partenza e ci serviranno per misurare insieme i tuoi progressi.</span>
-          </p>
+      <!-- STEP 8: Schermata Intermedia Intro 3 Numeri -->
+      <div class="step-card" id="step-8" style="text-align: center;">
+        <div style="width: 58px; height: 58px; background: rgba(245, 194, 0, 0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto; font-size: 26px;">
+          🎯
         </div>
+        <h2 style="font-size: 24px; margin-bottom: 12px; text-align: center;">Ora ti chiediamo <em>3 numeri</em></h2>
+        <p class="description" style="font-size: 16px; line-height: 1.6; text-align: center; max-width: 540px; margin: 0 auto 28px auto; color: var(--dark);">
+          Rispondi di getto, senza pensarci troppo: sono il tuo punto di partenza e ci serviranno per misurare insieme i tuoi progressi.
+        </p>
+        <div class="nav-buttons" style="justify-content: center; gap: 12px;">
+          <button type="button" class="btn-back" onclick="goBack()">← Indietro</button>
+          <button type="button" class="btn-submit" onclick="goNext()" style="font-size: 15px; padding: 13px 32px;">
+            Vai alle domande →
+          </button>
+        </div>
+      </div>
 
+      <!-- STEP 9: Soddisfazione Cute e Capelli (Scala 1-10) -->
+      <div class="step-card" id="step-9">
         <h2>Quanto sei soddisfatta/o della <em>situazione dei tuoi capelli e della tua cute</em> oggi?</h2>
         <p class="description">1 = per niente · 10 = del tutto</p>
 
@@ -705,8 +726,8 @@
         </div>
       </div>
 
-      <!-- STEP 9: Livello Controllo Problema (Scala 1-10) -->
-      <div class="step-card" id="step-9">
+      <!-- STEP 10: Livello Controllo Problema (Scala 1-10) -->
+      <div class="step-card" id="step-10">
         <h2>Quanto senti che il tuo <em>problema è sotto controllo</em> oggi?</h2>
         <p class="description">1 = per niente, peggiora e non so cosa fare · 10 = completamente sotto controllo</p>
 
@@ -729,8 +750,8 @@
         </div>
       </div>
 
-      <!-- STEP 10: Sentirsi a proprio agio (Scala 1-10) -->
-      <div class="step-card" id="step-10">
+      <!-- STEP 11: Sentirsi a proprio agio (Scala 1-10) -->
+      <div class="step-card" id="step-11">
         <h2>Quanto ti senti a tuo agio con i tuoi capelli <em>quando sei in mezzo agli altri?</em></h2>
         <p class="description">1 = per niente · 10 = completamente</p>
 
@@ -753,8 +774,8 @@
         </div>
       </div>
 
-      <!-- STEP 11: Situazione attuale (Checkbox) -->
-      <div class="step-card" id="step-11">
+      <!-- STEP 12: Situazione attuale (Checkbox) -->
+      <div class="step-card" id="step-12">
         <h2>In quale di queste <em>situazioni</em> ti trovi attualmente?</h2>
         <p class="description">Puoi selezionare più risposte.</p>
         <div class="options-list" id="opts-11">
@@ -766,8 +787,8 @@
         </div>
       </div>
 
-      <!-- STEP 12: Livello influenza (Radio) -->
-      <div class="step-card" id="step-12">
+      <!-- STEP 13: Livello influenza (Radio) -->
+      <div class="step-card" id="step-13">
         <h2>Quanto il rapporto con i tuoi capelli <em>ti influenza?</em></h2>
         <div class="options-list" id="opts-12">
           <!-- Dinamico -->
@@ -778,8 +799,8 @@
         </div>
       </div>
 
-      <!-- STEP 13: Cosa hai già provato (Checkbox) -->
-      <div class="step-card" id="step-13">
+      <!-- STEP 14: Cosa hai già provato (Checkbox) -->
+      <div class="step-card" id="step-14">
         <h2>Cosa hai <em>già provato</em> per prenderti cura della tua cute e dei tuoi capelli?</h2>
         <p class="description">Puoi selezionare più risposte.</p>
         <div class="options-list" id="opts-13">
@@ -795,8 +816,8 @@
         </div>
       </div>
 
-      <!-- STEP 14: Foto prodotti (File, Optional) -->
-      <div class="step-card" id="step-14">
+      <!-- STEP 15: Foto prodotti (File, Optional) -->
+      <div class="step-card" id="step-15">
         <h2>Se vuoi, mostraci cosa stai <em>usando</em> in questo momento</h2>
         <p class="description">Una foto può permettere a Daniela di controllare gli ingredienti dei tuoi attuali prodotti (Facoltativo).</p>
         
@@ -818,8 +839,8 @@
         </div>
       </div>
 
-      <!-- STEP 15: Risultati trattamenti (Radio) -->
-      <div class="step-card" id="step-15">
+      <!-- STEP 16: Risultati trattamenti (Radio) -->
+      <div class="step-card" id="step-16">
         <h2>Ciò che hai fatto ti ha permesso di ottenere dei <em>risultati?</em></h2>
         <div class="options-list" id="opts-15">
           <!-- Dinamico -->
@@ -834,8 +855,8 @@
         </div>
       </div>
 
-      <!-- STEP 16: Cosa vorresti fare (Checkbox) -->
-      <div class="step-card" id="step-16">
+      <!-- STEP 17: Cosa vorresti fare (Checkbox) -->
+      <div class="step-card" id="step-17">
         <h2>Cosa ti piacerebbe fare ancora che <em>non hai mai fatto?</em></h2>
         <p class="description">Puoi selezionare più risposte.</p>
         <div class="options-list" id="opts-16">
@@ -851,8 +872,8 @@
         </div>
       </div>
 
-      <!-- STEP 17: Thank you screen -->
-      <div class="step-card" id="step-17">
+      <!-- STEP 18: Thank you screen -->
+      <div class="step-card" id="step-18">
         <h2 style="text-align: center;"><em>Daniela ha qualcosa da dirti. 💛</em></h2>
         <div class="video-container">
           <iframe src="https://www.youtube.com/embed/1XyECwiU2Qs" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
@@ -965,7 +986,7 @@
     };
 
     let currentStep = 0;
-    const totalSteps = 17;
+    const totalSteps = 18;
     const answers = {};
     const checkAns = {};
     const otherTxt = {};
@@ -1245,50 +1266,55 @@
         answers["10"] = text;
       }
 
-      // Step 8: Soddisfazione cute e capelli (Scala 1-10)
+      // Step 8: Schermata Intermedia (Intro 3 numeri) - Nessuna validazione bloccante
       if (currentStep === 8) {
+        // Nessun campo richiesto, prosegue allo step 9
+      }
+
+      // Step 9: Soddisfazione cute e capelli (Scala 1-10)
+      if (currentStep === 9) {
         if (!answers["scale_satisfaction"]) {
           alert("Per favore, tocca un numero da 1 a 10 per dare il tuo voto prima di proseguire.");
           return false;
         }
       }
 
-      // Step 9: Controllo problema (Scala 1-10)
-      if (currentStep === 9) {
+      // Step 10: Controllo problema (Scala 1-10)
+      if (currentStep === 10) {
         if (!answers["scale_control"]) {
           alert("Per favore, tocca un numero da 1 a 10 per dare il tuo voto prima di proseguire.");
           return false;
         }
       }
 
-      // Step 10: Sentirsi a proprio agio (Scala 1-10)
-      if (currentStep === 10) {
+      // Step 11: Sentirsi a proprio agio (Scala 1-10)
+      if (currentStep === 11) {
         if (!answers["scale_social"]) {
           alert("Per favore, tocca un numero da 1 a 10 per dare il tuo voto prima di proseguire.");
           return false;
         }
       }
 
-      // Step 11: Situazione attuale
-      if (currentStep === 11) {
+      // Step 12: Situazione attuale
+      if (currentStep === 12) {
         // Nessun controllo bloccante
       }
 
-      // Step 12: Influenza
-      if (currentStep === 12) {
+      // Step 13: Influenza
+      if (currentStep === 13) {
         if (!answers["12"]) {
           alert("Seleziona un'opzione per continuare.");
           return false;
         }
       }
 
-      // Step 13: Cosa hai provato
-      if (currentStep === 13) {
+      // Step 14: Cosa hai provato
+      if (currentStep === 14) {
         answers["13-other"] = document.getElementById("ans-13-other").value.trim();
       }
 
-      // Step 15: Risultati trattamenti
-      if (currentStep === 15) {
+      // Step 16: Risultati trattamenti
+      if (currentStep === 16) {
         if (!answers["15"]) {
           alert("Seleziona un'opzione per continuare.");
           return false;
@@ -1308,7 +1334,7 @@
 
     // Submit a Firestore
     async function submitForm() {
-      // Ultimo controllo step 16
+      // Ultimo controllo step 17 (Cosa vorresti fare)
       answers["16-other"] = document.getElementById("ans-16-other").value.trim();
 
       const loader = document.getElementById("loader-overlay");
@@ -1373,9 +1399,9 @@
           localStorage.setItem('beautri_offline_consultations', JSON.stringify(offlineList));
         }
 
-        // Vai alla schermata finale di ringraziamento
+        // Vai alla schermata finale di ringraziamento (Step 18)
         loader.style.display = "none";
-        showStep(17);
+        showStep(18);
 
       } catch(err) {
         console.error("Errore durante l'invio:", err);
