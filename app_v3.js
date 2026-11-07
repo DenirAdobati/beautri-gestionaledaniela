@@ -653,8 +653,11 @@ window.addEventListener('unhandledrejection', function(e) {
       let maintenancePriceSedutaVal = "";
       let maintenanceSavingsVal = "";
       
-      if (typeVal === 'iniziale') {
+      if (typeVal === 'iniziale' || typeVal === 'mantenimento') {
         expiryDateVal = expiryDate ? expiryDate.value : "";
+      }
+      
+      if (typeVal === 'iniziale') {
         document.querySelectorAll('.treatment-row').forEach(row => {
           const select = row.querySelector('.treat-type-select');
           const customInput = row.querySelector('.custom-treat-input');
@@ -2568,6 +2571,7 @@ window.addEventListener('unhandledrejection', function(e) {
     const timerHours = document.getElementById('timer-hours');
     const timerMins = document.getElementById('timer-mins');
     const timerSecs = document.getElementById('timer-secs');
+    const countdownExactDate = document.getElementById('countdown-exact-date');
     const offerExpiredText = document.getElementById('offer-expired-text');
 
     const btnViewMenu = document.getElementById('btn-view-menu');
@@ -2990,6 +2994,7 @@ window.addEventListener('unhandledrejection', function(e) {
         if (cardPercorsoSection) cardPercorsoSection.style.display = 'block';
         if (cardMenuSection) cardMenuSection.style.display = 'block';
         if (cardMantenimentoSection) cardMantenimentoSection.style.display = 'none';
+        if (countdownContainer) countdownContainer.style.display = data.expiryDate ? 'block' : 'none';
         
         if (percorsoTitleText) {
           percorsoTitleText.textContent = "Il tuo Percorso Personalizzato";
@@ -3016,6 +3021,7 @@ window.addEventListener('unhandledrejection', function(e) {
           if (timerInterval) clearInterval(timerInterval);
           countdownTimer.style.display = "none";
           countdownTitleText.style.display = "none";
+          if (countdownExactDate) countdownExactDate.style.display = "none";
           
           if (!isNaN(expiryTime)) {
             const expDate = new Date(expiryTime);
@@ -3039,6 +3045,13 @@ window.addEventListener('unhandledrejection', function(e) {
           timerHours.textContent = String(hours).padStart(2, '0');
           timerMins.textContent = String(minutes).padStart(2, '0');
           timerSecs.textContent = String(seconds).padStart(2, '0');
+
+          if (!isNaN(expiryTime) && countdownExactDate) {
+            const expDate = new Date(expiryTime);
+            const formattedExp = expDate.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            countdownExactDate.innerHTML = `<span style="opacity: 0.85;">Offerta valida fino al:</span> <strong>${formattedExp}</strong>`;
+            countdownExactDate.style.display = "block";
+          }
         }
       };
 
