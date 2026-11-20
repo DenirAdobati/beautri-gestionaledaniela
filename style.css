@@ -186,7 +186,7 @@ body {
   background: var(--card);
   border-radius: var(--radius-sm);
   border: 1.5px solid var(--border);
-  border-left: 5px solid var(--red);
+  border-left: 5px solid #9CA3AF;
   padding: 16px 18px;
   display: flex;
   justify-content: space-between;
@@ -200,8 +200,8 @@ body {
 .notif-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-hover);
-  border-color: var(--gold);
-  border-left-color: var(--red);
+  border-color: #9CA3AF;
+  border-left-color: #6B7280;
 }
 
 .notif-card-body {
@@ -233,9 +233,9 @@ body {
 }
 
 .notif-type-badge.mantenimento {
-  background: rgba(99, 102, 241, 0.12);
-  color: #3730A3;
-  border: 1px solid rgba(99, 102, 241, 0.3);
+  background: var(--red-light, #FEE2E2);
+  color: #B91C1C;
+  border: 1px solid rgba(239, 68, 68, 0.45);
 }
 
 .notif-message {

@@ -1160,6 +1160,13 @@ window.addEventListener('unhandledrejection', function(e) {
 
         if (!expiryDayStart) return;
 
+        // Escludi dalla sezione notifiche tutte le offerte scadute il 18/11/2026 o precedentemente
+        // (già gestite manualmente da Daniela), senza modificare alcun dato del cliente
+        const manualCutoffDate = new Date(2026, 10, 18);
+        if (expiryDayStart.getTime() <= manualCutoffDate.getTime()) {
+          return;
+        }
+
         // La notifica scatta il giorno dopo la scadenza dell'offerta (todayStart > expiryDayStart)
         if (todayStart.getTime() > expiryDayStart.getTime()) {
           activeNotifs.push({
