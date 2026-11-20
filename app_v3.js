@@ -129,6 +129,11 @@ window.addEventListener('unhandledrejection', function(e) {
     const tabNuova = document.getElementById('tab-nuova');
     const tabStorico = document.getElementById('tab-storico');
     const tabSchedaInterna = document.getElementById('tab-scheda-interna');
+    const tabNotifiche = document.getElementById('tab-notifiche');
+    const notifBadge = document.getElementById('notif-badge');
+    const notifSectionCountBadge = document.getElementById('notif-section-count-badge');
+    const notificationsList = document.getElementById('notifications-list');
+    let cachedHistoryItems = [];
     const pdfModal = document.getElementById('pdf-modal');
     const pdfModalIframe = document.getElementById('pdf-modal-iframe');
     const pdfModalClose = document.getElementById('pdf-modal-close');
@@ -213,6 +218,7 @@ window.addEventListener('unhandledrejection', function(e) {
       auth.signInAnonymously()
         .then(() => {
           console.log("Autenticazione anonima completata con successo.");
+          loadClientsHistory();
         })
         .catch(error => {
           console.error("Autenticazione anonima fallita. Verifica che sia abilitata nella console di Firebase:", error);
@@ -269,6 +275,7 @@ window.addEventListener('unhandledrejection', function(e) {
         tabNuova.classList.remove('active');
         tabStorico.classList.remove('active');
         if (tabSchedaInterna) tabSchedaInterna.classList.remove('active');
+        if (tabNotifiche) tabNotifiche.classList.remove('active');
 
         if (tabId === 'tab-nuova') {
           tabNuova.classList.add('active');
@@ -278,6 +285,9 @@ window.addEventListener('unhandledrejection', function(e) {
         } else if (tabId === 'tab-storico') {
           tabStorico.classList.add('active');
           loadClientsHistory(); // Ricarica lo storico ogni volta che si cambia tab
+        } else if (tabId === 'tab-notifiche') {
+          if (tabNotifiche) tabNotifiche.classList.add('active');
+          loadClientsHistory(); // Aggiorna anche le notifiche
         }
       });
     });
@@ -858,6 +868,7 @@ window.addEventListener('unhandledrejection', function(e) {
 
           // Reset del form immediato per prepararlo a una nuova inserzione
           resetFormUI();
+          loadClientsHistory();
         }
 
       } catch (err) {
@@ -1073,6 +1084,270 @@ window.addEventListener('unhandledrejection', function(e) {
       }).join(' ');
     }
 
+    // ── GESTIONE NOTIFICHE SCADENZA OFFERTE ──
+    function getDismissedNotificationsMap() {
+      try {
+        return JSON.parse(localStorage.getItem('beautri_dismissed_notifications') || '{}');
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function markNotificationDismissedLocal(docId) {
+      const map = getDismissedNotificationsMap();
+      map[docId] = true;
+      localStorage.setItem('beautri_dismissed_notifications', JSON.stringify(map));
+    }
+
+    function computeActiveNotifications(items) {
+      const dismissedMap = getDismissedNotificationsMap();
+      const now = new Date();
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const activeNotifs = [];
+
+      items.forEach(item => {
+        if (!item || !item.id) return;
+        // Escludi schede interne, questionari pre-consulenza e segnaposto cartelle
+        if (item.recordType === 'scheda_interna' || item.recordType === 'questionario_pre' || item.recordType === 'folder_placeholder') {
+          return;
+        }
+        // Considera solo Consulenza Iniziale (Percorso Intensivo) e Percorso di Mantenimento
+        const type = item.type || 'iniziale';
+        if (type !== 'iniziale' && type !== 'mantenimento') {
+          return;
+        }
+        // Escludi se già spuntata/rimossa da Daniela
+        if (item.notifDismissed === true || dismissedMap[item.id] === true) {
+          return;
+        }
+
+        // Durata offerta: 2 giorni per Consulenza Iniziale, 10 giorni per Percorso di Mantenimento
+        const defaultDurationDays = (type === 'mantenimento') ? 10 : 2;
+
+        let createdDayStart = null;
+        if (item.createdAt) {
+          const cDate = item.createdAt.seconds ? new Date(item.createdAt.seconds * 1000) : new Date(item.createdAt);
+          if (!isNaN(cDate.getTime())) {
+            createdDayStart = new Date(cDate.getFullYear(), cDate.getMonth(), cDate.getDate());
+          }
+        }
+
+        let expiryDayStart = null;
+        if (item.expiryDate && typeof item.expiryDate === 'string') {
+          const parts = item.expiryDate.split('-').map(Number);
+          if (parts.length === 3 && !isNaN(parts[0]) && !isNaN(parts[1]) && !isNaN(parts[2])) {
+            const parsedExp = new Date(parts[0], parts[1] - 1, parts[2]);
+            if (!isNaN(parsedExp.getTime())) {
+              // Se la data nel form era rimasta al default generico di +30 giorni dalla creazione,
+              // calcola la scadenza reale in base alla durata prevista (2 giorni iniziale, 10 giorni mantenimento)
+              if (createdDayStart) {
+                const diffDaysFromCreated = Math.round((parsedExp.getTime() - createdDayStart.getTime()) / 86400000);
+                if (diffDaysFromCreated === 30) {
+                  expiryDayStart = new Date(createdDayStart.getFullYear(), createdDayStart.getMonth(), createdDayStart.getDate() + defaultDurationDays);
+                } else {
+                  expiryDayStart = parsedExp;
+                }
+              } else {
+                expiryDayStart = parsedExp;
+              }
+            }
+          }
+        }
+
+        if (!expiryDayStart && createdDayStart) {
+          expiryDayStart = new Date(createdDayStart.getFullYear(), createdDayStart.getMonth(), createdDayStart.getDate() + defaultDurationDays);
+        }
+
+        if (!expiryDayStart) return;
+
+        // La notifica scatta il giorno dopo la scadenza dell'offerta (todayStart > expiryDayStart)
+        if (todayStart.getTime() > expiryDayStart.getTime()) {
+          activeNotifs.push({
+            client: item,
+            type: type,
+            expiryDayStart: expiryDayStart,
+            createdDayStart: createdDayStart
+          });
+        }
+      });
+
+      // Ordina dalla scadenza più recente alla più vecchia
+      activeNotifs.sort((a, b) => b.expiryDayStart.getTime() - a.expiryDayStart.getTime());
+      return activeNotifs;
+    }
+
+    function updateNotificationBadges(count) {
+      if (notifBadge) {
+        if (count > 0) {
+          notifBadge.textContent = String(count);
+          notifBadge.style.display = 'inline-flex';
+        } else {
+          notifBadge.textContent = '0';
+          notifBadge.style.display = 'none';
+        }
+      }
+      if (notifSectionCountBadge) {
+        if (count > 0) {
+          notifSectionCountBadge.textContent = count === 1 ? '1 notifica attiva' : `${count} notifiche attive`;
+          notifSectionCountBadge.style.display = 'inline-block';
+        } else {
+          notifSectionCountBadge.style.display = 'none';
+        }
+      }
+    }
+
+    function openClientFolderFromNotification(client) {
+      if (!client) return;
+      const targetKey = getCanonicalNameKey(client.name || 'Cliente Senza Nome');
+
+      // 1. Passa alla tab Storico Clienti
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      const btnTabStorico = document.getElementById('btn-tab-storico');
+      if (btnTabStorico) btnTabStorico.classList.add('active');
+
+      tabNuova.classList.remove('active');
+      if (tabSchedaInterna) tabSchedaInterna.classList.remove('active');
+      if (tabNotifiche) tabNotifiche.classList.remove('active');
+      tabStorico.classList.add('active');
+
+      // 2. Ripristina eventuale filtro di ricerca e renderizza la lista completa
+      if (searchInput && searchInput.value) {
+        searchInput.value = '';
+      }
+      if (cachedHistoryItems && cachedHistoryItems.length > 0) {
+        renderClientsList(cachedHistoryItems);
+      }
+
+      // 3. Trova la cartella del cliente, aprila e scorri fino ad essa
+      setTimeout(() => {
+        const allFolders = clientsList.querySelectorAll('.client-folder-details');
+        let targetFolder = null;
+        allFolders.forEach(folderEl => {
+          if (folderEl.getAttribute('data-folder-key') === targetKey) {
+            targetFolder = folderEl;
+          }
+        });
+
+        if (targetFolder) {
+          targetFolder.open = true;
+          targetFolder.classList.add('folder-highlight-pulse');
+          targetFolder.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          setTimeout(() => {
+            targetFolder.classList.remove('folder-highlight-pulse');
+          }, 3000);
+        }
+      }, 60);
+    }
+
+    async function dismissNotification(clientId) {
+      markNotificationDismissedLocal(clientId);
+
+      // Aggiorna lo stato in memoria
+      cachedHistoryItems.forEach(item => {
+        if (item.id === clientId) {
+          item.notifDismissed = true;
+        }
+      });
+
+      // Rirenderizza subito le notifiche e il badge rosso
+      renderNotificationsList(cachedHistoryItems);
+
+      // Salva anche su Firestore o localStorage senza alterare gli altri campi del documento
+      try {
+        if (firebaseActive) {
+          if (auth && !auth.currentUser) {
+            await auth.signInAnonymously();
+          }
+          await db.collection('tricologia_consultations').doc(clientId).set({
+            notifDismissed: true
+          }, { merge: true });
+        } else {
+          let localData = JSON.parse(localStorage.getItem('beautri_local_consultations') || '[]');
+          localData = localData.map(item => {
+            if (item.id === clientId) {
+              return { ...item, notifDismissed: true };
+            }
+            return item;
+          });
+          localStorage.setItem('beautri_local_consultations', JSON.stringify(localData));
+        }
+      } catch (err) {
+        console.warn("Impossibile sincronizzare rimozione notifica sul cloud:", err);
+      }
+    }
+
+    function renderNotificationsList(items) {
+      if (!notificationsList) return;
+      const activeNotifs = computeActiveNotifications(items);
+      updateNotificationBadges(activeNotifs.length);
+
+      if (activeNotifs.length === 0) {
+        notificationsList.innerHTML = `
+          <div class="q-card no-clients" style="padding: 40px 20px; text-align: center;">
+            <i data-lucide="check-circle-2" style="width: 36px; height: 36px; color: #22C55E; margin-bottom: 10px;"></i>
+            <div style="font-size: 16px; font-weight: 700; color: var(--dark); margin-bottom: 4px;">Nessuna notifica in sospeso</div>
+            <div style="font-size: 13px; color: var(--gray);">Tutte le offerte scadute sono state gestite.</div>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      notificationsList.innerHTML = "";
+
+      activeNotifs.forEach(notif => {
+        const client = notif.client;
+        const displayName = formatNameTitleCase(client.name || 'Cliente Senza Nome');
+        const isMaint = notif.type === 'mantenimento';
+
+        const expDateStr = notif.expiryDayStart.toLocaleDateString('it-IT', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        });
+
+        const badgeClass = isMaint ? 'mantenimento' : 'iniziale';
+        const badgeLabel = isMaint ? 'Percorso di Mantenimento (10 giorni)' : 'Consulenza Iniziale • Percorso Intensivo (2 giorni)';
+
+        const messageHtml = isMaint
+          ? `Ieri è scaduta l'offerta di <strong>${displayName}</strong> per il percorso di mantenimento`
+          : `Ieri è scaduta l'offerta per il percorso intensivo di <strong>${displayName}</strong>`;
+
+        const card = document.createElement('div');
+        card.className = 'notif-card';
+        card.innerHTML = `
+          <div class="notif-card-body" title="Clicca per aprire la cartella di ${displayName}">
+            <span class="notif-type-badge ${badgeClass}">${badgeLabel}</span>
+            <div class="notif-message">${messageHtml}</div>
+            <div class="notif-meta">
+              <span>Scadenza offerta: ${expDateStr}</span>
+              <span>•</span>
+              <span class="notif-open-folder-hint">
+                <i data-lucide="folder-open" style="width: 13px; height: 13px;"></i>
+                Apri cartella cliente →
+              </span>
+            </div>
+          </div>
+          <button type="button" class="notif-check-btn" title="Segna come già contattato e rimuovi notifica" aria-label="Rimuovi notifica">
+            <i data-lucide="check" style="width: 22px; height: 22px; stroke-width: 3;"></i>
+          </button>
+        `;
+
+        card.querySelector('.notif-card-body').onclick = () => {
+          openClientFolderFromNotification(client);
+        };
+
+        card.querySelector('.notif-check-btn').onclick = (e) => {
+          e.stopPropagation();
+          dismissNotification(client.id);
+        };
+
+        notificationsList.appendChild(card);
+      });
+
+      lucide.createIcons();
+    }
+
     // 7. Storico Clienti (Caricamento e Filtro)
     async function loadClientsHistory() {
       clientsList.innerHTML = '<div class="no-clients">Caricamento dello storico...</div>';
@@ -1081,6 +1356,9 @@ window.addEventListener('unhandledrejection', function(e) {
         let items = [];
 
         if (firebaseActive) {
+          if (auth && !auth.currentUser) {
+            await auth.signInAnonymously();
+          }
           const snapshot = await db.collection('tricologia_consultations').orderBy('createdAt', 'desc').get();
           snapshot.forEach(doc => {
             const data = doc.data();
@@ -1095,7 +1373,9 @@ window.addEventListener('unhandledrejection', function(e) {
           items.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         }
 
+        cachedHistoryItems = items;
         renderClientsList(items);
+        renderNotificationsList(items);
 
         // Associa ricerca in tempo reale (supporta qualsiasi ordine delle parole)
         searchInput.oninput = function() {
@@ -1270,6 +1550,7 @@ window.addEventListener('unhandledrejection', function(e) {
       folders.forEach(folder => {
         const folderDetails = document.createElement('details');
         folderDetails.className = 'client-folder-details';
+        folderDetails.setAttribute('data-folder-key', getCanonicalNameKey(folder.displayName));
 
         // Filtra i placeholder per contare i soli documenti reali
         const realDocs = folder.documents.filter(d => d.recordType !== 'folder_placeholder');
@@ -1481,6 +1762,8 @@ window.addEventListener('unhandledrejection', function(e) {
                 }
                 
                 card.remove();
+                cachedHistoryItems = cachedHistoryItems.filter(item => item.id !== client.id);
+                renderNotificationsList(cachedHistoryItems);
                 showToast("Eliminato", "Elemento rimosso con successo.", "success", 1800);
                 
                 // Aggiorna contatore
